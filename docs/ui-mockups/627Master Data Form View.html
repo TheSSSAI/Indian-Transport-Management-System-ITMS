@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organism: Master Data Form View</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Component: Master Data Form View */
+    /* This CSS block combines styles for the organism and its molecular/atomic dependencies. */
+
+    /* --- DESIGN TOKENS --- */
+    :root {
+      /* Colors */
+      --color-primary-50: #EFF6FF; --color-primary-100: #DBEAFE; --color-primary-500: #3B82F6; --color-primary-600: #2563EB; --color-primary-700: #1D4ED8; --color-primary-800: #1E40AF;
+      --color-neutral-white: #FFFFFF; --color-neutral-50: #F9FAFB; --color-neutral-100: #F3F4F6; --color-neutral-200: #E5E7EB; --color-neutral-300: #D1D5DB; --color-neutral-500: #6B7280; --color-neutral-700: #374151; --color-neutral-900: #111827;
+      --color-semantic-success: #16A34A; --color-semantic-error: #DC2626;
+
+      /* Typography */
+      --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-size-sm: 12px; --font-size-base: 14px; --font-size-lg: 16px; --font-size-xl: 24px;
+      --font-weight-medium: 500; --font-weight-semibold: 600; --font-weight-bold: 700;
+
+      /* Spacing */
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-8: 48px;
+
+      /* Borders & Shadows */
+      --border-radius-md: 6px; --border-radius-lg: 8px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-focus-ring: 0 0 0 3px var(--color-primary-100);
+    }
+
+    /* --- BASE & LAYOUT --- */
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font-family-primary); font-size: var(--font-size-base); color: var(--color-neutral-900); background-color: var(--color-neutral-100); }
+    .showcase { padding: var(--space-6); }
+    .showcase-title { font-size: 1.5rem; margin: var(--space-6) 0; font-weight: var(--font-weight-bold); color: var(--color-neutral-900); }
+
+    /* --- ORGANISM: Master Data Form View --- */
+    .o_form_view {
+      display: flex;
+      flex-direction: column;
+    }
+    .o_form_sheet_bg {
+      padding: 0; /* No extra padding in showcase */
+    }
+    .o_form_sheet {
+      max-width: 1080px;
+      margin: 0 auto;
+      background-color: var(--color-neutral-white);
+      border: 1px solid var(--color-neutral-200);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* --- MOLECULAR & ATOMIC DEPENDENCIES --- */
+
+    /* Form Header with Statusbar */
+    .form-header { background-color: var(--color-neutral-50); padding: var(--space-3) var(--space-5); border-bottom: 1px solid var(--color-neutral-200); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-4); border-top-left-radius: var(--border-radius-lg); border-top-right-radius: var(--border-radius-lg); }
+    .form-header__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--space-2) var(--space-4); font-size: var(--font-size-base); font-weight: var(--font-weight-medium); border-radius: var(--border-radius-md); cursor: pointer; border: 1px solid transparent; transition: all 0.2s ease; }
+    .btn--primary { background-color: var(--color-primary-600); color: var(--color-neutral-white); border-color: var(--color-primary-600); }
+    .btn--primary:hover { background-color: var(--color-primary-700); }
+    .btn--secondary { background-color: var(--color-neutral-white); color: var(--color-neutral-700); border-color: var(--color-neutral-300); box-shadow: var(--shadow-sm); }
+    .btn--secondary:hover { background-color: var(--color-neutral-100); }
+    .btn:focus-visible { outline: 2px solid var(--color-primary-500); outline-offset: 2px; }
+    .statusbar { display: flex; flex-wrap: nowrap; }
+    .statusbar__item { background-color: var(--color-neutral-100); position: relative; display: flex; align-items: center; padding: var(--space-2) var(--space-3) var(--space-2) 20px; margin-right: -10px; font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); text-transform: uppercase; color: var(--color-neutral-500); }
+    .statusbar__item.is-current { background-color: var(--color-neutral-300); color: var(--color-neutral-900); }
+
+    /* Smart Button Box */
+    .smart-button-box { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4); }
+    .smart-button { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3); border-radius: var(--border-radius-md); text-decoration: none; color: inherit; transition: background-color 0.2s; }
+    .smart-button:hover { background-color: var(--color-neutral-100); }
+    .smart-button__icon svg { width: 20px; height: 20px; color: var(--color-neutral-500); }
+    .smart-button__content { display: flex; flex-direction: column; }
+    .smart-button__count { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); }
+    .smart-button__label { font-size: var(--font-size-sm); color: var(--color-neutral-500); }
+
+    /* Form Content */
+    .o_sheet_content { padding: var(--space-5); }
+    .o_form_title { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); border: none; padding: 0; width: 100%; margin-bottom: var(--space-4); background: transparent; }
+    .o_form_title:focus-visible { outline: none; }
+    .o_group { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5); }
+    .o_field_group { display: flex; flex-direction: column; gap: var(--space-1); }
+    .o_field_group label { font-weight: var(--font-weight-medium); color: var(--color-neutral-700); font-size: var(--font-size-base); }
+    .o_field_group label.is-required::after { content: ' *'; color: var(--color-semantic-error); }
+    .field-widget, select { width: 100%; padding: var(--space-2) var(--space-3); font-size: var(--font-size-base); border: 1px solid var(--color-neutral-300); border-radius: var(--border-radius-md); }
+    .field-widget:focus-visible, select:focus-visible { border-color: var(--color-primary-500); outline: 2px solid var(--color-primary-500); outline-offset: 1px; }
+    .readonly-value { padding: var(--space-2) 0; color: var(--color-neutral-900); min-height: 38px; display: flex; align-items: center; }
+    .readonly-value--link { color: var(--color-primary-700); text-decoration: none; font-weight: var(--font-weight-medium); }
+    .readonly-value--link:hover { text-decoration: underline; }
+
+    /* State control for mockup */
+    .o_form_view--edit .readonly-value { display: none; }
+    .o_form_view--edit .o_form_title { border-bottom: 1px solid var(--color-neutral-200); }
+    .o_form_view--readonly .field-widget, .o_form_view--readonly select { display: none; }
+    .o_form_view--readonly .o_form_title { pointer-events: none; }
+
+    /* Notebook Tabs */
+    .notebook { width: 100%; margin-top: var(--space-6); }
+    .notebook__tabs { display: flex; border-bottom: 1px solid var(--color-neutral-200); }
+    .notebook__tab { padding: var(--space-3) var(--space-4); font-size: var(--font-size-base); font-weight: var(--font-weight-medium); color: var(--color-neutral-500); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px; }
+    .notebook__tab.is-active { color: var(--color-primary-700); border-bottom-color: var(--color-primary-700); font-weight: var(--font-weight-semibold); }
+    .notebook__panel { padding: var(--space-5) 0; }
+
+    /* Chatter/Log Area */
+    .chatter { background-color: var(--color-neutral-50); border-top: 1px solid var(--color-neutral-200); margin: var(--space-6) calc(-1 * var(--space-5)) calc(-1 * var(--space-5)); padding: var(--space-4); border-bottom-left-radius: var(--border-radius-lg); border-bottom-right-radius: var(--border-radius-lg); }
+    .chatter p { color: var(--color-neutral-500); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .o_group { grid-template-columns: 1fr; }
+      .form-header { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+
+<main class="showcase">
+  <h1 class="showcase-title">Organism: Master Data Form View (Vehicle Variant)</h1>
+
+  <!-- Read-Only State -->
+  <h2 class="showcase-title">Read-Only State</h2>
+  <div class="o_form_view o_form_view--readonly">
+    <div class="o_form_sheet">
+      <header class="form-header">
+        <div class="form-header__actions">
+          <button class="btn btn--primary">Edit</button>
+          <button class="btn btn--secondary">Create</button>
+        </div>
+        <nav class="statusbar" aria-label="Status workflow">
+          <div class="statusbar__item statusbar__item--readonly is-current" aria-current="step">Active</div>
+          <div class="statusbar__item statusbar__item--readonly">Inactive</div>
+        </nav>
+      </header>
+      <div class="o_sheet_content">
+        <div class="smart-button-box">
+          <a href="#" class="smart-button">
+            <span class="smart-button__icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-1.125 0-2.062.912-2.062 2.031v7.618C2.813 18.401 3.75 19.5 4.875 19.5h14.25c1.125 0 2.063-1.099 2.063-2.282V8.25" /></svg>
+            </span>
+            <span class="smart-button__content">
+              <span class="smart-button__count">12</span>
+              <span class="smart-button__label">Trips</span>
+            </span>
+          </a>
+          <a href="#" class="smart-button">
+            <span class="smart-button__icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V6.75m0 0h1.5" /></svg>
+            </span>
+            <span class="smart-button__content">
+              <span class="smart-button__count">3</span>
+              <span class="smart-button__label">Expenses</span>
+            </span>
+          </a>
+        </div>
+        <input class="o_form_title" value="MH12AB1234">
+        <div class="o_group">
+          <div class="o_field_group">
+            <label for="v-model-ro">Model</label>
+            <div id="v-model-ro" class="readonly-value">Tata Signa 4225.T</div>
+          </div>
+          <div class="o_field_group">
+            <label for="v-capacity-ro">Capacity (Tons)</label>
+            <div id="v-capacity-ro" class="readonly-value">25</div>
+          </div>
+          <div class="o_field_group">
+            <label for="v-owner-ro">Ownership Type</label>
+            <div id="v-owner-ro" class="readonly-value">Company-Owned</div>
+          </div>
+          <div class="o_field_group">
+            <label for="v-fuel-ro">Fuel Type</label>
+            <div id="v-fuel-ro" class="readonly-value">Diesel</div>
+          </div>
+        </div>
+        <div class="notebook">
+          <div class="notebook__tabs" role="tablist">
+            <button class="notebook__tab is-active" role="tab">Compliance</button>
+            <button class="notebook__tab" role="tab">Service History</button>
+          </div>
+          <div class="notebook__panel">Content for Compliance Documents...</div>
+        </div>
+      </div>
+      <div class="chatter">
+        <p>Chatter and audit trail would appear here...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit/New State -->
+  <h2 class="showcase-title">Edit / New State</h2>
+  <div class="o_form_view o_form_view--edit">
+    <div class="o_form_sheet">
+      <header class="form-header">
+        <div class="form-header__actions">
+          <button class="btn btn--primary">Save</button>
+          <button class="btn btn--secondary">Discard</button>
+        </div>
+        <!-- Statusbar might be hidden or simple in 'new' state -->
+      </header>
+      <div class="o_sheet_content">
+        <input class="o_form_title" placeholder="e.g., MH12AB1234">
+        <div class="o_group">
+          <div class="o_field_group">
+            <label class="is-required" for="v-model-edit">Model</label>
+            <input id="v-model-edit" type="text" class="field-widget" placeholder="e.g., Tata Signa 4225.T">
+          </div>
+          <div class="o_field_group">
+            <label class="is-required" for="v-capacity-edit">Capacity (Tons)</label>
+            <input id="v-capacity-edit" type="number" class="field-widget" placeholder="e.g., 25">
+          </div>
+          <div class="o_field_group">
+            <label class="is-required" for="v-owner-edit">Ownership Type</label>
+            <select id="v-owner-edit">
+              <option>Company-Owned</option>
+              <option>Outsourced</option>
+            </select>
+          </div>
+          <div class="o_field_group">
+            <label class="is-required" for="v-fuel-edit">Fuel Type</label>
+            <select id="v-fuel-edit">
+              <option>Diesel</option>
+              <option>Petrol</option>
+              <option>CNG</option>
+              <option>Electric</option>
+            </select>
+          </div>
+        </div>
+        <div class="notebook">
+          <div class="notebook__tabs" role="tablist">
+            <button class="notebook__tab is-active" role="tab">Compliance</button>
+            <button class="notebook__tab" role="tab">Service History</button>
+          </div>
+          <div class="notebook__panel">Editable content for Compliance Documents...</div>
+        </div>
+      </div>
+      <div class="chatter">
+        <p>Chatter and composer for new messages...</p>
+      </div>
+    </div>
+  </div>
+</main>
+	<div> <h2> Component Variations</h2>
+      <div>
+        <h3>Variant Name : "Vehicle"<h3>
+		<!--description--><normal> The form view for creating or editing a vehicle record. It includes fields specific to a vehicle such as Truck Number, Model, Capacity, and Ownership Status. </normal>
+		<!-- vrient 1 html -->
+              
+		
+      <div>
+	 </div>
+      <div>
+        <h3>Variant Name : "Driver (inherited)"<h3>
+		<!--description--><normal> This variant extends the base Odoo `hr.employee` form. It adds a 'TMS' tab or section containing driver-specific fields like 'License Number', 'License Expiry Date', and a toggle to mark the employee as a driver. The core employee details (Name, Contact) are inherited. </normal>
+		<!-- vrient 1 html -->
+              
+		
+      <div>
+	 </div>
+      <div>
+        <h3>Variant Name : "Customer (inherited)"<h3>
+		<!--description--><normal> This variant extends the base Odoo `res.partner` form. It adds TMS-specific fields or tabs, such as a list of customer-specific 'Rate Agreements' and potentially multiple 'Shipping Locations'. The core customer details (Name, Address, GSTIN) are inherited. </normal>
+		<!-- vrient 1 html -->
+              
+		
+      <div>
+	 </div>
+      <div>
+        <h3>Variant Name : "Route"<h3>
+		<!--description--><normal> A simpler form for managing pre-defined routes. It contains fields for 'Route Name', 'Source Location', 'Destination Location', and 'Standard Distance'. This form typically does not require complex tabs or a chatter area. </normal>
+		<!-- vrient 1 html -->
+              
+		
+      <div>
+	 </div>
+      <div>
+        <h3>Variant Name : "Material"<h3>
+		<!--description--><normal> A very simple form for managing material types. It would contain a 'Material Name' and possibly a text field for 'Special Handling Instructions'. This is one of the most basic master data forms. </normal>
+		<!-- vrient 1 html -->
+              
+		
+      <div>
+	 </div>    
+	
+	</body>
+</html>

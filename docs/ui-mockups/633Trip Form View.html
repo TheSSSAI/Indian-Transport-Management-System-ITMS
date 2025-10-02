@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Form View</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- DESIGN TOKENS --- */
+        :root {
+            /* Colors */
+            --color-primary-50: #EFF6FF; --color-primary-100: #DBEAFE; --color-primary-200: #BFDBFE; --color-primary-300: #93C5FD; --color-primary-400: #60A5FA; --color-primary-500: #3B82F6; --color-primary-600: #2563EB; --color-primary-700: #1D4ED8; --color-primary-800: #1E40AF; --color-primary-900: #1E3A8A;
+            --color-neutral-white: #FFFFFF; --color-neutral-50: #F9FAFB; --color-neutral-100: #F3F4F6; --color-neutral-200: #E5E7EB; --color-neutral-300: #D1D5DB; --color-neutral-500: #6B7280; --color-neutral-700: #374151; --color-neutral-900: #111827;
+            --color-semantic-success: #16A34A; --color-semantic-success-dark: #15803d; --color-semantic-warning: #F59E0B; --color-semantic-error: #DC2626; --color-semantic-info: #0284C7;
+            /* Typography */
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-size-sm: 12px; --font-size-base: 14px; --font-size-lg: 16px; --font-size-xl: 20px; --font-size-2xl: 24px;
+            --font-weight-medium: 500; --font-weight-semibold: 600; --font-weight-bold: 700;
+            /* Spacing */
+            --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px;
+            /* Borders & Shadows */
+            --border-radius-md: 6px; --border-radius-lg: 8px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-focus-ring: 0 0 0 3px var(--color-primary-200);
+        }
+        /* --- BASE & ORGANISM LAYOUT STYLES --- */
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; font-family: var(--font-family-primary); font-size: var(--font-size-base); color: var(--color-neutral-900); background-color: var(--color-neutral-100); }
+        .o_form_view { display: flex; flex-direction: column; height: 100vh; }
+        .o_form_sheet_bg { flex-grow: 1; padding: var(--space-4); overflow-y: auto; }
+        .o_form_sheet { max-width: 1080px; margin: 0 auto; background-color: var(--color-neutral-white); border: 1px solid var(--color-neutral-200); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); }
+        .o_form_sheet > header { padding: var(--space-4) var(--space-5); }
+        .o_form_sheet h1 { font-size: var(--font-size-2xl); font-weight: var(--font-weight-semibold); margin: 0 0 var(--space-4) 0; color: var(--color-neutral-700); }
+        .o_group { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); padding: 0 var(--space-5); }
+        .o_group_col { display: flex; flex-direction: column; gap: var(--space-5); }
+
+        /* --- ATOMIC: ACTION BUTTON --- */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--space-2) var(--space-4); font-size: var(--font-size-base); font-weight: var(--font-weight-medium); border-radius: var(--border-radius-md); text-decoration: none; cursor: pointer; border: 1px solid transparent; transition: all 0.2s ease-in-out; min-height: 38px; }
+        .btn--primary { background-color: var(--color-primary-600); color: var(--color-white); border-color: var(--color-primary-600); }
+        .btn--primary:hover { background-color: var(--color-primary-700); border-color: var(--color-primary-700); }
+        .btn--secondary { background-color: var(--color-white); color: var(--color-neutral-700); border-color: var(--color-neutral-300); box-shadow: var(--shadow-sm); }
+        .btn--secondary:hover { background-color: var(--color-neutral-100); }
+        .btn--state-transition { background-color: var(--color-semantic-success); color: var(--color-white); border-color: var(--color-semantic-success); }
+        .btn--state-transition:hover { background-color: var(--color-semantic-success-dark); border-color: var(--color-semantic-success-dark); }
+        .btn:focus-visible { outline: 2px solid var(--color-primary-500); outline-offset: 2px; }
+
+        /* --- MOLECULAR: FORM HEADER --- */
+        .form-header { background-color: var(--color-neutral-50); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-neutral-200); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-4); }
+        .form-header__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+        .form-header__statusbar { display: flex; flex-wrap: nowrap; overflow-x: auto; }
+        .statusbar__item { position: relative; display: flex; align-items: center; padding: var(--space-2) var(--space-3) var(--space-2) 20px; margin-right: -10px; font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); text-transform: uppercase; white-space: nowrap; border: none; background-color: var(--color-white); color: var(--color-neutral-500); cursor: pointer; border-top: 1px solid var(--color-neutral-300); border-bottom: 1px solid var(--color-neutral-300); }
+        .statusbar__item::before, .statusbar__item::after { content: ''; position: absolute; top: 0; height: 100%; width: 15px; background-color: inherit; transform: skewX(-20deg); border-top: 1px solid var(--color-neutral-300); border-bottom: 1px solid var(--color-neutral-300); }
+        .statusbar__item::before { left: 0; }
+        .statusbar__item::after { right: -8px; border-right: 1px solid var(--color-neutral-300); z-index: 1; }
+        .statusbar__item:hover { background-color: var(--color-neutral-100); }
+        .statusbar__item.is-current { background-color: var(--color-primary-600); color: var(--color-white); z-index: 2; }
+        .statusbar__item.is-current::before, .statusbar__item.is-current::after { border-color: var(--color-primary-700); }
+        .statusbar__item:first-child { padding-left: var(--space-4); border-left: 1px solid var(--color-neutral-300); border-top-left-radius: var(--border-radius-md); border-bottom-left-radius: var(--border-radius-md); }
+        .statusbar__item:first-child::before { display: none; }
+
+        /* --- MOLECULAR: SMART BUTTON BOX --- */
+        .smart-button-box { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+        .smart-button { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); background-color: var(--color-neutral-white); border: 1px solid var(--color-neutral-200); border-radius: var(--border-radius-lg); text-decoration: none; color: inherit; transition: all 0.2s ease-in-out; box-shadow: var(--shadow-sm); }
+        .smart-button:hover { background-color: var(--color-primary-50); transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .smart-button__icon svg { width: 24px; height: 24px; color: var(--color-primary-600); }
+        .smart-button__content { display: flex; flex-direction: column; line-height: 1.3; }
+        .smart-button__count { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); }
+        .smart-button__label { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-neutral-500); }
+
+        /* --- MOLECULAR: NOTEBOOK TABS --- */
+        .notebook { width: 100%; padding: 0 var(--space-5); margin-top: var(--space-6); }
+        .notebook__tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--color-neutral-200); }
+        .notebook__tab { padding: var(--space-3) var(--space-4); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-neutral-500); background-color: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px; }
+        .notebook__tab:hover { color: var(--color-neutral-900); }
+        .notebook__tab.is-active { color: var(--color-primary-700); border-bottom-color: var(--color-primary-700); font-weight: var(--font-weight-semibold); }
+        .notebook__panel { padding: var(--space-5) 0; }
+        .notebook__panel.is-hidden { display: none; }
+
+        /* --- MOLECULAR: CHATTER --- */
+        .chatter { background-color: var(--color-neutral-50); border-top: 1px solid var(--color-neutral-200); padding: var(--space-4); text-align: center; color: var(--color-neutral-500); font-style: italic; }
+
+        /* --- ORGANISM-SPECIFIC & FIELD STYLES --- */
+        .field-group { display: flex; flex-direction: column; }
+        .field-group label { display: block; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-neutral-500); margin-bottom: var(--space-1); text-transform: uppercase; }
+        .field-group .field-value { font-weight: var(--font-weight-medium); color: var(--color-primary-700); text-decoration: none; display: block; }
+        .field-group .field-value:hover { text-decoration: underline; }
+        .field-group .field-value--text { font-weight: normal; color: var(--color-neutral-900); }
+        .field-group .field-value--money { font-weight: var(--font-weight-semibold); font-size: var(--font-size-lg); }
+
+        /* --- RESPONSIVE ADAPTATIONS --- */
+        @media (max-width: 768px) {
+            .o_group { grid-template-columns: 1fr; }
+            .form-header { flex-direction: column; align-items: stretch; }
+            .o_form_sheet_bg { padding: var(--space-2); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="o_form_view">
+    <!-- MOLECULE: FORM HEADER WITH STATUSBAR -->
+    <header class="form-header">
+        <div class="form-header__actions">
+            <button class="btn btn--primary">Edit</button>
+            <button class="btn btn--secondary">Create</button>
+            <!-- State-specific buttons would appear here based on logic -->
+            <button class="btn btn--state-transition">Start Trip</button>
+        </div>
+        <nav class="form-header__statusbar" aria-label="Trip Status Workflow">
+            <button class="statusbar__item">Planned</button>
+            <button class="statusbar__item is-current" aria-current="step">Assigned</button>
+            <button class="statusbar__item" disabled>In-Transit</button>
+            <button class="statusbar__item" disabled>Delivered</button>
+            <button class="statusbar__item" disabled>Completed</button>
+        </nav>
+    </header>
+
+    <main class="o_form_sheet_bg">
+        <div class="o_form_sheet">
+            <header>
+                <h1>TRIP/2025/00123</h1>
+                <!-- MOLECULE: SMART BUTTON BOX -->
+                <div class="smart-button-box">
+                    <a href="#" class="smart-button">
+                        <span class="smart-button__icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg>
+                        </span>
+                        <span class="smart-button__content">
+                            <span class="smart-button__count">2</span>
+                            <span class="smart-button__label">Expenses</span>
+                        </span>
+                    </a>
+                    <a href="#" class="smart-button">
+                        <span class="smart-button__icon" aria-hidden="true">
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C6.34 4.01 5.5 4.973 5.5 6.108V18.75c0 1.258.803 2.31 1.938 2.456C7.597 21.185 8 21.12 8 21h4.5A2.25 2.25 0 0015 18.75V10.5m-5.801 0l-.008.003-.008-.003z" /></svg>
+                        </span>
+                        <span class="smart-button__content">
+                            <span class="smart-button__count">0</span>
+                            <span class="smart-button__label">Invoice</span>
+                        </span>
+                    </a>
+                </div>
+            </header>
+
+            <div class="o_group">
+                <div class="o_group_col">
+                    <div class="field-group">
+                        <label>Customer</label>
+                        <a href="#" class="field-value">Tata Steel Ltd.</a>
+                    </div>
+                    <div class="field-group">
+                        <label>Route</label>
+                        <a href="#" class="field-value">Mumbai Port to Pune Warehouse</a>
+                    </div>
+                     <div class="field-group">
+                        <label>Source</label>
+                        <span class="field-value field-value--text">Mumbai Port</span>
+                    </div>
+                     <div class="field-group">
+                        <label>Destination</label>
+                        <span class="field-value field-value--text">Pune Warehouse</span>
+                    </div>
+                </div>
+                <div class="o_group_col">
+                    <div class="field-group">
+                        <label>Assigned Vehicle</label>
+                        <a href="#" class="field-value">MH-01-AB-1234</a>
+                    </div>
+                    <div class="field-group">
+                        <label>Assigned Driver</label>
+                        <a href="#" class="field-value">John Doe</a>
+                    </div>
+                    <div class="field-group">
+                        <label>Expected Delivery Date</label>
+                        <span class="field-value field-value--text">25-Oct-2025</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MOLECULE: NOTEBOOK TABS -->
+            <div class="notebook">
+                <div class="notebook__tabs">
+                    <button class="notebook__tab is-active">Operations</button>
+                    <button class="notebook__tab">Financials</button>
+                    <button class="notebook__tab">Notes &amp; POD</button>
+                </div>
+                <div class="notebook__panel">
+                    <div class="o_group">
+                         <div class="o_group_col">
+                             <div class="field-group">
+                                <label>Material</label>
+                                <span class="field-value field-value--text">Steel Coils</span>
+                            </div>
+                         </div>
+                         <div class="o_group_col">
+                             <div class="field-group">
+                                <label>Weight (Tons)</label>
+                                <span class="field-value field-value--text">22.5</span>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+                <div class="notebook__panel is-hidden">
+                     <div class="o_group">
+                         <div class="o_group_col">
+                             <div class="field-group">
+                                <label>Rate Type</label>
+                                <span class="field-value field-value--text">Per Ton</span>
+                            </div>
+                             <div class="field-group">
+                                <label>Rate</label>
+                                <span class="field-value field-value--money">₹ 2,500.00</span>
+                            </div>
+                             <div class="field-group">
+                                <label>Total Revenue</label>
+                                <span class="field-value field-value--money">₹ 56,250.00</span>
+                            </div>
+                         </div>
+                         <div class="o_group_col">
+                             <div class="field-group">
+                                <label>Total Approved Expenses</label>
+                                <span class="field-value field-value--money">₹ 12,300.00</span>
+                            </div>
+                             <div class="field-group">
+                                <label>Net Profitability</label>
+                                <span class="field-value field-value--money" style="color: var(--color-semantic-success);">₹ 43,950.00</span>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+                <div class="notebook__panel is-hidden">
+                     <div class="field-group">
+                        <label>Notes</label>
+                        <span class="field-value field-value--text">Handle with care. Contact site manager upon arrival.</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MOLECULE: CHATTER/LOG AREA -->
+    <footer class="chatter">
+        Mock Chatter/Log Area - See Chatter Component for details
+    </footer>
+</div>
+<div>
+    <h2>Component Variations</h2>
+    <div>
+        <h3>Variant Name: "all_roles"</h3>
+        <normal>The single variant of the Trip Form View organism. Its appearance and behavior are not defined by a CSS class but by the user's role and the record's current state. For example, a 'Driver' would see a simplified version with fewer fields and actions. The various states determine which buttons are active in the header and the content of the statusbar.</normal>
+    </div>
+</div>
+</body>
+</html>

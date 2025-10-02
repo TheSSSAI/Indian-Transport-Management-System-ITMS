@@ -1,0 +1,6 @@
+"sprint_number","story_ids","total_points","sprint_goal","dependencies_resolved"
+"","[""US-100""]","21","Provision all cloud infrastructure as code to enable automated deployments. This is a foundational, parallel track.","true"
+"1","[""US-001"",""US-004"",""US-070"",""US-006"",""US-011"",""US-015"",""US-019"",""US-020""]","20","Establish the core application foundation, including RBAC and all master data models (Vehicle, Driver, Customer, Route, Material).","true"
+"2","[""US-026"",""US-027"",""US-031"",""US-009"",""US-101""]","19","Implement the core trip workflow (Create, Assign, Cancel) and vehicle document management. Establish the CI pipeline.","true"
+"3","[""US-046"",""US-047"",""US-049"",""US-052"",""US-102""]","23","Launch the Driver Portal MVP with login, trip viewing, trip start, and POD upload capabilities. Establish the CD pipeline.",""
+"4","[""US-053"",""US-089"",""US-090""]","26","Implement the end-to-end expense submission workflow for drivers and develop the data migration scripts and validation process.",""

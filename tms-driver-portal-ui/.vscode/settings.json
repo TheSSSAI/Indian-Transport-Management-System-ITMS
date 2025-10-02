@@ -1,0 +1,32 @@
+{
+  "python.pythonPath": "/usr/bin/python3",
+  "python.analysis.extraPaths": ["./odoo/addons"],
+  "eslint.workingDirectories": ["./"],
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    }
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[xml]": {
+    "editor.defaultFormatter": "redhat.vscode-xml"
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/*.pyc": true,
+    "**/__pycache__": true
+  },
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/*/**": true,
+    "**/__pycache__/**": true
+  }
+}

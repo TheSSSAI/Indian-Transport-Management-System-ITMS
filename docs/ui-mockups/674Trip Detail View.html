@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organism: Trip Detail View</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Design System Tokens */
+    :root {
+      /* Colors - Primary */
+      --color-primary-100: #DBEAFE;
+      --color-primary-500: #3B82F6;
+      --color-primary-600: #2563EB;
+      --color-primary-700: #1D4ED8;
+      /* Colors - Neutrals */
+      --color-white: #FFFFFF;
+      --color-gray-50: #F9FAFB;
+      --color-gray-100: #F3F4F6;
+      --color-gray-300: #D1D5DB;
+      --color-gray-500: #6B7280;
+      --color-gray-700: #374151;
+      --color-gray-900: #111827;
+      /* Colors - Semantic */
+      --color-success-base: #16A34A;
+      --color-success-light: #ECFDF5;
+      --color-success-dark: #14532D;
+      --color-warning-base: #F59E0B;
+      --color-warning-light: #FFFBEB;
+      --color-warning-dark: #78350F;
+      --color-error-base: #DC2626;
+      --color-error-light: #FEF2F2;
+      --color-error-dark: #7F1D1D;
+      --color-info-base: #0284C7;
+      --color-info-light: #F0F9FF;
+      --color-info-dark: #0C4A6E;
+      /* Fonts */
+      --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-size-sm: 14px;
+      --font-size-base: 16px;
+      --font-size-lg: 18px;
+      --font-size-xl: 20px;
+      --font-weight-normal: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      /* Spacing */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      --spacing-2xl: 48px;
+      /* Borders */
+      --border-radius-md: 6px;
+      --border-radius-lg: 8px;
+      /* Transitions */
+      --transition-fast: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Base Styles */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: var(--font-family-primary);
+      background-color: var(--color-gray-100);
+      color: var(--color-gray-900);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Showcase Container */
+    .mobile-showcase {
+      max-width: 420px;
+      min-width: 360px;
+      margin: 2rem auto;
+      background-color: var(--color-gray-50);
+      border-radius: var(--border-radius-lg);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .showcase-header { font-size: 20px; padding: var(--spacing-lg); background-color: var(--color-white); border-bottom: 1px solid var(--color-gray-300);}
+    .showcase-content { padding: var(--spacing-lg); }
+
+    /* Dependent Atomic Component: Large Action Button */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; position: relative;
+      width: 100%; min-height: 48px; padding: var(--spacing-sm) var(--spacing-md);
+      font-size: var(--font-size-base); font-weight: var(--font-weight-bold);
+      text-decoration: none; border: 1px solid transparent; border-radius: var(--border-radius-md);
+      cursor: pointer; transition: var(--transition-fast); -webkit-tap-highlight-color: transparent;
+    }
+    .btn:focus-visible { outline: 2px solid var(--color-primary-500); outline-offset: 2px; }
+    .btn:active { transform: scale(0.98); }
+    .btn[disabled] { cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn--primary { background-color: var(--color-primary-600); color: var(--color-white); }
+    .btn--primary:hover { background-color: var(--color-primary-700); }
+    .btn--primary[disabled] { background-color: var(--color-primary-100); color: var(--color-white); }
+    .btn--secondary { background-color: var(--color-white); color: var(--color-gray-700); border-color: var(--color-gray-300); }
+    .btn--secondary:hover { background-color: var(--color-gray-50); }
+
+    /* Dependent Atomic Component: Status Tag */
+    .status-tag {
+      display: inline-block; padding: var(--spacing-xs) var(--spacing-sm);
+      font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); border-radius: 9999px;
+    }
+    .status-tag--info { background-color: var(--color-info-light); color: var(--color-info-dark); }
+    .status-tag--primary { background-color: var(--color-primary-100); color: var(--color-primary-700); }
+    .status-tag--warning { background-color: var(--color-warning-light); color: var(--color-warning-dark); }
+
+    /* Organism: Trip Detail View */
+    .trip-detail-view {
+      display: flex;
+      flex-direction: column;
+      background-color: var(--color-white);
+    }
+    .trip-detail-view__section {
+      padding: var(--spacing-lg);
+      border-bottom: 8px solid var(--color-gray-100);
+    }
+
+    /* Header Section */
+    .trip-detail-view__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .trip-detail-view__id {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-gray-900);
+    }
+    .trip-detail-view__customer {
+      font-size: var(--font-size-base);
+      color: var(--color-gray-500);
+      margin-top: var(--spacing-xs);
+    }
+
+    /* Info Section (Key-Value Pairs) */
+    .trip-detail-view__info-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-md);
+    }
+    .trip-detail-view__info-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .trip-detail-view__info-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-gray-500);
+      margin-bottom: var(--spacing-xs);
+    }
+    .trip-detail-view__info-value {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-gray-900);
+    }
+
+    /* Actions Section */
+    .trip-detail-view__actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--spacing-md);
+      padding: var(--spacing-lg);
+    }
+
+    /* Loading State (Skeleton) */
+    .skeleton-loader {
+      width: 100%;
+      padding: var(--spacing-lg);
+    }
+    @keyframes shimmer {
+      0% { background-position: -468px 0; }
+      100% { background-position: 468px 0; }
+    }
+    .skeleton-line {
+      background-color: var(--color-gray-100);
+      background-image: linear-gradient(to right, #f0f0f0 0%, #e0e0e0 20%, #f0f0f0 40%, #f0f0f0 100%);
+      background-repeat: no-repeat;
+      background-size: 800px 104px;
+      animation: shimmer 1.5s linear infinite;
+      border-radius: var(--border-radius-md);
+    }
+
+    /* Error State */
+    .error-state {
+      padding: var(--spacing-2xl) var(--spacing-lg);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+    }
+    .error-state__icon {
+      width: 64px;
+      height: 64px;
+      color: var(--color-error-base);
+      margin-bottom: var(--spacing-md);
+    }
+    .error-state__title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--spacing-sm);
+    }
+    .error-state__message {
+      color: var(--color-gray-500);
+      max-width: 300px;
+      margin-bottom: var(--spacing-lg);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-showcase">
+    <div class="showcase-header">Trip Detail View</div>
+    <main class="trip-detail-view" data-state="loaded">
+      <section class="trip-detail-view__section trip-detail-view__header">
+        <div>
+          <h2 class="trip-detail-view__id">TRIP-2025-00123</h2>
+          <p class="trip-detail-view__customer">For: Reliable Steel Corp</p>
+        </div>
+        <span class="status-tag status-tag--primary">In-Transit</span>
+      </section>
+
+      <section class="trip-detail-view__section">
+        <dl class="trip-detail-view__info-grid">
+          <div class="trip-detail-view__info-item">
+            <dt class="trip-detail-view__info-label">From</dt>
+            <dd class="trip-detail-view__info-value">Mumbai Port, Maharashtra</dd>
+          </div>
+          <div class="trip-detail-view__info-item">
+            <dt class="trip-detail-view__info-label">To</dt>
+            <dd class="trip-detail-view__info-value">Delhi Warehouse, Delhi</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="trip-detail-view__section">
+        <dl class="trip-detail-view__info-grid">
+          <div class="trip-detail-view__info-item">
+            <dt class="trip-detail-view__info-label">Vehicle</dt>
+            <dd class="trip-detail-view__info-value">MH-01-AB-1234</dd>
+          </div>
+          <div class="trip-detail-view__info-item">
+            <dt class="trip-detail-view__info-label">Driver</dt>
+            <dd class="trip-detail-view__info-value">Rajesh Kumar</dd>
+          </div>
+          <div class="trip-detail-view__info-item">
+            <dt class="trip-detail-view__info-label">Expected Delivery</dt>
+            <dd class="trip-detail-view__info-value">25 Oct 2025</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="trip-detail-view__actions">
+        <button class="btn btn--primary">Upload Proof of Delivery</button>
+        <button class="btn btn--secondary">Submit Expense</button>
+        <button class="btn btn--secondary">Log Trip Event</button>
+      </section>
+    </main>
+  </div>
+  
+  <div class="mobile-showcase" style="margin-top: 2rem;">
+    <div class="showcase-header">State: Loading</div>
+      <div class="skeleton-loader" aria-busy="true" aria-label="Loading trip details">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: var(--spacing-lg);">
+          <div>
+            <div class="skeleton-line" style="width: 150px; height: 24px; margin-bottom: 8px;"></div>
+            <div class="skeleton-line" style="width: 200px; height: 16px;"></div>
+          </div>
+          <div class="skeleton-line" style="width: 80px; height: 24px; border-radius: 999px;"></div>
+        </div>
+        <div style="padding: var(--spacing-lg);">
+          <div class="skeleton-line" style="width: 80px; height: 14px; margin-bottom: 4px;"></div>
+          <div class="skeleton-line" style="width: 220px; height: 20px; margin-bottom: 16px;"></div>
+          <div class="skeleton-line" style="width: 80px; height: 14px; margin-bottom: 4px;"></div>
+          <div class="skeleton-line" style="width: 200px; height: 20px;"></div>
+        </div>
+        <div style="padding: var(--spacing-lg); margin-top: -8px; border-top: 8px solid var(--color-gray-50);">
+           <div class="skeleton-line" style="width: 80px; height: 14px; margin-bottom: 4px;"></div>
+          <div class="skeleton-line" style="width: 120px; height: 20px; margin-bottom: 16px;"></div>
+           <div class="skeleton-line" style="width: 80px; height: 14px; margin-bottom: 4px;"></div>
+          <div class="skeleton-line" style="width: 140px; height: 20px; margin-bottom: 16px;"></div>
+        </div>
+         <div style="padding: var(--spacing-lg); border-top: 8px solid var(--color-gray-50);">
+            <div class="skeleton-line" style="width: 100%; height: 48px; margin-bottom: 16px;"></div>
+            <div class="skeleton-line" style="width: 100%; height: 48px;"></div>
+        </div>
+    </div>
+  </div>
+
+  <div class="mobile-showcase" style="margin-top: 2rem;">
+    <div class="showcase-header">State: Error</div>
+    <div class="error-state" role="alert">
+      <svg class="error-state__icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+      </svg>
+      <h3 class="error-state__title">Could Not Load Trip</h3>
+      <p class="error-state__message">The trip details could not be loaded. Please check your network connection and try again.</p>
+      <button class="btn btn--secondary" style="width: auto; padding: 8px 16px;">Retry</button>
+    </div>
+  </div>
+
+	
+	<div class="mobile-showcase" style="margin-top: 2rem;"> <h2> Component Variations</h2>
+      <div>
+        <h3 style="margin-bottom: 8px;">Variant Name : "Default"<h3>
+		<!--description--><normal> The standard view of the component, displaying all sections of data as intended for a driver's mobile device. This is the primary implementation. </normal>
+		<!-- vrient 1 html -->
+        
+      <div>
+	 </div>
+      <div>
+        <h3 style="margin-top: 16px; margin-bottom: 8px;">State: "Assigned"<h3>
+		<!--description--><normal> A demonstration of the component when the trip status is 'Assigned'. The action buttons are different, showing 'Start Trip' as the primary action. </normal>
+		<!-- vrient 1 html -->
+        <div class="trip-detail-view" data-state="loaded" style="border: 1px solid var(--color-gray-300); border-radius: var(--border-radius-lg);">
+          <section class="trip-detail-view__section trip-detail-view__header">
+            <div>
+              <h2 class="trip-detail-view__id">TRIP-2025-00124</h2>
+              <p class="trip-detail-view__customer">For: Quick Logistics</p>
+            </div>
+            <span class="status-tag status-tag--info">Assigned</span>
+          </section>
+          <section class="trip-detail-view__actions">
+            <button class="btn btn--primary">Start Trip</button>
+            <button class="btn btn--secondary">View Vehicle Documents</button>
+          </section>
+        </div>
+		
+      <div>
+	 </div>    
+	
+	</body>
+</html>

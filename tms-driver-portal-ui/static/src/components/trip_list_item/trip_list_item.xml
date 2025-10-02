@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="tms_driver_portal.TripListItem" owl="1">
+        <a href="#" t-attf-href="/my/trips/{{ props.trip.id }}" class="tms-TripListItem card shadow-sm mb-3 text-decoration-none" t-on-click.prevent="_onTripClick">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="tms-TripListItem_id card-title mb-0 fw-bold">
+                        <t t-esc="props.trip.name"/>
+                    </h5>
+                    <StatusBadge status="props.trip.status" label="props.trip.status_label"/>
+                </div>
+
+                <div class="tms-TripListItem_customer mb-2">
+                    <i class="fa fa-user text-muted me-2"/>
+                    <span class="text-dark"><t t-esc="props.trip.customer_name"/></span>
+                </div>
+
+                <div class="tms-TripListItem_route">
+                    <div class="d-flex align-items-start mb-1">
+                        <i class="fa fa-map-marker-alt text-success me-2 mt-1"/>
+                        <div>
+                            <div class="text-muted small">From</div>
+                            <div class="fw-medium text-dark"><t t-esc="props.trip.source_location"/></div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start">
+                        <i class="fa fa-flag-checkered text-danger me-2 mt-1"/>
+                        <div>
+                            <div class="text-muted small">To</div>
+                            <div class="fw-medium text-dark"><t t-esc="props.trip.destination_location"/></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </t>
+</templates>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- TMS Expense Tree View -->
+        <record id="tms_expense_view_tree" model="ir.ui.view">
+            <field name="name">tms.expense.view.tree</field>
+            <field name="model">tms.expense</field>
+            <field name="arch" type="xml">
+                <tree string="Expenses" decoration-muted="state=='rejected'" decoration-success="state=='approved'">
+                    <field name="trip_id"/>
+                    <field name="driver_id"/>
+                    <field name="expense_type"/>
+                    <field name="amount" sum="Total Amount" widget="monetary"/>
+                    <field name="create_date" string="Submission Date"/>
+                    <field name="state" widget="badge" decoration-info="state == 'submitted'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- TMS Expense Form View -->
+        <record id="tms_expense_view_form" model="ir.ui.view">
+            <field name="name">tms.expense.view.form</field>
+            <field name="model">tms.expense</field>
+            <field name="arch" type="xml">
+                <form string="Expense">
+                    <header>
+                        <button name="action_approve" string="Approve" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'submitted')]}" groups="tms_core.group_tms_dispatch_manager,tms_core.group_tms_admin"/>
+                        <button name="%(tms_core.action_tms_reason_wizard)d" string="Reject" type="action" context="{'default_target_model': 'tms.expense', 'default_target_method': 'action_reject'}" attrs="{'invisible': [('state', '!=', 'submitted')]}" groups="tms_core.group_tms_dispatch_manager,tms_core.group_tms_finance_officer,tms_core.group_tms_admin"/>
+                        <field name="state" widget="statusbar" statusbar_visible="submitted,approved,rejected"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="trip_id" readonly="1" force_save="1"/>
+                                <field name="driver_id" readonly="1" force_save="1"/>
+                                <field name="expense_type" readonly="1" force_save="1"/>
+                            </group>
+                            <group>
+                                <field name="amount" readonly="1" force_save="1" widget="monetary"/>
+                                <field name="receipt" widget="image" readonly="1"/>
+                            </group>
+                        </group>
+                        <group string="Diesel Details" attrs="{'invisible': [('expense_type', '!=', 'diesel')]}">
+                            <field name="fuel_quantity" readonly="1"/>
+                            <field name="odometer_reading" readonly="1"/>
+                        </group>
+                        <group string="Rejection Details" attrs="{'invisible': [('state', '!=', 'rejected')]}">
+                            <field name="rejection_reason" readonly="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- TMS Expense Search View -->
+        <record id="tms_expense_view_search" model="ir.ui.view">
+            <field name="name">tms.expense.view.search</field>
+            <field name="model">tms.expense</field>
+            <field name="arch" type="xml">
+                <search string="Search Expenses">
+                    <field name="trip_id"/>
+                    <field name="driver_id"/>
+                    <field name="expense_type"/>
+                    <filter name="submitted" string="Submitted" domain="[('state', '=', 'submitted')]"/>
+                    <filter name="approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                    <filter name="rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_type" string="Expense Type" context="{'group_by': 'expense_type'}"/>
+                        <filter name="group_by_driver" string="Driver" context="{'group_by': 'driver_id'}"/>
+                        <filter name="group_by_trip" string="Trip" context="{'group_by': 'trip_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- TMS Expense Action -->
+        <record id="action_tms_expense" model="ir.actions.act_window">
+            <field name="name">All Expenses</field>
+            <field name="res_model">tms.expense</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No expenses found.
+                </p><p>
+                    This view shows all trip-related expenses submitted by drivers.
+                </p>
+            </field>
+        </record>
+
+        <!-- TMS Expense Approval Action -->
+        <record id="action_tms_expense_approval" model="ir.actions.act_window">
+            <field name="name">Expense Approvals</field>
+            <field name="res_model">tms.expense</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', '=', 'submitted')]</field>
+            <field name="context">{'search_default_submitted': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No expenses awaiting approval.
+                </p><p>
+                    This queue shows all driver-submitted expenses that require your review.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modal Wizard (Odoo)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* --- DESIGN TOKENS --- */
+    :root {
+      /* Colors */
+      --color-primary-50: #EFF6FF; --color-primary-100: #DBEAFE; --color-primary-200: #BFDBFE; --color-primary-300: #93C5FD; --color-primary-400: #60A5FA; --color-primary-500: #3B82F6; --color-primary-600: #2563EB; --color-primary-700: #1D4ED8; --color-primary-800: #1E40AF; --color-primary-900: #1E3A8A;
+      --color-neutral-white: #FFFFFF; --color-neutral-50: #F9FAFB; --color-neutral-100: #F3F4F6; --color-neutral-200: #E5E7EB; --color-neutral-300: #D1D5DB; --color-neutral-500: #6B7280; --color-neutral-700: #374151; --color-neutral-900: #111827;
+      --color-semantic-error: #DC2626;
+
+      /* Typography */
+      --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-size-sm: 14px; --font-size-base: 16px; --font-size-lg: 18px;
+      --font-weight-medium: 500; --font-weight-semibold: 600;
+
+      /* Spacing */
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px;
+
+      /* Borders & Shadows */
+      --border-radius-md: 6px; --border-radius-lg: 8px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-focus-ring: 0 0 0 3px var(--color-primary-200);
+    }
+
+    /* --- BASE & SHOWCASE STYLES --- */
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font-family-primary); font-size: var(--font-size-base); color: var(--color-neutral-900); background-color: var(--color-neutral-50); padding: var(--space-6); }
+    h1 { font-size: 1.75rem; margin-bottom: var(--space-2); }
+    h2 { font-size: 1.25rem; margin-top: var(--space-6); margin-bottom: var(--space-4); }
+    p { color: var(--color-neutral-500); font-size: var(--font-size-sm); max-width: 65ch; margin-bottom: var(--space-4);}
+    .showcase { max-width: 900px; margin: auto; }
+    .open-modal-link { display: inline-block; padding: var(--space-3) var(--space-6); background-color: var(--color-primary-600); color: var(--color-neutral-white); text-decoration: none; border-radius: var(--border-radius-md); font-weight: var(--font-weight-medium); }
+
+    /* --- DEPENDENT ATOMIC COMPONENTS --- */
+
+    /* Action Button */
+    .btn { display: inline-flex; align-items: center; justify-content: center; font-weight: var(--font-weight-medium); font-size: var(--font-size-sm); padding: var(--space-2) var(--space-4); border-radius: var(--border-radius-md); text-decoration: none; cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease; border: 1px solid transparent; }
+    .btn:focus-visible { outline: none; box-shadow: var(--shadow-focus-ring); }
+    .btn--primary { background-color: var(--color-primary-700); color: var(--color-neutral-white); border-color: var(--color-primary-700); }
+    .btn--primary:hover { background-color: var(--color-primary-800); border-color: var(--color-primary-800); }
+    .btn--secondary { background-color: var(--color-neutral-white); color: var(--color-neutral-700); border-color: var(--color-neutral-300); box-shadow: var(--shadow-sm); }
+    .btn--secondary:hover { background-color: var(--color-neutral-100); }
+    .btn:active { transform: scale(0.98); }
+
+    /* Form Input */
+    .form-group { display: flex; flex-direction: column; }
+    .form-group label { font-weight: var(--font-weight-medium); font-size: var(--font-size-sm); margin-bottom: var(--space-2); color: var(--color-neutral-700); }
+    .form-group label.is-required::after { content: ' *'; color: var(--color-semantic-error); }
+    .form-group .form-input { width: 100%; padding: var(--space-2) var(--space-3); font-family: var(--font-family-primary); font-size: var(--font-size-sm); border: 1px solid var(--color-neutral-300); border-radius: var(--border-radius-md); transition: border-color 0.15s ease, box-shadow 0.15s ease; resize: vertical; min-height: 100px;}
+    .form-group .form-input:focus-visible { outline: none; border-color: var(--color-primary-500); box-shadow: var(--shadow-focus-ring); }
+    .form-group.has-error .form-input { border-color: var(--color-semantic-error); }
+    .form-group .error-message { color: var(--color-semantic-error); font-size: var(--font-size-sm); margin-top: var(--space-2); }
+
+    /* --- ORGANISM COMPONENT: MODAL WIZARD --- */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(17, 24, 39, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
+
+    /* CSS-only toggle using :target */
+    .modal-backdrop:target {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-backdrop:target .modal-dialog {
+        transform: scale(1);
+    }
+
+    .modal-dialog {
+      background-color: var(--color-neutral-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+    }
+
+    /* Elements */
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--color-neutral-200);
+    }
+
+    .modal-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-900);
+      margin: 0;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-neutral-500);
+      padding: var(--space-1);
+      line-height: 1;
+      font-size: 24px;
+      text-decoration: none;
+    }
+    .modal-close-btn:hover { color: var(--color-neutral-900); }
+
+    .modal-body { padding: var(--space-6); }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      background-color: var(--color-neutral-50);
+      border-top: 1px solid var(--color-neutral-200);
+      border-bottom-left-radius: var(--border-radius-lg);
+      border-bottom-right-radius: var(--border-radius-lg);
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      .modal-backdrop, .modal-dialog { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="showcase">
+    <h1>Modal Wizard (Odoo)</h1>
+    
+    <h2>Open State</h2>
+    <p>This demonstrates the standard appearance of the modal. Click the link to open it. It will appear as an overlay.</p>
+    <a href="#resume-trip-modal" class="open-modal-link">Open "Resume Trip" Modal</a>
+    
+    <div class="modal-backdrop" id="resume-trip-modal">
+      <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title-1">
+        <header class="modal-header">
+          <h2 class="modal-title" id="modal-title-1">Resume Trip</h2>
+          <a href="#" class="modal-close-btn" aria-label="Close modal">&times;</a>
+        </header>
+        <main class="modal-body">
+          <div class="form-group">
+            <label for="resolution-comment" class="is-required">Resolution Comment</label>
+            <textarea id="resolution-comment" class="form-input" placeholder="Enter the reason for resuming the trip..."></textarea>
+          </div>
+        </main>
+        <footer class="modal-footer">
+          <a href="#" class="btn btn--secondary">Cancel</a>
+          <button type="button" class="btn btn--primary">Confirm</button>
+        </footer>
+      </div>
+    </div>
+
+    <h2>Error State</h2>
+    <p>This demonstrates how the modal appears when there is a validation error, such as a missing mandatory comment. The component is shown inline here for demonstration purposes.</p>
+    
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title-2" style="position: relative; margin-top: 1rem;">
+      <header class="modal-header">
+        <h2 class="modal-title" id="modal-title-2">Resume Trip</h2>
+        <button class="modal-close-btn" aria-label="Close modal">&times;</button>
+      </header>
+      <main class="modal-body">
+        <div class="form-group has-error">
+          <label for="resolution-comment-error" class="is-required">Resolution Comment</label>
+          <textarea id="resolution-comment-error" class="form-input" placeholder="Enter the reason for resuming the trip..." aria-describedby="comment-error-msg"></textarea>
+          <div class="error-message" id="comment-error-msg">A resolution comment is required.</div>
+        </div>
+      </main>
+      <footer class="modal-footer">
+        <button type="button" class="btn btn--secondary">Cancel</button>
+        <button type="button" class="btn btn--primary">Confirm</button>
+      </footer>
+    </div>
+  </div>
+
+
+	
+	<div class="showcase"> <h2> Component Variations</h2>
+      <div>
+        <h3>Variant Name: "Reason Input (Resume Trip)"</h3>
+		<!--description--><p>The primary and only variant for this component, designed to capture a mandatory text input from the user before confirming an action. It consists of a title, a labeled text area, and confirm/cancel actions.</p>
+		<!-- vrient 1 html -->
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title-variant" style="position: relative; margin-top: 1rem;">
+          <header class="modal-header">
+            <h2 class="modal-title" id="modal-title-variant">Resume Trip</h2>
+            <button class="modal-close-btn" aria-label="Close modal">&times;</button>
+          </header>
+          <main class="modal-body">
+            <div class="form-group">
+              <label for="resolution-comment-variant" class="is-required">Resolution Comment</label>
+              <textarea id="resolution-comment-variant" class="form-input" placeholder="Enter the reason for resuming the trip..."></textarea>
+            </div>
+          </main>
+          <footer class="modal-footer">
+            <button type="button" class="btn btn--secondary">Cancel</button>
+            <button type="button" class="btn btn--primary">Confirm</button>
+          </footer>
+        </div>     
+		
+      </div>
+	 </div>
+	
+	</body>
+</html>

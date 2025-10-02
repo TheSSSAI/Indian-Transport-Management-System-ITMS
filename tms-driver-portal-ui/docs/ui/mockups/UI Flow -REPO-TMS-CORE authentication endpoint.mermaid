@@ -1,0 +1,31 @@
+sequenceDiagram
+    participant "Driver Portal UI" as DriverPortalUI
+    participant "TMS Core (Odoo Backend)" as TMSCoreOdooBackend
+
+    activate TMSCoreOdooBackend
+    DriverPortalUI->>TMSCoreOdooBackend: 1. POST /web/session/authenticate with credentials
+    
+    TMSCoreOdooBackend->>TMSCoreOdooBackend: 1a. Find user by login
+    TMSCoreOdooBackend-->>TMSCoreOdooBackend: User record or null
+    
+    TMSCoreOdooBackend->>TMSCoreOdooBackend: 1b. [IF user found] Validate active status and 'Driver' role
+    TMSCoreOdooBackend-->>TMSCoreOdooBackend: Validation result (pass/fail)
+    
+    TMSCoreOdooBackend->>TMSCoreOdooBackend: 1c. [IF valid user] Authenticate credentials
+    TMSCoreOdooBackend-->>TMSCoreOdooBackend: Authenticated user ID or raises exception
+    
+    TMSCoreOdooBackend->>TMSCoreOdooBackend: 1d. [IF authenticated] Create session
+    TMSCoreOdooBackend-->>TMSCoreOdooBackend: Session object
+
+    alt Success
+        TMSCoreOdooBackend-->>DriverPortalUI: 2. 200 OK with session data and 'Set-Cookie' header
+        DriverPortalUI->>DriverPortalUI: 3. Redirect to Driver Portal Dashboard (/my/home)
+    else Failure
+        TMSCoreOdooBackend-->>DriverPortalUI: 4. Error response (e.g., 401 Unauthorized)
+        DriverPortalUI->>DriverPortalUI: 5. Display 'Invalid Credentials' error message
+    end
+
+    note over TMSCoreOdooBackend: The 'Set-Cookie' header returned on successful login is critical. It must have 'HttpOnly', 'Secure', and 'SameSite=Lax' attributes.
+    note over DriverPortalUI: The UI must never display detailed error messages from the backend (e.g., 'User not found' vs 'Incorrect password') to prevent user enumeration.
+
+    deactivate TMSCoreOdooBackend

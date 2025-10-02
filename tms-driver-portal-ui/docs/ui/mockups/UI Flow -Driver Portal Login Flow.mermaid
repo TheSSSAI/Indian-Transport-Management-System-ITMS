@@ -1,0 +1,40 @@
+flowchart TD
+    subgraph User Interaction
+        A[Driver navigates to Login Page] --> B[Enters Username & Password];
+        B --> C{Taps 'Log In'};
+    end
+
+    subgraph Frontend Validation
+        C --> D{Client-Side Validation: Fields empty?};
+        D -->|Yes| E[Show 'Required field' errors];
+        E --> B;
+    end
+
+    subgraph Backend Authentication
+        D -->|No| F[POST /web/session/authenticate];
+        F --> G[TMS Core Backend];
+        G --> H{Validate Credentials & User Status};
+        H -->|Invalid Credentials| I[Return Generic Error: 'Invalid username or password'];
+        H -->|Inactive Account| J[Return Specific Error: 'Your account is inactive'];
+        H -->|Valid Credentials & Active Driver| K[Create Session & Return Session Cookie];
+    end
+
+    subgraph UI Response
+        I --> L[Driver Portal UI];
+        J --> L;
+        K --> L;
+        L --> M{Handle Backend Response};
+        M -->|Error Received| N[Display Error Message on Login Page];
+        N --> B;
+        M -->|Success & Session Cookie Received| O[Redirect to Driver Dashboard];
+        O --> P([Driver Dashboard]);
+    end
+
+    %% Styling
+    classDef errorNode fill:#ffebee,stroke:#d32f2f,color:#000;
+    classDef successNode fill:#e8f5e8,stroke:#4caf50,color:#000;
+    classDef processNode fill:#e3f2fd,stroke:#2196f3,color:#000;
+
+    class E,I,J,N errorNode;
+    class K,O,P successNode;
+    class F,G,H,M processNode;

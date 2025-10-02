@@ -1,0 +1,35 @@
+.editorconfig
+# .editorconfig helps developers define and maintain consistent
+# coding styles between different editors and IDEs.
+# editorconfig.org
+
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{py,
+   xml,
+   js,
+   css,
+   scss,
+   html,
+   md,
+   yml,
+   json}]
+indent_size = 4
+
+[*.py]
+indent_size = 4
+max_line_length = 120
+
+[*.xml]
+indent_size = 2
+
+[*.js]
+indent_size = 2

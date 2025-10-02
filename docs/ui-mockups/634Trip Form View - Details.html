@@ -1,0 +1,519 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Form View - Component Specifications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .component-type-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .section h2 {
+            color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4f46e5;
+            display: inline-block;
+        }
+        
+        .section h3 {
+            color: #4f46e5;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .info-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .variations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .variation-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .variation-name {
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 8px;
+        }
+        
+        .variation-code {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #1e293b;
+            overflow-x: auto;
+            margin: 8px 0;
+            border-left: 4px solid #4f46e5;
+        }
+        
+        .variation-description {
+            font-size: 13px;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .feature-category {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .feature-category h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .feature-category ul {
+            list-style: none;
+        }
+        
+        .feature-category li {
+            padding: 6px 0;
+            color: #4b5563;
+            font-size: 14px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .feature-category li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .tokens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        
+        .token {
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            border: 1px solid #bae6fd;
+            text-align: center;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 16px 0;
+            line-height: 1.4;
+        }
+        
+        .stats-bar {
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .stat {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Trip Form View</h1>
+            <div class="component-type-badge">organism Component</div>
+        </div>
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Variations</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">30</span>
+                <span class="stat-label">Design Tokens</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">3</span>
+                <span class="stat-label">Breakpoints</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">5</span>
+                <span class="stat-label">A11y Features</span>
+            </div>
+        </div><div class="content">
+        <div class="section">
+            <h2>Component Information</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Component Id</h4>
+                    <p>MU-ORGN-002</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Name</h4>
+                    <p>Trip Form View</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Type</h4>
+                    <p>organism</p>
+                </div>
+                <div class="info-card">
+                    <h4>Description</h4>
+                    <p>The Trip Form View is a complex organism that serves as the primary interface for creating, viewing, and managing a single trip record. It integrates multiple molecular components like a status header, smart buttons for navigation, tabbed sections for organizing data, and a chatter area for logging and communication. Its appearance and available actions change based on the trip's current state in its lifecycle.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Design System Alignment</h4>
+                    <p>This organism is a composition of several molecular and atomic components. It relies heavily on the design system's tokens for layout (spacing, grid), typography, and colors to ensure consistency with the rest of the Odoo backend.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Design Tokens Used</h2>
+            <div class="tokens-grid"><div class="token">--color-primary-50</div><div class="token">--color-primary-500</div><div class="token">--color-primary-600</div><div class="token">--color-primary-700</div><div class="token">--color-neutral-50</div><div class="token">--color-neutral-100</div><div class="token">--color-neutral-200</div><div class="token">--color-neutral-300</div><div class="token">--color-neutral-500</div><div class="token">--color-neutral-700</div><div class="token">--color-neutral-900</div><div class="token">--color-white</div><div class="token">--color-semantic-success</div><div class="token">--space-1</div><div class="token">--space-2</div><div class="token">--space-3</div><div class="token">--space-4</div><div class="token">--space-5</div><div class="token">--space-6</div><div class="token">--font-family-primary</div><div class="token">--font-size-sm</div><div class="token">--font-size-base</div><div class="token">--font-size-xl</div><div class="token">--font-size-2xl</div><div class="token">--font-weight-medium</div><div class="token">--font-weight-semibold</div><div class="token">--font-weight-bold</div><div class="token">--border-radius-md</div><div class="token">--border-radius-lg</div><div class="token">--shadow-sm</div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Responsive Specifications</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Mobile Adaptations</h4>
+                    <ul><li>The main two-column grid (`.o_group`) collapses into a single column.</li><li>The form header (`.form-header`) stacks its action buttons and statusbar vertically.</li><li>Padding around the main form sheet is reduced to maximize content space.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Tablet Adaptations</h4>
+                    <ul><li>The layout may either be single-column or two-column depending on the exact width and orientation, thanks to the responsive grid.</li><li>Maintains desktop-like spacing and component sizes.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Desktop Enhancements</h4>
+                    <ul><li>Displays a spacious two-column layout for optimal data density and readability.</li><li>All molecular components (header, smart buttons, tabs) are fully expanded and interactive.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Accessibility Features</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Keyboard Support</h4><p>The entire form is navigable via keyboard. All interactive elements (buttons, links, tabs) are part of the tab order.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Screen Reader Support</h4><p>Uses semantic HTML5. `<h1>` for the main record title. Form fields are grouped and have associated `<label>`s (simulated here with `div`s for mockup). `aria-label` is used on the statusbar nav.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Focus Management</h4><p>Visible focus rings are applied to all interactive elements, inheriting from the atomic and molecular component styles.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Aria Attributes</h4><ul><li>aria-label on statusbar</li><li>aria-current='step' on the active status item</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Color Contrast</h4><p>All text and UI elements adhere to WCAG 2.1 AA contrast ratios as defined by the design system tokens.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>CSS Implementation</h2>
+            <div class="code-block">/* --- DESIGN TOKENS --- */
+:root {
+  /* Colors */
+  --color-primary-50: #EFF6FF; --color-primary-100: #DBEAFE; --color-primary-200: #BFDBFE; --color-primary-300: #93C5FD; --color-primary-400: #60A5FA; --color-primary-500: #3B82F6; --color-primary-600: #2563EB; --color-primary-700: #1D4ED8; --color-primary-800: #1E40AF; --color-primary-900: #1E3A8A;
+  --color-neutral-white: #FFFFFF; --color-neutral-50: #F9FAFB; --color-neutral-100: #F3F4F6; --color-neutral-200: #E5E7EB; --color-neutral-300: #D1D5DB; --color-neutral-500: #6B7280; --color-neutral-700: #374151; --color-neutral-900: #111827;
+  --color-semantic-success: #16A34A; --color-semantic-success-dark: #15803d; --color-semantic-warning: #F59E0B; --color-semantic-error: #DC2626; --color-semantic-info: #0284C7;
+  /* Typography */
+  --font-family-primary: &#039;Inter&#039;, -apple-system, BlinkMacSystemFont, &#039;Segoe UI&#039;, Roboto, Helvetica, Arial, sans-serif;
+  --font-size-sm: 12px; --font-size-base: 14px; --font-size-lg: 16px; --font-size-xl: 20px; --font-size-2xl: 24px;
+  --font-weight-medium: 500; --font-weight-semibold: 600;
+  /* Spacing */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px;
+  /* Borders &amp; Shadows */
+  --border-radius-md: 6px; --border-radius-lg: 8px;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-focus-ring: 0 0 0 3px var(--color-primary-200);
+}
+/* --- BASE &amp; LAYOUT STYLES --- */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; font-family: var(--font-family-primary); font-size: var(--font-size-base); color: var(--color-neutral-900); background-color: var(--color-neutral-100); }
+.o_form_view { display: flex; flex-direction: column; height: 100vh; }
+.o_form_sheet_bg { flex-grow: 1; padding: var(--space-4); overflow-y: auto; }
+.o_form_sheet { max-width: 1080px; margin: 0 auto; background-color: var(--color-neutral-white); border: 1px solid var(--color-neutral-200); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); }
+.o_form_sheet &gt; header { padding: var(--space-4) var(--space-5); }
+.o_form_sheet h1 { font-size: var(--font-size-2xl); font-weight: var(--font-weight-semibold); margin: 0 0 var(--space-4) 0; }
+.o_group { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); padding: 0 var(--space-5); }
+.o_group_col { display: flex; flex-direction: column; gap: var(--space-4); }
+
+/* --- ATOMIC: ACTION BUTTON --- */
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--space-2) var(--space-4); font-size: var(--font-size-base); font-weight: var(--font-weight-medium); border-radius: var(--border-radius-md); text-decoration: none; cursor: pointer; border: 1px solid transparent; transition: all 0.2s ease-in-out; min-height: 38px; }
+.btn--primary { background-color: var(--color-primary-600); color: var(--color-white); border-color: var(--color-primary-600); }
+.btn--primary:hover { background-color: var(--color-primary-700); border-color: var(--color-primary-700); }
+.btn--secondary { background-color: var(--color-white); color: var(--color-neutral-700); border-color: var(--color-neutral-300); box-shadow: var(--shadow-sm); }
+.btn--secondary:hover { background-color: var(--color-neutral-100); }
+.btn--state-transition { background-color: var(--color-semantic-success); color: var(--color-white); border-color: var(--color-semantic-success); }
+.btn--state-transition:hover { background-color: var(--color-semantic-success-dark); border-color: var(--color-semantic-success-dark); }
+.btn:focus-visible { outline: 2px solid var(--color-primary-500); outline-offset: 2px; }
+
+/* --- MOLECULAR: FORM HEADER --- */
+.form-header { background-color: var(--color-neutral-100); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-neutral-200); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-4); }
+.form-header__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.form-header__statusbar { display: flex; flex-wrap: nowrap; overflow-x: auto; }
+.statusbar__item { position: relative; display: flex; align-items: center; padding: var(--space-2) var(--space-3) var(--space-2) 20px; margin-right: -10px; font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); text-transform: uppercase; white-space: nowrap; border: none; background-color: var(--color-white); color: var(--color-neutral-500); cursor: pointer; border-top: 1px solid var(--color-neutral-300); border-bottom: 1px solid var(--color-neutral-300); }
+.statusbar__item::before, .statusbar__item::after { content: &#039;&#039;; position: absolute; top: 0; height: 100%; width: 15px; background-color: inherit; transform: skewX(-20deg); border-top: 1px solid var(--color-neutral-300); border-bottom: 1px solid var(--color-neutral-300); }
+.statusbar__item::before { left: 0; }
+.statusbar__item::after { right: -8px; border-right: 1px solid var(--color-neutral-300); z-index: 1; }
+.statusbar__item:hover { background-color: var(--color-neutral-100); }
+.statusbar__item.is-current { background-color: var(--color-primary-600); color: var(--color-white); z-index: 2; }
+.statusbar__item.is-current::before, .statusbar__item.is-current::after { border-color: var(--color-primary-700); }
+.statusbar__item:first-child { padding-left: var(--space-4); border-left: 1px solid var(--color-neutral-300); border-top-left-radius: var(--border-radius-md); border-bottom-left-radius: var(--border-radius-md); }
+.statusbar__item:first-child::before { display: none; }
+
+/* --- MOLECULAR: SMART BUTTON BOX --- */
+.smart-button-box { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.smart-button { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); background-color: var(--color-neutral-white); border: 1px solid transparent; border-radius: var(--border-radius-lg); text-decoration: none; color: inherit; transition: all 0.2s ease-in-out; box-shadow: var(--shadow-sm); }
+.smart-button:hover { background-color: var(--color-primary-50); transform: translateY(-2px); }
+.smart-button__icon svg { width: 24px; height: 24px; color: var(--color-primary-600); }
+.smart-button__content { display: flex; flex-direction: column; line-height: 1.3; }
+.smart-button__count { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); }
+.smart-button__label { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-neutral-500); }
+
+/* --- MOLECULAR: NOTEBOOK TABS --- */
+.notebook { width: 100%; padding: 0 var(--space-5); margin-top: var(--space-6); }
+.notebook__tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--color-neutral-200); }
+.notebook__tab { padding: var(--space-3) var(--space-4); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-neutral-500); background-color: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px; }
+.notebook__tab:hover { color: var(--color-neutral-900); }
+.notebook__tab.is-active { color: var(--color-primary-700); border-bottom-color: var(--color-primary-700); font-weight: var(--font-weight-semibold); }
+.notebook__panel { padding: var(--space-5) 0; }
+
+/* --- MOLECULAR: CHATTER --- */
+.chatter { background-color: var(--color-neutral-50); border-top: 1px solid var(--color-neutral-200); }
+
+/* --- ORGANISM-SPECIFIC &amp; FIELD STYLES --- */
+.field-group { display: flex; flex-direction: column; }
+.field-group label { display: block; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-neutral-700); margin-bottom: var(--space-1); }
+.field-group .field-value { font-weight: var(--font-weight-medium); color: var(--color-primary-700); text-decoration: none; }
+.field-group .field-value--text { font-weight: normal; color: var(--color-neutral-900); }
+
+/* --- RESPONSIVE ADAPTATIONS --- */
+@media (max-width: 768px) {
+  .o_group { grid-template-columns: 1fr; }
+  .form-header { flex-direction: column; align-items: stretch; }
+  .o_form_sheet_bg { padding: var(--space-2); }
+}</div>
+        </div>
+        <div class="section">
+            <h2>Implementation Notes</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Embedded Css Architecture</h4>
+                    <p>All required CSS, from design tokens to atomic and molecular component styles, is embedded in a single `<style>` tag. The structure follows BEM for clarity and is organized logically from general layout to specific component styles.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Organization</h4>
+                    <p>The HTML is structured to mirror a standard Odoo form view. It assembles the required molecular components (`Form Header`, `Smart Button Box`, `Notebook Tabs`, `Chatter`) into a cohesive organism. The form content is laid out in a responsive grid.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Responsive Design</h4>
+                    <p>A simple media query at 768px handles the primary layout shift from two columns to one, providing a robust responsive experience that aligns with Odoo's standard behavior.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Accessibility Compliance</h4>
+                    <p>Accessibility is built-in by using semantic elements and leveraging the accessible patterns of the child components. The structure ensures a logical reading order for screen readers.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Browser Support</h4>
+                    <p>The component uses modern, widely-supported CSS, ensuring compatibility with all target browsers.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Usage Guidelines</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>When To Use</h4><p>This organism is the primary interface for viewing and editing a trip record. It should be used as the main screen for all trip-related details and actions.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Content Guidelines</h4><p>Field labels should be concise. Field values are read-only in this mockup but would be interactive form inputs in the actual implementation. The content within tabs should be logically grouped.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Placement Rules</h4><p>This organism constitutes a full screen or view within the Odoo backend.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Customization Options</h4><ul><li style="list-style: disc; margin-left: 16px; padding-left: 0;">The buttons and statusbar items in the header are dynamically rendered based on the record's state.</li><li style="list-style: disc; margin-left: 16px; padding-left: 0;">Smart buttons are shown/hidden based on the existence of related records.</li><li style="list-style: disc; margin-left: 16px; padding-left: 0;">The number and content of notebook tabs can be customized.</li></ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Testing Recommendations</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Browser Testing</h4><p>Test in Chrome, Firefox, and Safari.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Device Testing</h4><p>Verify the layout correctly collapses on screen widths below 768px. Test on both portrait and landscape tablet orientations.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Accessibility Testing</h4><ul><li>Verify logical tab order through all interactive elements from top to bottom.</li><li>Use a screen reader to test the announcement of headers, field labels, and component roles (e.g., statusbar navigation, tabbed interface).</li><li>Check for any color contrast issues.</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Performance Testing</h4><p>The initial load time of the view should be measured. Performance is largely dependent on the backend data queries, but the frontend rendering should be efficient.</p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+</html>

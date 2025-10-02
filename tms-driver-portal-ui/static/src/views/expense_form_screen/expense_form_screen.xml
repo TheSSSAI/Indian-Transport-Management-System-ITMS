@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="tms_driver_portal.ExpenseFormScreen" owl="1">
+        <div class="d-flex flex-column h-100 bg-light">
+            <HeaderNav title="'Add Expense'"/>
+            <div class="flex-grow-1 overflow-auto p-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <form t-on-submit.prevent="_onSubmit">
+                            <!-- Expense Type -->
+                            <div class="mb-3">
+                                <label for="expenseType" class="form-label fw-bold">Expense Type</label>
+                                <select id="expenseType" class="form-select form-select-lg" t-model="state.form.expense_type" t-att-class="{ 'is-invalid': state.validationErrors.expense_type }">
+                                    <option value="">Select a type...</option>
+                                    <t t-foreach="state.expenseTypes" t-as="type" t-key="type.id">
+                                        <option t-att-value="type.id"><t t-esc="type.name"/></option>
+                                    </t>
+                                </select>
+                                <div t-if="state.validationErrors.expense_type" class="invalid-feedback" t-esc="state.validationErrors.expense_type"/>
+                            </div>
+
+                            <!-- Amount -->
+                            <div class="mb-3">
+                                <label for="amount" class="form-label fw-bold">Amount (₹)</label>
+                                <input type="number" id="amount" class="form-control form-control-lg" placeholder="0.00" step="0.01" t-model="state.form.amount" t-att-class="{ 'is-invalid': state.validationErrors.amount }"/>
+                                <div t-if="state.validationErrors.amount" class="invalid-feedback" t-esc="state.validationErrors.amount"/>
+                            </div>
+                            
+                            <!-- Date -->
+                            <div class="mb-3">
+                                <label for="date" class="form-label fw-bold">Date</label>
+                                <input type="date" id="date" class="form-control form-control-lg" t-model="state.form.date"/>
+                            </div>
+
+                            <!-- Conditional Fields for Diesel -->
+                            <div t-if="state.expenseTypes.find(et => et.id == state.form.expense_type)?.name?.toLowerCase() === 'diesel'">
+                                <!-- Odometer -->
+                                <div class="mb-3">
+                                    <label for="odometer" class="form-label fw-bold">Odometer Reading (km)</label>
+                                    <input type="number" id="odometer" class="form-control form-control-lg" placeholder="e.g. 150250" t-model="state.form.odometer" t-att-class="{ 'is-invalid': state.validationErrors.odometer }"/>
+                                    <div t-if="state.validationErrors.odometer" class="invalid-feedback" t-esc="state.validationErrors.odometer"/>
+                                </div>
+                                <!-- Quantity -->
+                                <div class="mb-3">
+                                    <label for="quantity" class="form-label fw-bold">Fuel Quantity (Liters)</label>
+                                    <input type="number" id="quantity" class="form-control form-control-lg" placeholder="e.g. 75.5" step="0.01" t-model="state.form.quantity" t-att-class="{ 'is-invalid': state.validationErrors.quantity }"/>
+                                    <div t-if="state.validationErrors.quantity" class="invalid-feedback" t-esc="state.validationErrors.quantity"/>
+                                </div>
+                            </div>
+
+                            <!-- Receipt Uploader -->
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Receipt</label>
+                                <FileUploader onFile-selected="_onFileSelected" accepted_files="'image/jpeg,image/png,application/pdf'"/>
+                                <div t-if="state.validationErrors.receipt_file" class="d-block invalid-feedback" t-esc="state.validationErrors.receipt_file"/>
+                            </div>
+                            
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label for="description" class="form-label fw-bold">Description (Optional)</label>
+                                <textarea id="description" class="form-control" rows="3" t-model="state.form.description"></textarea>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 bg-white border-top shadow-lg">
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg" t-on-click="_onSubmit" t-att-disabled="state.isSubmitting">
+                        <span t-if="state.isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"/>
+                        Submit Expense
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,47 @@
+stateDiagram-v2
+    direction LR
+
+    [*] --> Visible
+    state Visible {
+        [*] --> Default
+
+        Default --> Hovering : mouse over
+        Hovering --> Default : mouse out
+        Hovering --> Active : mouse down
+        Active --> Hovering : mouse up (if still over)
+        Focused --> Default : blur
+
+        state "Default" as Default
+        note right of Default
+            Primary: background #2563EB, text #FFFFFF
+            Secondary: background #FFFFFF, border 1px solid #1D4ED8
+        end note
+
+        state "Hovering" as Hovering
+        note right of Hovering
+            Primary: background #1D4ED8, shadow-md
+            Secondary: background #EFF6FF
+        end note
+
+        state "Active (Pressed)" as Active
+        note right of Active
+            Primary: background #1E40AF, scale(0.98)
+            Secondary: background #DBEAFE, scale(0.98)
+        end note
+        
+        Default --> Focused : focus (e.g., Tab key)
+        state "Focused" as Focused
+        note right of Focused
+            Shared: outline 2px solid #60A5FA
+        end note
+
+    }
+
+    Visible --> Disabled : disable action
+    Disabled --> Visible : enable action
+
+    state "Disabled" as Disabled
+    note right of Disabled
+        Primary: background #BFDBFE, cursor not-allowed
+        Secondary: border 1px solid #93C5FD, cursor not-allowed
+    end note

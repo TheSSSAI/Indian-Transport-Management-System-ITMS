@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Inherit Form View to add TMS Driver details -->
+        <record id="hr_employee_view_form_inherit_tms" model="ir.ui.view">
+            <field name="name">hr.employee.form.inherit.tms</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                    <page string="TMS Driver Information">
+                        <group>
+                            <group>
+                                <field name="is_tms_driver"/>
+                            </group>
+                        </group>
+                        <group attrs="{'invisible': [('is_tms_driver', '=', False)]}">
+                            <group string="License Details">
+                                <field name="license_number"/>
+                                <field name="license_expiry_date"/>
+                            </group>
+                            <group string="Status">
+                                <field name="active" string="TMS Active" readonly="1" force_save="1"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,142 @@
+# Default values for tms-gps-service chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- Number of pods to run. For production, this should be overridden to 3 or more for high availability.
+replicaCount: 1
+
+image:
+  # -- The repository for the Docker image of the GPS service.
+  repository: "123456789012.dkr.ecr.ap-south-1.amazonaws.com/tms-gps-service"
+  # -- The pull policy for the image.
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  # This will be updated by the CI/CD pipeline upon a new build.
+  tag: "latest"
+
+# -- A name to override the default chart name.
+nameOverride: ""
+# -- A name to override the default fullname.
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created.
+  create: true
+  # -- Annotations to add to the service account.
+  # This is critical for IAM Roles for Service Accounts (IRSA) to grant access to AWS resources.
+  annotations: {}
+  # -- The name of the service account to use. If not set and create is true, a name is generated.
+  name: ""
+
+# -- Security context for the pods.
+podSecurityContext:
+  fsGroup: 1001
+
+# -- Security context for the containers.
+securityContext:
+  runAsUser: 1001
+  runAsGroup: 1001
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  # -- The type of Kubernetes service to create.
+  type: ClusterIP
+  # -- The port the service will expose.
+  port: 80
+  # -- The target port on the container.
+  targetPort: 8000
+
+ingress:
+  # -- Enable or disable the Ingress resource.
+  enabled: false
+  # -- The IngressClass to use.
+  className: "alb"
+  # -- Annotations for the Ingress resource, used by the AWS Load Balancer Controller.
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/target-type: ip
+  # -- Hostname configuration for the Ingress.
+  hosts:
+    - host: gps-service.tms.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  # -- TLS configuration for the Ingress.
+  tls: []
+
+# -- Resource requests and limits for the container.
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  # -- Enable or disable the HorizontalPodAutoscaler.
+  enabled: false
+  # -- Minimum number of replicas.
+  minReplicas: 1
+  # -- Maximum number of replicas.
+  maxReplicas: 5
+  # -- Target CPU utilization percentage to trigger scaling.
+  targetCPUUtilizationPercentage: 80
+  # -- Target memory utilization percentage to trigger scaling.
+  targetMemoryUtilizationPercentage: 80
+
+# -- Pod-level annotations. Critical for integrating with monitoring tools like Prometheus.
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/metrics"
+  prometheus.io/port: "8000"
+
+# -- Node affinity for pod scheduling.
+nodeSelector: {}
+tolerations: []
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - {{ .Chart.Name }}
+        topologyKey: topology.kubernetes.io/zone
+
+# -- Configuration for fetching secrets from AWS Secrets Manager using the CSI driver.
+# This directly supports REQ-1-503.
+secrets:
+  # -- The name of the SecretProviderClass resource to be created.
+  secretProviderClassName: "tms-gps-service-secrets"
+  aws:
+    # -- The AWS region where the secrets are stored.
+    region: "ap-south-1"
+    # -- A list of secrets to fetch from AWS Secrets Manager.
+    # The name corresponds to the secret ARN. The key is how it will be referenced in the k8s secret.
+    objects:
+      - secretName: "arn:aws:secretsmanager:ap-south-1:123456789012:secret:tms/gps-service-AbCdEf"
+        data:
+          - key: RABBITMQ_URL # Key in the Kubernetes secret
+            objectName: rabbitmq_url # Key in the AWS Secret JSON
+          - key: GPS_PROVIDER_API_KEY
+            objectName: gps_provider_api_key
+
+# -- Application-specific environment variables.
+# These are non-sensitive configurations.
+env:
+  - name: "LOG_LEVEL"
+    value: "INFO"
+  - name: "POLLING_INTERVAL_SECONDS"
+    value: "15"

@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # Odoo Application Service
+  odoo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tms_odoo_consumer
+    depends_on:
+      - db
+      - rabbitmq
+    ports:
+      - "8069:8069" # Odoo HTTP port
+      - "5678:5678" # Python Debugger (debugpy) port
+    volumes:
+      # Mount custom addons for live development
+      - ./tms_gps_consumer:/mnt/extra-addons/tms_gps_consumer
+      # Mount a volume for Odoo filestore (attachments, etc.)
+      - odoo_data:/var/lib/odoo
+    environment:
+      - HOST=db
+      - PORT=5432
+      - USER=${POSTGRES_USER}
+      - PASSWORD=${POSTGRES_PASSWORD}
+      - DATABASE=${POSTGRES_DB}
+      # Add Odoo master password for creating new databases
+      - ODOO_MASTER_PASSWORD=${ODOO_MASTER_PASSWORD}
+    command: >
+      bash -c "
+        pip3 install debugpy -t /usr/lib/python3/dist-packages &&
+        python3 -m debugpy --wait-for-client --listen 0.0.0.0:5678 /usr/bin/odoo
+        --addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons
+        -d ${POSTGRES_DB}
+        -i tms_gps_consumer
+        --db_host=db
+        --db_user=${POSTGRES_USER}
+        --db_password=${POSTGRES_PASSWORD}
+        --db_port=5432
+        --xmlrpc-port=8069
+        --dev=all
+        --stop-after-init
+      "
+    restart: unless-stopped
+
+  # PostgreSQL Database Service
+  db:
+    image: postgres:16-alpine
+    container_name: tms_postgres_db
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  # RabbitMQ Message Broker Service
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: tms_rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "5672:5672" # AMQP port
+      - "15672:15672" # Management UI port
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+
+volumes:
+  odoo_data:
+  postgres_data:
+  rabbitmq_data:
+
+networks:
+  default:
+    name: tms_network

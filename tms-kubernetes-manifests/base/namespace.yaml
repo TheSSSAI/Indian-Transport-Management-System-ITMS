@@ -1,0 +1,23 @@
+# ==============================================================================
+# Kubernetes Namespace for the Transport Management System (TMS)
+#
+# Defines the isolated logical space within the Kubernetes cluster where all
+# TMS application components will be deployed. This is a foundational
+# resource for providing scope for naming, access control, and network policies.
+#
+# All subsequent resources (Deployments, Services, ConfigMaps, Secrets, etc.)
+# for the TMS application should be created within this namespace.
+#
+# As per REPO-TMS-K8S SDS, namespace_strategy.root_namespace is 'tms'.
+# ==============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tms
+  labels:
+    # Standard Kubernetes labels for application identification and management.
+    # These labels can be used for selecting the namespace in other manifests,
+    # for example, in cluster-wide monitoring or security configurations.
+    app.kubernetes.io/name: tms-application
+    app.kubernetes.io/instance: tms-prod # This could be templated in a real multi-env setup
+    app.kubernetes.io/part-of: tms

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organism: Expense Submission Form</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Design System Tokens */
+    :root {
+      /* Colors - Primary */
+      --color-primary-100: #DBEAFE;
+      --color-primary-500: #3B82F6;
+      --color-primary-600: #2563EB;
+      --color-primary-700: #1D4ED8;
+      /* Colors - Neutrals */
+      --color-white: #FFFFFF;
+      --color-gray-50: #F9FAFB;
+      --color-gray-100: #F3F4F6;
+      --color-gray-300: #D1D5DB;
+      --color-gray-500: #6B7280;
+      --color-gray-700: #374151;
+      --color-gray-900: #111827;
+      /* Colors - Semantic */
+      --color-error-base: #DC2626;
+      --color-error-light: #FEF2F2;
+      --color-error-dark: #7F1D1D;
+      /* Fonts */
+      --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-size-sm: 14px;
+      --font-size-base: 16px;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      /* Spacing */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      --spacing-2xl: 48px;
+      /* Borders */
+      --border-radius-md: 6px;
+      --border-radius-lg: 8px;
+      /* Transitions */
+      --transition-fast: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Base & Layout Styles */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: var(--font-family-primary);
+      background-color: var(--color-gray-100);
+      color: var(--color-gray-900);
+      margin: 0;
+      padding: var(--spacing-lg);
+    }
+    .mobile-showcase {
+      max-width: 420px;
+      min-width: 360px;
+      margin: 0 auto;
+      background-color: var(--color-white);
+      padding: var(--spacing-lg);
+      border-radius: var(--border-radius-lg);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+    h2 { font-size: 20px; margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-sm); border-bottom: 1px solid var(--color-gray-300); }
+    .component-section { margin-bottom: var(--spacing-xl); }
+
+    /* Dependent Atomic/Molecular Component Styles */
+    /* Large Action Button */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; position: relative;
+      width: 100%; min-height: 48px; padding: var(--spacing-sm) var(--spacing-md);
+      font-size: var(--font-size-base); font-weight: var(--font-weight-bold);
+      text-decoration: none; border: 1px solid transparent; border-radius: var(--border-radius-md);
+      cursor: pointer; transition: var(--transition-fast); -webkit-tap-highlight-color: transparent;
+    }
+    .btn:focus-visible { outline: 2px solid var(--color-primary-500); outline-offset: 2px; }
+    .btn:active { transform: scale(0.98); }
+    .btn[disabled] { cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn--primary { background-color: var(--color-primary-600); color: var(--color-white); }
+    .btn--primary:hover { background-color: var(--color-primary-700); }
+    .btn--primary[disabled] { background-color: var(--color-primary-100); color: var(--color-white); }
+    .btn--loading .btn-text { visibility: hidden; }
+    .btn--loading::after { content: ''; position: absolute; width: 24px; height: 24px; border: 3px solid; border-color: currentColor currentColor currentColor transparent; border-radius: 50%; animation: btn-spinner 0.6s linear infinite; }
+    @keyframes btn-spinner { to { transform: rotate(360deg); } }
+
+    /* Form Inputs */
+    .form-group { margin: 0; }
+    .form-label { display: block; font-weight: var(--font-weight-medium); margin-bottom: var(--spacing-sm); }
+    .form-input, .form-select { width: 100%; padding: 12px var(--spacing-md); font-size: var(--font-size-base); font-family: var(--font-family-primary); border: 1px solid var(--color-gray-300); border-radius: var(--border-radius-md); transition: var(--transition-fast); }
+    .form-input:focus, .form-select:focus { outline: none; border-color: var(--color-primary-500); box-shadow: 0 0 0 2px var(--color-primary-100); }
+    .form-input::placeholder { color: var(--color-gray-500); }
+    .form-input.error, .form-select.error { border-color: var(--color-error-base); }
+    .form-input.error:focus, .form-select.error:focus { box-shadow: 0 0 0 2px var(--color-error-light); }
+    .form-error-message { color: var(--color-error-base); font-size: var(--font-size-sm); margin-top: var(--spacing-xs); display: none; }
+    .error + .form-error-message { display: block; }
+    .form-select-wrapper { position: relative; }
+    .form-select-wrapper::after { content: '▾'; position: absolute; right: var(--spacing-md); top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--color-gray-500); font-size: 20px; }
+    .form-select { appearance: none; -webkit-appearance: none; }
+
+    /* File Uploader */
+    .file-uploader { position: relative; width: 100%; border-radius: var(--border-radius-lg); background-color: var(--color-gray-50); transition: var(--transition-fast); }
+    .file-uploader__input { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+    .file-uploader__dropzone { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--spacing-xl) var(--spacing-lg); border: 2px dashed var(--color-gray-300); border-radius: var(--border-radius-lg); text-align: center; cursor: pointer; transition: var(--transition-fast); }
+    .file-uploader__dropzone:hover { border-color: var(--color-primary-500); background-color: var(--color-primary-100); }
+    .file-uploader__input:focus-visible + .file-uploader__dropzone { outline: 2px solid var(--color-primary-500); outline-offset: 2px; border-color: var(--color-primary-500); }
+    .file-uploader__icon { width: 40px; height: 40px; color: var(--color-primary-600); margin-bottom: var(--spacing-sm); }
+    .file-uploader__text { font-weight: var(--font-weight-semibold); color: var(--color-primary-600); }
+    .file-uploader__hint { font-size: var(--font-size-sm); color: var(--color-gray-500); margin-top: var(--spacing-xs); }
+
+    /* General Alert Message */
+    .alert-banner { padding: var(--spacing-md); border-radius: var(--border-radius-md); font-weight: var(--font-weight-medium); display: none; }
+    .alert-banner--error { display: block; background-color: var(--color-error-light); color: var(--color-error-dark); border: 1px solid var(--color-error-base); }
+
+    /* Organism: Expense Submission Form */
+    .expense-form {
+      display: flex;
+      flex-direction: column;
+    }
+    .expense-form fieldset {
+      border: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+    }
+    .expense-form__conditional-fields {
+      display: none; /* Hidden by default */
+      flex-direction: column;
+      gap: var(--spacing-lg);
+      animation: fadeIn 300ms ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .expense-form__conditional-fields--visible {
+      display: flex; /* Shown by JS */
+    }
+    .expense-form__footer {
+      margin-top: var(--spacing-xl);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-showcase">
+    <header>
+      <h1 style="font-size: 24px; margin-bottom: var(--spacing-lg);">Organism: Expense Submission Form</h1>
+    </header>
+
+    <main>
+      <section class="component-section">
+        <h2>Live Example</h2>
+
+        <form class="expense-form" id="expense-form-demo">
+            <div id="form-error-banner" class="alert-banner" role="alert" aria-live="assertive"></div>
+
+            <fieldset id="form-fieldset">
+                <!-- Expense Type -->
+                <div class="form-group">
+                    <label for="expense-type" class="form-label">Expense Type</label>
+                    <div class="form-select-wrapper">
+                        <select id="expense-type" name="expense_type" class="form-select" required>
+                            <option value="">Select an option...</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Toll">Toll</option>
+                            <option value="Food">Food</option>
+                            <option value="Repair">Repair</option>
+                        </select>
+                    </div>
+                    <p class="form-error-message" id="expense-type-error"></p>
+                </div>
+
+                <!-- Amount -->
+                <div class="form-group">
+                    <label for="expense-amount" class="form-label">Amount (₹)</label>
+                    <input type="number" id="expense-amount" name="amount" class="form-input" placeholder="e.g., 500.00" required inputmode="decimal">
+                    <p class="form-error-message" id="expense-amount-error"></p>
+                </div>
+
+                <!-- Conditional Fields for Diesel -->
+                <div class="expense-form__conditional-fields" id="diesel-fields">
+                    <div class="form-group">
+                        <label for="fuel-quantity" class="form-label">Fuel Quantity (Liters)</label>
+                        <input type="number" id="fuel-quantity" name="quantity" class="form-input" placeholder="e.g., 50.5" inputmode="decimal">
+                        <p class="form-error-message" id="fuel-quantity-error"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="odometer" class="form-label">Odometer Reading (km)</label>
+                        <input type="number" id="odometer" name="odometer" class="form-input" placeholder="e.g., 150250" inputmode="numeric">
+                        <p class="form-error-message" id="odometer-error"></p>
+                    </div>
+                </div>
+
+                <!-- Receipt Upload -->
+                <div class="form-group">
+                    <label class="form-label">Upload Receipt</label>
+                    <div id="receipt-uploader" class="file-uploader" data-state="empty" role="group" aria-label="Upload a receipt photo">
+                        <input type="file" id="receipt-input" class="file-uploader__input" accept="image/jpeg,image/png,application/pdf">
+                        <label for="receipt-input" class="file-uploader__dropzone" tabindex="0">
+                            <svg class="file-uploader__icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.776 48.776 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" /></svg>
+                            <span class="file-uploader__text">Take or Upload Photo</span>
+                            <span class="file-uploader__hint">JPG, PNG, PDF up to 5MB</span>
+                        </label>
+                    </div>
+                    <p class="form-error-message" id="receipt-uploader-error"></p>
+                </div>
+            </fieldset>
+
+            <div class="expense-form__footer">
+                <button type="submit" class="btn btn--primary">
+                    <span class="btn-text">Submit Expense</span>
+                </button>
+            </div>
+        </form>
+
+        <div style="margin-top: 2rem; border-top: 1px solid var(--color-gray-300); padding-top: 1rem;">
+            <h4>Demonstration Controls</h4>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button onclick="setFormState('default')" style="font-size: 12px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">Default</button>
+                <button onclick="setFormState('validation_failed')" style="font-size: 12px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">Validation Failed</button>
+                <button onclick="setFormState('submitting')" style="font-size: 12px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">Submitting</button>
+                <button onclick="setFormState('error')" style="font-size: 12px; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">Server Error</button>
+            </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('expense-form-demo');
+      const typeSelect = document.getElementById('expense-type');
+      const dieselFields = document.getElementById('diesel-fields');
+
+      // Conditional field logic
+      typeSelect.addEventListener('change', function() {
+        if (this.value === 'Diesel') {
+          dieselFields.classList.add('expense-form__conditional-fields--visible');
+          dieselFields.querySelectorAll('input').forEach(input => input.required = true);
+        } else {
+          dieselFields.classList.remove('expense-form__conditional-fields--visible');
+          dieselFields.querySelectorAll('input').forEach(input => input.required = false);
+        }
+      });
+
+      // Prevent actual submission for demo
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Form submission prevented for demonstration.');
+      });
+    });
+
+    // Demo state management function
+    function setFormState(state) {
+        const form = document.getElementById('expense-form-demo');
+        const fieldset = document.getElementById('form-fieldset');
+        const submitButton = form.querySelector('button[type="submit"]');
+        const errorBanner = document.getElementById('form-error-banner');
+
+        // Reset all states
+        fieldset.disabled = false;
+        submitButton.classList.remove('btn--loading');
+        submitButton.disabled = false;
+        errorBanner.classList.remove('alert-banner--error');
+        errorBanner.textContent = '';
+        document.querySelectorAll('.form-input, .form-select').forEach(el => el.classList.remove('error'));
+        document.querySelectorAll('.form-error-message').forEach(el => el.textContent = '');
+
+        switch (state) {
+            case 'default':
+                // Already reset
+                break;
+            case 'validation_failed':
+                document.getElementById('expense-amount').classList.add('error');
+                document.getElementById('expense-amount-error').textContent = 'Amount cannot be zero.';
+                document.getElementById('receipt-uploader-error').textContent = 'A receipt photo is required.';
+                // Simulate diesel error
+                document.getElementById('expense-type').value = 'Diesel';
+                document.getElementById('expense-type').dispatchEvent(new Event('change'));
+                document.getElementById('odometer').classList.add('error');
+                document.getElementById('odometer-error').textContent = 'Odometer reading must be greater than the last one (150000 km).';
+                break;
+            case 'submitting':
+                fieldset.disabled = true;
+                submitButton.classList.add('btn--loading');
+                submitButton.disabled = true;
+                break;
+            case 'error':
+                errorBanner.classList.add('alert-banner--error');
+                errorBanner.textContent = 'Submission failed. Could not connect to the server.';
+                break;
+        }
+    }
+  </script>
+
+</body>
+</html>

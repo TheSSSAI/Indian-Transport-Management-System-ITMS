@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="tms_driver_portal.HeaderNav" owl="1">
+        <header class="tms-HeaderNav d-flex align-items-center justify-content-between p-3 shadow-sm">
+            <div class="tms-HeaderNav_start">
+                <button t-if="props.showBackButton"
+                        class="btn btn-link tms-HeaderNav_button"
+                        t-on-click="_onBackClick"
+                        aria-label="Go Back">
+                    <i class="fa fa-arrow-left fa-lg"/>
+                </button>
+            </div>
+            <div class="tms-HeaderNav_center">
+                <h1 class="tms-HeaderNav_title m-0 h5 fw-bold">
+                    <t t-esc="state.title"/>
+                </h1>
+            </div>
+            <div class="tms-HeaderNav_end">
+                <button t-if="props.showMenuButton"
+                        class="btn btn-link tms-HeaderNav_button"
+                        t-on-click="_onMenuClick"
+                        aria-label="Open Menu">
+                    <i class="fa fa-bars fa-lg"/>
+                </button>
+            </div>
+        </header>
+    </t>
+</templates>

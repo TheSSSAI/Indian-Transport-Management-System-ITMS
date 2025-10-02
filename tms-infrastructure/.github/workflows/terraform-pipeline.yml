@@ -1,0 +1,261 @@
+#
+# TMS Infrastructure - Terraform CI/CD Pipeline
+#
+# This GitHub Actions workflow automates the validation, planning, and application
+# of Terraform infrastructure changes for the Transport Management System on AWS.
+#
+# It adheres to enterprise-grade GitOps principles for Infrastructure as Code (IaC):
+#   1. Plan on Pull Request: Any PR targeting 'main' triggers a 'terraform plan' for all environments.
+#      The plan output is posted as a comment on the PR for mandatory peer review.
+#   2. Apply on Merge/Push: Pushing to specific branches automatically triggers 'terraform apply'.
+#      - 'develop' branch -> applies to the 'dev' environment.
+#      - 'release/*' branches -> applies to the 'staging' environment.
+#      - 'main' branch -> applies to the 'prod' environment after MANUAL APPROVAL.
+#   3. Security: Uses AWS OIDC for secure, short-lived credentials. No long-lived keys are stored.
+#   4. State Management: Securely uses a remote S3 backend with DynamoDB for state locking.
+#   5. Quality Gates: Includes linting and validation steps to ensure code quality before planning.
+#
+
+name: 'Terraform CI/CD'
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'release/*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+# Permissions required for AWS OIDC authentication and posting PR comments.
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  # ===================================================================================
+  #  QUALITY GATE: LINT & VALIDATE
+  #  This job runs first to ensure code quality and syntax correctness.
+  # ===================================================================================
+  lint_and_validate:
+    name: 'Lint and Validate'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
+
+      - name: 'Setup Terraform'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0 # As per versions.tf or project standard
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: 'Terraform Format Check'
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: 'Terraform Init All'
+        run: |
+          for dir in environments/*; do
+            if [ -d "$dir" ]; then
+              echo "Initializing in $dir"
+              terraform -chdir="$dir" init -backend=false
+            fi
+          done
+        
+      - name: 'Terraform Validate All'
+        id: validate
+        run: |
+          for dir in environments/*; do
+            if [ -d "$dir" ]; then
+              echo "Validating in $dir"
+              terraform -chdir="$dir" validate -no-color
+            fi
+          done
+
+      - name: 'TFLint'
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.50.3
+
+      - name: 'Run TFLint'
+        run: tflint --recursive --force
+
+  # ===================================================================================
+  #  PLAN: Generates a Terraform plan for each environment on Pull Requests.
+  #  This allows reviewers to see the exact impact of the proposed changes.
+  # ===================================================================================
+  plan:
+    name: 'Terraform Plan'
+    needs: lint_and_validate
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [ 'dev', 'staging', 'prod' ]
+    
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
+
+      - name: 'Setup Terraform'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: 'Configure AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_IAC_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: 'Terraform Init (${{ matrix.environment }})'
+        id: init
+        run: terraform -chdir=environments/${{ matrix.environment }} init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" -backend-config="key=environments/${{ matrix.environment }}/terraform.tfstate" -backend-config="dynamodb_table=${{ secrets.TF_STATE_LOCK_TABLE }}" -backend-config="region=${{ vars.AWS_REGION }}"
+
+      - name: 'Terraform Plan (${{ matrix.environment }})'
+        id: plan
+        run: terraform -chdir=environments/${{ matrix.environment }} plan -no-color -out=tfplan
+        continue-on-error: true
+      
+      - name: 'Format Plan Output'
+        id: format-plan
+        run: |
+          PLAN_OUTPUT=$(terraform -chdir=environments/${{ matrix.environment }} show -no-color tfplan)
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "PLAN_BODY<<$EOF" >> $GITHUB_ENV
+          echo '```terraform' >> $GITHUB_ENV
+          echo "$PLAN_OUTPUT" >> $GITHUB_ENV
+          echo '```' >> $GITHUB_ENV
+          echo "$EOF" >> $GITHUB_ENV
+
+      - name: 'Post Plan to PR'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { PLAN_BODY } = process.env;
+            const environment = "${{ matrix.environment }}".toUpperCase();
+            let status = "${{ steps.plan.outcome }}" === "success" ? "✅" : "❌";
+            let planResult = "${{ steps.plan.outcome }}" === "success" ? "succeeded" : "failed";
+
+            const output = `
+            #### Terraform Plan for \`${environment}\` Environment ${status}
+            
+            \`terraform plan\` ${planResult}.
+            
+            <details><summary>Show Plan</summary>
+            
+            ${PLAN_BODY}
+            
+            </details>
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            });
+
+  # ===================================================================================
+  #  APPLY: Applies the Terraform configuration to the target environments.
+  # ===================================================================================
+  apply_dev:
+    name: 'Apply to DEV'
+    needs: lint_and_validate
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: development
+    
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
+
+      - name: 'Setup Terraform'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: 'Configure AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_IAC_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: 'Terraform Init (dev)'
+        run: terraform -chdir=environments/dev init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" -backend-config="key=environments/dev/terraform.tfstate" -backend-config="dynamodb_table=${{ secrets.TF_STATE_LOCK_TABLE }}" -backend-config="region=${{ vars.AWS_REGION }}"
+
+      - name: 'Terraform Apply (dev)'
+        run: terraform -chdir=environments/dev apply -auto-approve
+
+  apply_staging:
+    name: 'Apply to STAGING'
+    needs: lint_and_validate
+    if: startsWith(github.ref, 'refs/heads/release/') && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
+
+      - name: 'Setup Terraform'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: 'Configure AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_IAC_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: 'Terraform Init (staging)'
+        run: terraform -chdir=environments/staging init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" -backend-config="key=environments/staging/terraform.tfstate" -backend-config="dynamodb_table=${{ secrets.TF_STATE_LOCK_TABLE }}" -backend-config="region=${{ vars.AWS_REGION }}"
+
+      - name: 'Terraform Apply (staging)'
+        run: terraform -chdir=environments/staging apply -auto-approve
+
+  apply_prod:
+    name: 'Apply to PROD'
+    needs: lint_and_validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: 
+      name: production
+      url: https://tms.example.com # Replace with actual production URL
+
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
+
+      - name: 'Setup Terraform'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: 'Configure AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_IAC_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      
+      - name: 'Terraform Init (prod)'
+        run: terraform -chdir=environments/prod init -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" -backend-config="key=environments/prod/terraform.tfstate" -backend-config="dynamodb_table=${{ secrets.TF_STATE_LOCK_TABLE }}" -backend-config="region=${{ vars.AWS_REGION }}"
+      
+      # For production, we re-plan to ensure what's applied is based on the latest state,
+      # but the PR plan provides the review gate.
+      - name: 'Terraform Plan (prod)'
+        run: terraform -chdir=environments/prod plan -out=tfplan
+
+      - name: 'Terraform Apply (prod)'
+        run: terraform -chdir=environments/prod apply -auto-approve tfplan

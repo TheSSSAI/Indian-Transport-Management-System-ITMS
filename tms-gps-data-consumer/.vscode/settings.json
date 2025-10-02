@@ -1,0 +1,34 @@
+{
+    "python.pythonPath": "/usr/bin/python3",
+    "python.languageServer": "Pylance",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "python.linting.flake8Args": [
+        "--config=${workspaceFolder}/.flake8"
+    ],
+    "python.formatting.provider": "black",
+    "python.formatting.blackPath": "/usr/local/bin/black",
+    "editor.formatOnSave": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+    "python.sortImports.path": "/usr/local/bin/isort",
+    "python.sortImports.args": [
+        "--profile",
+        "black"
+    ],
+    "files.associations": {
+        "*.xml": "xml"
+    },
+    "xml.format.splitAttributes": true,
+    "search.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/*.pyc": true
+    }
+}

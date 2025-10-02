@@ -1,0 +1,37 @@
+sequenceDiagram
+    actor "Dispatch Manager" as User
+    participant "Odoo Web Client (OWL)" as UI
+    participant "Odoo Server (Business Logic)" as Server
+    participant "PostgreSQL Database" as DB
+
+    User->>UI: 1. Clicks 'Resume Trip' on 'On Hold' trip
+    UI->>UI: 2. Renders modal for 'Resolution Comment'
+    User->>UI: 3. Enters comment and clicks 'Confirm'
+    
+    activate Server
+    UI->>Server: 4. RPC call: action_resume_trip(comment)
+    
+    Server->>Server: 5. [Security Check] Verify user has 'Dispatch Manager' group
+    note over Server: Raises AccessError if check fails (REQ-FNC-002)
+    
+    Server->>Server: 6. [Validation] Check if comment is not empty
+    note over Server: Raises ValidationError if check fails (REQ-FNC-002)
+
+    Server->>DB: 7. BEGIN TRANSACTION
+    activate DB
+    
+    Server->>DB: 8. UPDATE tms_trip SET status = 'in_transit' WHERE id = ...
+    DB-->>Server: OK
+    
+    Server->>DB: 9. INSERT INTO mail_message (body, res_id, model, ...)
+    note right of Server: Posts resolution comment to trip's chatter (audit trail)
+    DB-->>Server: OK
+
+    Server->>DB: 10. COMMIT TRANSACTION
+    deactivate DB
+
+    Server-->>UI: 11. Success response + UI action
+    deactivate Server
+
+    UI->>UI: 12. Close modal, refresh form view
+    UI-->>User: 13. Trip status is now 'In-Transit' and comment is visible

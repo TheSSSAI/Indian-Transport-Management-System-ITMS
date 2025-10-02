@@ -1,0 +1,273 @@
+
+{
+  "component_inventory": {
+    "atomic_components": [
+      {
+        "component_name": "Large Action Button (Mobile)",
+        "category": "form_controls",
+        "variants": ["primary", "secondary", "danger", "success"],
+        "states": ["default", "active", "disabled", "loading"],
+        "responsive_needs": "Full-width on mobile viewports, large touch target (min 48x48px), bold text.",
+        "dependencies": [],
+        "complexity_level": "low",
+        "implementation_priority": 1,
+        "estimated_effort": "2-4 hours"
+      },
+      {
+        "component_name": "Form Input (Mobile)",
+        "category": "form_controls",
+        "variants": ["text", "email", "password", "numeric", "textarea"],
+        "states": ["default", "focused", "error", "read-only"],
+        "responsive_needs": "100% width, increased font size and padding for mobile usability.",
+        "dependencies": [],
+        "complexity_level": "low",
+        "implementation_priority": 1,
+        "estimated_effort": "3-5 hours (for all variants)"
+      },
+      {
+        "component_name": "Dropdown Select (Mobile)",
+        "category": "form_controls",
+        "variants": ["standard"],
+        "states": ["default", "focused", "error"],
+        "responsive_needs": "Should use native mobile OS dropdown UI for better UX and accessibility.",
+        "dependencies": [],
+        "complexity_level": "low",
+        "implementation_priority": 2,
+        "estimated_effort": "2-3 hours"
+      },
+      {
+        "component_name": "Status Tag",
+        "category": "feedback_elements",
+        "variants": ["Assigned (info)", "In-Transit (primary)", "Delivered (success)", "On-Hold (warning)", "Canceled (error)"],
+        "states": ["default"],
+        "responsive_needs": "Font size and padding adjusted for mobile readability.",
+        "dependencies": [],
+        "complexity_level": "low",
+        "implementation_priority": 2,
+        "estimated_effort": "2-3 hours (for all variants)"
+      },
+      {
+        "component_name": "Toast Notification",
+        "category": "feedback_elements",
+        "variants": ["success", "error", "info"],
+        "states": ["visible", "hidden"],
+        "responsive_needs": "Positioned at the top or bottom of the viewport, full-width with margins.",
+        "dependencies": [],
+        "complexity_level": "medium",
+        "implementation_priority": 2,
+        "estimated_effort": "4-6 hours"
+      }
+    ],
+    "molecular_components": [
+      {
+        "component_name": "Mobile Header Bar",
+        "category": "navigation",
+        "variants": ["with_back_button", "with_hamburger_menu"],
+        "states": ["default"],
+        "responsive_needs": "Fixed to the top of the viewport.",
+        "dependencies": ["Icon Button"],
+        "complexity_level": "medium",
+        "implementation_priority": 1,
+        "estimated_effort": "3-5 hours"
+      },
+      {
+        "component_name": "Mobile Navigation Menu",
+        "category": "navigation",
+        "variants": ["off-canvas_sidebar"],
+        "states": ["open", "closed"],
+        "responsive_needs": "Full-screen or slides in from the side, with an overlay to dim the background content.",
+        "dependencies": ["Mobile Header Bar"],
+        "complexity_level": "medium",
+        "implementation_priority": 1,
+        "estimated_effort": "4-6 hours"
+      },
+      {
+        "component_name": "Trip List Card",
+        "category": "data_display",
+        "variants": ["current_trip", "past_trip"],
+        "states": ["default", "tapped"],
+        "responsive_needs": "Full-width with clear information hierarchy for small screens.",
+        "dependencies": ["Status Tag"],
+        "complexity_level": "medium",
+        "implementation_priority": 2,
+        "estimated_effort": "4-6 hours"
+      },
+      {
+        "component_name": "File Uploader (Mobile)",
+        "category": "form_controls",
+        "variants": ["photo_upload", "document_upload"],
+        "states": ["empty", "file_selected", "uploading", "error"],
+        "responsive_needs": "Launches native device camera or file gallery. Displays thumbnail preview.",
+        "dependencies": ["Large Action Button (Mobile)", "Inline Loader/Spinner"],
+        "complexity_level": "high",
+        "implementation_priority": 3,
+        "estimated_effort": "8-10 hours"
+      },
+      {
+        "component_name": "Signature Pad",
+        "category": "form_controls",
+        "variants": ["default"],
+        "states": ["empty", "drawing", "signed"],
+        "responsive_needs": "Canvas area should adapt to viewport size and orientation.",
+        "dependencies": ["Large Action Button (Mobile)"],
+        "complexity_level": "high",
+        "implementation_priority": 3,
+        "estimated_effort": "6-8 hours"
+      }
+    ],
+    "organism_components": [
+      {
+        "component_name": "Driver Login Form",
+        "category": "forms",
+        "variants": ["default"],
+        "states": ["default", "submitting", "error"],
+        "responsive_needs": "Single-column layout, centered on the screen, optimized for mobile portrait view.",
+        "dependencies": ["Form Input (Mobile)", "Large Action Button (Mobile)"],
+        "complexity_level": "medium",
+        "implementation_priority": 1,
+        "estimated_effort": "4-6 hours"
+      },
+      {
+        "component_name": "Trip Detail View",
+        "category": "data_display",
+        "variants": ["default"],
+        "states": ["loading", "loaded", "error"],
+        "responsive_needs": "A scrollable, single-column view with clearly sectioned information.",
+        "dependencies": ["Large Action Button (Mobile)", "Status Tag"],
+        "complexity_level": "medium",
+        "implementation_priority": 2,
+        "estimated_effort": "6-8 hours"
+      },
+      {
+        "component_name": "Expense Submission Form",
+        "category": "forms",
+        "variants": ["default"],
+        "states": ["default", "submitting", "error", "validation_failed"],
+        "responsive_needs": "Single-column form with conditional fields for 'Diesel' expenses.",
+        "dependencies": ["Dropdown Select (Mobile)", "Form Input (Mobile)", "File Uploader (Mobile)", "Large Action Button (Mobile)"],
+        "complexity_level": "high",
+        "implementation_priority": 3,
+        "estimated_effort": "8-12 hours"
+      },
+      {
+        "component_name": "POD Submission Form",
+        "category": "forms",
+        "variants": ["photo_upload", "e_signature"],
+        "states": ["default", "submitting", "error"],
+        "responsive_needs": "Single-column layout with a choice between two input methods.",
+        "dependencies": ["File Uploader (Mobile)", "Signature Pad", "Form Input (Mobile)", "Large Action Button (Mobile)"],
+        "complexity_level": "high",
+        "implementation_priority": 3,
+        "estimated_effort": "10-14 hours"
+      }
+    ]
+  },
+  "screen_inventory": [
+    {
+      "screen_name": "Driver Login Screen",
+      "screen_type": "authentication",
+      "variants": ["mobile"],
+      "states": ["default", "loading", "error"],
+      "required_components": ["Driver Login Form"],
+      "platform_optimizations": "Minimalist UI focused on quick credential entry on a mobile device.",
+      "implementation_priority": 1,
+      "estimated_effort": "4-6 hours",
+      "user_flow_criticality": "high"
+    },
+    {
+      "screen_name": "My Trips (Dashboard)",
+      "screen_type": "list_view",
+      "variants": ["mobile"],
+      "states": ["loading", "loaded_current", "loaded_past", "empty"],
+      "required_components": ["Mobile Header Bar", "Mobile Navigation Menu", "Tab Navigation", "Trip List Card"],
+      "platform_optimizations": "Default view is 'Current' trips. Uses lazy loading for 'Past' trips to ensure fast initial load times.",
+      "implementation_priority": 2,
+      "estimated_effort": "8-12 hours",
+      "user_flow_criticality": "high"
+    },
+    {
+      "screen_name": "Trip Detail Screen",
+      "screen_type": "detail_view",
+      "variants": ["mobile"],
+      "states": ["loading", "loaded", "error"],
+      "required_components": ["Mobile Header Bar", "Trip Detail View"],
+      "platform_optimizations": "A hub for all trip-related actions, with large, clear buttons for 'Start Trip', 'Log Event', 'Submit Expense', and 'Upload POD'.",
+      "implementation_priority": 3,
+      "estimated_effort": "6-8 hours",
+      "user_flow_criticality": "high"
+    },
+    {
+      "screen_name": "Expense Submission Screen",
+      "screen_type": "form",
+      "variants": ["mobile"],
+      "states": ["default", "loading", "error"],
+      "required_components": ["Mobile Header Bar", "Expense Submission Form"],
+      "platform_optimizations": "Streamlined, single-purpose form to minimize driver data entry time.",
+      "implementation_priority": 4,
+      "estimated_effort": "8-12 hours",
+      "user_flow_criticality": "high"
+    },
+    {
+      "screen_name": "POD Submission Screen",
+      "screen_type": "form",
+      "variants": ["mobile"],
+      "states": ["default", "loading", "error"],
+      "required_components": ["Mobile Header Bar", "POD Submission Form"],
+      "platform_optimizations": "Optimized for in-field use, with clear choices for photo vs. signature.",
+      "implementation_priority": 4,
+      "estimated_effort": "10-14 hours",
+      "user_flow_criticality": "high"
+    },
+    {
+      "screen_name": "Help & Training Screen",
+      "screen_type": "content_view",
+      "variants": ["mobile"],
+      "states": ["loading", "loaded", "empty", "error"],
+      "required_components": ["Mobile Header Bar", "Mobile Navigation Menu"],
+      "platform_optimizations": "Simple list of links to videos and documents, optimized for quick access.",
+      "implementation_priority": 5,
+      "estimated_effort": "4-6 hours",
+      "user_flow_criticality": "medium"
+    }
+  ],
+  "implementation_plan": {
+    "phase_1_foundation": {
+      "components": ["Large Action Button (Mobile)", "Form Input (Mobile)", "Mobile Header Bar", "Mobile Navigation Menu"],
+      "rationale": "Builds the foundational atomic and navigation components required for all screens.",
+      "estimated_duration": "3-5 days"
+    },
+    "phase_2_authentication_and_core_view": {
+      "components": ["Driver Login Form", "Trip List Card", "Status Tag"],
+      "screens": ["Driver Login Screen", "My Trips (Dashboard)"],
+      "rationale": "Implements the critical user entry point and the primary dashboard, unblocking further development.",
+      "estimated_duration": "4-6 days"
+    },
+    "phase_3_trip_execution_workflow": {
+      "components": ["Trip Detail View", "File Uploader (Mobile)", "Signature Pad"],
+      "screens": ["Trip Detail Screen", "POD Submission Screen"],
+      "rationale": "Focuses on the core driver workflow of starting a trip and completing delivery, which are high-value actions.",
+      "estimated_duration": "5-8 days"
+    },
+    "phase_4_supporting_workflows": {
+      "components": ["Expense Submission Form"],
+      "screens": ["Expense Submission Screen", "Help & Training Screen"],
+      "rationale": "Adds the remaining essential driver tasks and support features.",
+      "estimated_duration": "4-7 days"
+    }
+  },
+  "platform_implementation_strategy": {
+    "target_platform": "Mobile Web Application (Odoo OWL 2.0)",
+    "implementation_approach": "mobile_first",
+    "responsive_strategy": "The design is optimized for mobile viewports (360px+). It will be functional on tablets but will not have a distinct tablet-optimized layout, instead scaling the mobile UI.",
+    "progressive_enhancement": "Core functionality will be built with semantic HTML and basic forms. OWL 2.0 will then be used to add client-side validation, dynamic component states, and asynchronous communication with the backend.",
+    "browser_support": "Latest versions of Chrome on Android and Safari on iOS.",
+    "accessibility_integration": "WCAG 2.1 AA compliance will be a primary goal throughout development, with a focus on large touch targets, sufficient color contrast, and proper ARIA attributes for custom components."
+  },
+  "quality_assurance_plan": {
+    "component_testing": "Each OWL component will be tested in isolation using storybook-like tools or Odoo's JS testing framework.",
+    "integration_testing": "Testing the interaction between OWL components and the backend Odoo controller APIs, verifying data contracts.",
+    "responsive_testing": "Primary focus on testing across a range of mobile device viewports (360px to 420px width) using browser dev tools and physical devices.",
+    "accessibility_testing": "Automated scans with tools like Axe, combined with manual keyboard and screen reader testing for all user flows.",
+    "performance_testing": "Using browser developer tools to measure LCP, interaction responsiveness, and network performance on simulated 4G connections."
+  }
+}

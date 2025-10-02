@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="tms_driver_portal.TripListScreen" owl="1">
+        <div class="d-flex flex-column h-100 bg-light">
+            <HeaderNav title="'My Trips'" showBackButton="false"/>
+
+            <!-- Filter Tabs -->
+            <div class="d-flex bg-white shadow-sm">
+                <button
+                    class="btn btn-lg btn-light flex-grow-1 rounded-0 border-0 p-3"
+                    t-att-class="{ 'fw-bold text-primary border-bottom border-primary border-3': state.activeFilter === 'current' }"
+                    t-on-click="() => this._onSwitchFilter('current')"
+                >
+                    Current
+                </button>
+                <button
+                    class="btn btn-lg btn-light flex-grow-1 rounded-0 border-0 p-3"
+                    t-att-class="{ 'fw-bold text-primary border-bottom border-primary border-3': state.activeFilter === 'past' }"
+                    t-on-click="() => this._onSwitchFilter('past')"
+                >
+                    Past
+                </button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-grow-1 overflow-auto" t-ref="scrollContainer">
+                <div t-if="state.hasError" class="alert alert-danger m-3" role="alert">
+                    <i class="fa fa-exclamation-triangle me-2"/>
+                    <t t-esc="state.errorMessage"/>
+                </div>
+
+                <!-- Skeleton Loader -->
+                <div t-if="state.isLoading and !state.trips.length" class="p-3">
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-body p-3 placeholder-glow">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="placeholder col-4"/>
+                                <span class="placeholder col-3"/>
+                            </div>
+                            <h5 class="card-title placeholder-glow">
+                                <span class="placeholder col-6"/>
+                            </h5>
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-7 me-1"/>
+                                <span class="placeholder col-4"/>
+                            </p>
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-8"/>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-body p-3 placeholder-glow">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="placeholder col-4"/>
+                                <span class="placeholder col-3"/>
+                            </div>
+                            <h5 class="card-title placeholder-glow">
+                                <span class="placeholder col-6"/>
+                            </h5>
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-7 me-1"/>
+                                <span class="placeholder col-4"/>
+                            </p>
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-8"/>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div t-if="!state.isLoading and !state.trips.length" class="text-center text-muted p-5">
+                    <i class="fa fa-truck fa-3x mb-3"/>
+                    <h4 t-if="state.activeFilter === 'current'">You have no current trips assigned.</h4>
+                    <h4 t-if="state.activeFilter === 'past'">No past trips found.</h4>
+                </div>
+
+                <!-- Trip List -->
+                <div class="p-3" t-if="state.trips.length">
+                    <TripListItem
+                        t-foreach="state.trips"
+                        t-as="trip"
+                        t-key="trip.id"
+                        trip="trip"
+                        onClick="() => this._onTripClick(trip.id)"
+                    />
+                </div>
+                
+                <!-- Loading more spinner -->
+                <div t-if="state.isLoading and state.trips.length" class="d-flex justify-content-center p-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </t>
+</templates>

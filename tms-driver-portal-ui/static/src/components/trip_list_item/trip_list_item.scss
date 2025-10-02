@@ -1,0 +1,48 @@
+@use "../../scss/variables" as *;
+
+.tms-TripListItem {
+    color: inherit;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 1px solid $gray-200;
+
+    &:hover,
+    &:focus {
+        transform: translateY(-4px);
+        box-shadow: $box-shadow-lg !important;
+        outline: none;
+    }
+
+    &:focus-visible {
+        outline: 2px solid $primary-500;
+        outline-offset: 2px;
+    }
+
+    .card-body {
+        padding: $spacing-md;
+    }
+
+    &_id {
+        color: $primary-700;
+        font-size: 1.1rem;
+    }
+
+    &_customer {
+        font-size: 0.95rem;
+
+        .fa {
+            width: 16px;
+        }
+    }
+
+    &_route {
+        .fa {
+            width: 16px;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .text-muted {
+            font-size: 0.8rem;
+        }
+    }
+}

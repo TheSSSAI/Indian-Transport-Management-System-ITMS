@@ -1,0 +1,168 @@
+# ==============================================================================
+# PROMETHEUS MAIN CONFIGURATION (prometheus.yml)
+# ==============================================================================
+# This file defines the global Prometheus settings, scrape targets, and
+# integration with Alertmanager. It uses Kubernetes Service Discovery to
+# dynamically find and monitor application pods within the EKS cluster,
+# aligning with REQ-1-014 and REQ-1-602.
+# ==============================================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  # external_labels are labels to add to any time series or alerts when
+  # communicating with external systems (federation, remote storage, Alertmanager).
+  external_labels:
+    cluster: 'tms-eks-production'
+    region: 'ap-south-1'
+
+# Alerting configuration. Specifies the Alertmanager to which alerts are sent.
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            # This should resolve to the Alertmanager service in Kubernetes.
+            # Assumes Alertmanager is running in the same namespace.
+            - 'alertmanager.monitoring.svc.cluster.local:9093'
+
+# Rule files specifies the location of files containing alerting and recording rules.
+# Prometheus will periodically reload these files.
+rule_files:
+  - /etc/prometheus/rules/platform.rules.yml
+  - /etc/prometheus/rules/application.rules.yml
+  - /etc/prometheus/rules/recording.rules.yml
+
+# Scrape configurations define the set of targets and parameters for scraping metrics.
+scrape_configs:
+  # ----------------------------------------------------------------------------
+  # Job: Self-monitoring for the Prometheus instance itself.
+  # ----------------------------------------------------------------------------
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # ----------------------------------------------------------------------------
+  # Job: Discover and scrape TMS Odoo application pods.
+  # REQ-1-602: Scrape metrics from Odoo pods.
+  # ----------------------------------------------------------------------------
+  - job_name: 'tms-odoo-app'
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      # Filter for pods with the label 'app: tms-odoo-app'
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: keep
+        regex: 'tms-odoo-app'
+      # Scrape only if the pod has the annotation 'prometheus.io/scrape: true'
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      # Use the pod's port annotation for scraping, default to 9117 if not set.
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        target_label: __address__
+        regex: (\d+)
+        replacement: ${1}:9117
+      # Define the metrics path from the annotation, default to /metrics.
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      # Add pod and namespace labels to the metrics.
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: pod
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: replace
+        target_label: app
+
+  # ----------------------------------------------------------------------------
+  # Job: Discover and scrape TMS GPS Microservice pods.
+  # REQ-1-602: Scrape metrics from microservice pods.
+  # ----------------------------------------------------------------------------
+  - job_name: 'tms-gps-microservice'
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      # Filter for pods with the label 'app: tms-gps-svc'
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: keep
+        regex: 'tms-gps-svc'
+      # Scrape only if the pod has the annotation 'prometheus.io/scrape: true'
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      # Use the pod's port annotation for scraping, default to 8000 if not set.
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        target_label: __address__
+        regex: (\d+)
+        replacement: ${1}:8000
+      # Define the metrics path from the annotation, default to /metrics.
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      # Add pod and namespace labels to the metrics.
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: pod
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: namespace
+      - source_labels: [__meta_kubernetes_pod_label_app]
+        action: replace
+        target_label: app
+
+  # ----------------------------------------------------------------------------
+  # Job: Discover and scrape Kubernetes control plane components.
+  # Useful for platform-level monitoring.
+  # ----------------------------------------------------------------------------
+  - job_name: 'kubernetes-apiservers'
+    kubernetes_sd_configs:
+      - role: endpoints
+    scheme: https
+    tls_config:
+      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: default;kubernetes;https
+
+  - job_name: 'kubernetes-nodes'
+    kubernetes_sd_configs:
+      - role: node
+    scheme: https
+    tls_config:
+      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+      - target_label: __address__
+        replacement: kubernetes.default.svc:443
+      - source_labels: [__meta_kubernetes_node_name]
+        regex: (.+)
+        target_label: __metrics_path__
+        replacement: /api/v1/nodes/${1}/proxy/metrics
+
+  - job_name: 'kubernetes-cadvisor'
+    kubernetes_sd_configs:
+      - role: node
+    scheme: https
+    tls_config:
+      ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+    relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+      - target_label: __address__
+        replacement: kubernetes.default.svc:443
+      - source_labels: [__meta_kubernetes_node_name]
+        regex: (.+)
+        target_label: __metrics_path__
+        replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor

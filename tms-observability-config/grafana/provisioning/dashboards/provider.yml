@@ -1,0 +1,37 @@
+# ==============================================================================
+# GRAFANA DASHBOARD PROVIDER CONFIGURATION (provider.yml)
+# ==============================================================================
+# This file configures Grafana's declarative provisioning system to
+# automatically discover and load all dashboard JSON models from a specified
+# directory. This enables "Dashboards as Code", fulfilling REQ-1-602.
+# ==============================================================================
+
+# The API version for this configuration file format.
+apiVersion: 1
+
+# A list of dashboard providers.
+providers:
+  # ----------------------------------------------------------------------------
+  # Provider: tms-dashboards
+  # This provider loads all JSON files from the specified path as dashboards.
+  # ----------------------------------------------------------------------------
+  - name: 'tms-dashboards'
+    # Unique identifier for the provider.
+    orgId: 1
+    # A friendly name for the folder where these dashboards will appear in Grafana.
+    folder: 'TMS Application Dashboards'
+    # The type of provider. 'file' means it scans a directory.
+    type: file
+    # If set to true, Grafana will not allow users to disable this provider from the UI.
+    disableDeletion: false
+    # Interval in seconds for Grafana to scan the directory for new/changed dashboards.
+    updateIntervalSeconds: 30
+    # Allow dashboards to be loaded with an unsigned signature.
+    allowUiUpdates: true
+    options:
+      # The path where the dashboard JSON files are located inside the Grafana container.
+      # This path will be mounted from a Kubernetes ConfigMap created from the files in
+      # the 'grafana/dashboards/' directory of this repository.
+      path: /etc/grafana/provisioning/dashboards
+      # Whether to load dashboards from subfolders.
+      foldersFromFilesStructure: false

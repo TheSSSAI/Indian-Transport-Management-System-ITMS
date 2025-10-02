@@ -1,0 +1,2 @@
+"total_risks_identified","critical_risks","high_priority_risks","average_risk_score","key_risk_themes","immediate_actions_required"
+"6","0","4","15","[""External API Dependencies"",""Complex Infrastructure & Skill Gaps"",""Data Migration Integrity""]","[""Initiate a skills gap analysis for the DevOps/SRE technology stack."",""Prioritize development of the GSP API mock server and the resilient integration pattern."",""Schedule a data profiling task for the legacy system ahead of ETL development.""]"

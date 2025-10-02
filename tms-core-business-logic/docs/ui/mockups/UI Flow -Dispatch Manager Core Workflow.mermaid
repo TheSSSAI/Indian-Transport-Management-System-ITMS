@@ -1,0 +1,74 @@
+sequenceDiagram
+    actor "Dispatch Manager" as Manager
+    participant "Odoo Web UI" as UI
+    participant "TMS Core Backend" as Backend
+
+    Manager->>UI: 1. Navigates to Trips and clicks 'Create'
+    UI->>Manager: 2. Renders New Trip Form
+    Manager->>UI: 3. Fills trip details (Customer, Route, Rate) and saves
+    activate Backend
+    UI->>Backend: 4. call('tms.trip', 'create', vals)
+    Backend->>Backend: 5. Validates required fields (BR-006)
+    Backend-->>UI: 6. Returns new trip record ID with state='Planned'
+    deactivate Backend
+    UI->>Manager: 7. Displays new trip in 'Planned' state
+
+    Manager->>UI: 8. Opens 'Planned' trip, selects Vehicle & Driver
+    activate Backend
+    UI->>Backend: 9. call('tms.trip', 'write', {'vehicle_id': X, 'driver_id': Y})
+    Backend->>Backend: 10. Validates Vehicle Capacity (BR-007) & Driver License (BR-003)
+    Backend->>Backend: 11. [State Change] Updates trip state to 'Assigned'
+    Backend-->>UI: 12. Returns success
+    deactivate Backend
+    UI->>Manager: 13. Displays trip in 'Assigned' state
+
+    note over Manager, Backend: (Driver starts trip, logs critical event. Trip status becomes 'On Hold' per BR-005)
+
+    Manager->>UI: 14. Views 'On Hold' trip and clicks 'Resume Trip'
+    UI->>Manager: 15. Renders 'Resume Trip' modal
+    Manager->>UI: 16. Enters mandatory resolution comment and confirms
+    activate Backend
+    UI->>Backend: 17. call('tms.trip', 'action_resume_trip', comment)
+    Backend->>Backend: 18. [State Change] Updates trip state to 'In-Transit'
+    Backend->>Backend: 19. Logs resolution comment in chatter (audit trail)
+    Backend-->>UI: 20. Returns success
+    deactivate Backend
+    UI->>Manager: 21. Displays trip in 'In-Transit' state
+
+    Manager->>UI: 22. Navigates to 'Expense Approval' queue
+    UI->>Backend: 23. Requests expenses with state='Submitted'
+    Backend-->>UI: 24. Returns list of pending expenses
+    UI->>Manager: 25. Displays expense queue
+
+    alt Approve Expense
+        Manager->>UI: 26a. Clicks 'Approve' on an expense
+        activate Backend
+        UI->>Backend: 27a. call('tms.expense', 'action_approve')
+        Backend->>Backend: 28a. [State Change] Updates expense state to 'Approved'
+        Backend->>Backend: 29a. Triggers Trip Profitability recalculation
+        Backend-->>UI: 30a. Returns success
+        deactivate Backend
+        UI->>Manager: 31a. Expense status updated in UI
+    else Reject Expense
+        Manager->>UI: 26b. Clicks 'Reject' on an expense
+        UI->>Manager: 27b. Renders 'Rejection Reason' modal
+        Manager->>UI: 28b. Enters reason and confirms
+        activate Backend
+        UI->>Backend: 29b. call('tms.expense', 'action_reject', reason)
+        Backend->>Backend: 30b. [State Change] Updates expense state to 'Rejected'
+        Backend->>Backend: 31b. Sends notification to Driver
+        Backend-->>UI: 32b. Returns success
+        deactivate Backend
+        UI->>Manager: 33b. Expense status updated in UI
+    end
+
+    Manager->>UI: 34. Views a different trip and clicks 'Cancel Trip'
+    UI->>Manager: 35. Renders 'Cancellation Reason' modal
+    Manager->>UI: 36. Enters mandatory reason and confirms
+    activate Backend
+    UI->>Backend: 37. call('tms.trip', 'action_cancel', reason)
+    Backend->>Backend: 38. [State Change] Updates trip state to 'Canceled'
+    Backend->>Backend: 39. Sends notification to assigned Driver
+    Backend-->>UI: 40. Returns success
+    deactivate Backend
+    UI->>Manager: 41. Displays trip in 'Canceled' state

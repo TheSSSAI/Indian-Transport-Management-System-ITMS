@@ -1,0 +1,36 @@
+flowchart TD
+    subgraph User Interaction
+        A[Trip is in 'On Hold' state on Form View] --> B(User clicks 'Resume Trip' button);
+        B --> C[System displays 'Resolution Comment' modal];
+        C --> D{User enters comment and clicks 'Confirm'};
+    end
+
+    D --> E{Is comment provided?};
+    E -->|No| F[Display validation error: 'Comment is mandatory'];
+    F --> C;
+
+    E -->|Yes| G[Server receives request];
+    
+    subgraph Server-Side Process
+        G --> H(Security Check: User has 'Dispatch Manager' role);
+        H --> I(Start Database Transaction);
+        I --> J[Update trip.status: 'On Hold' -> 'In-Transit'];
+        J --> K[Post resolution comment to trip's chatter/audit log];
+        K --> L(Commit Database Transaction);
+    end
+
+    L --> M[System closes modal and refreshes Trip Form UI];
+    M --> N[End: Trip is now 'In-Transit' with resolution logged];
+
+    %% Styling
+    classDef userAction fill:#f0f9ff,stroke:#0284c7,color:#000;
+    classDef systemProcess fill:#f1f5f9,stroke:#64748b,color:#000;
+    classDef decision fill:#fefce8,stroke:#eab308,color:#000;
+    classDef errorState fill:#fef2f2,stroke:#dc2626,color:#000;
+    classDef successState fill:#f0fdf4,stroke:#22c55e,color:#000;
+
+    class B,D userAction;
+    class C,G,H,I,J,K,L,M systemProcess;
+    class E decision;
+    class F errorState;
+    class N successState;

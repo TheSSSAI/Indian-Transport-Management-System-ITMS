@@ -1,0 +1,53 @@
+# overlays/production/kustomization.yaml
+#
+# This Kustomize overlay configures the TMS application for the production environment.
+# It builds upon the common 'base' configuration and applies production-specific
+# overrides and patches.
+#
+# Key Production Overrides:
+# 1. helmCharts.valuesFile: Uses 'prod-values.yaml' to set production-grade
+#    settings like hostnames, higher resource limits, and specific image tags.
+# 2. patches: Applies patches to increase replica counts for high availability,
+#    as required by REQ-1-502.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Inherit all common resources from the base configuration.
+# This includes the namespace, default network policies, and the HelmChart definitions.
+resources:
+  - ../../base
+
+# Specify the namespace for all resources in this overlay.
+# This ensures consistency and proper resource isolation.
+namespace: tms
+
+# Apply strategic merge patches for production.
+# This patch targets the Deployment resources to increase the replica count
+# for high availability, directly fulfilling RE-1-502.
+patches:
+  - path: patches/deployment-replicas.yaml
+
+# Configure Helm chart rendering for the production environment.
+# This section instructs Kustomize on how to render the Helm charts
+# defined in the base, specifically overriding their default values with
+# the production-specific values file.
+helmCharts:
+  # Configuration for the tms-odoo chart in production.
+  - name: tms-odoo
+    releaseName: tms-odoo-prod
+    # The valuesFile key points to the production-specific overrides.
+    # This file contains production hostnames, resource requests/limits,
+    # image tags, and references to production SecretProviderClasses.
+    valuesFile: prod-values.yaml
+    includeCRDs: true
+    namespace: tms # Explicitly set namespace for Helm release
+  
+  # Configuration for the tms-gps-service chart in production.
+  - name: tms-gps-service
+    releaseName: tms-gps-service-prod
+    # The same production values file is used, as it's structured
+    # to contain sections for both charts (e.g., tmsOdoo: {...}, tmsGpsService: {...}).
+    valuesFile: prod-values.yaml
+    includeCRDs: true
+    namespace: tms # Explicitly set namespace for Helm release

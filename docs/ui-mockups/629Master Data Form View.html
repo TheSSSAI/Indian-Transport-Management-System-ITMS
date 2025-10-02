@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organism: Master Data Form View</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- DESIGN TOKENS --- */
+        :root {
+            /* Colors */
+            --color-primary-50: #EFF6FF; --color-primary-100: #DBEAFE; --color-primary-200: #BFDBFE; --color-primary-300: #93C5FD; --color-primary-400: #60A5FA; --color-primary-500: #3B82F6; --color-primary-600: #2563EB; --color-primary-700: #1D4ED8; --color-primary-800: #1E40AF; --color-primary-900: #1E3A8A;
+            --color-neutral-white: #FFFFFF; --color-neutral-50: #F9FAFB; --color-neutral-100: #F3F4F6; --color-neutral-200: #E5E7EB; --color-neutral-300: #D1D5DB; --color-neutral-500: #6B7280; --color-neutral-700: #374151; --color-neutral-800: #1F2937; --color-neutral-900: #111827;
+            --color-semantic-success: #16A34A; --color-semantic-warning: #F59E0B; --color-semantic-error: #DC2626; --color-semantic-info: #0284C7;
+
+            /* Typography */
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-size-sm: 12px; --font-size-base: 14px; --font-size-lg: 16px; --font-size-xl: 24px;
+            --font-weight-medium: 500; --font-weight-semibold: 600; --font-weight-bold: 700;
+
+            /* Spacing */
+            --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px;
+
+            /* Borders */
+            --border-radius-sm: 4px; --border-radius-md: 6px; --border-radius-lg: 8px;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-focus-ring: 0 0 0 3px var(--color-primary-200);
+        }
+
+        /* --- BASE STYLES --- */
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; font-family: var(--font-family-primary); font-size: var(--font-size-base); color: var(--color-neutral-900); background-color: var(--color-neutral-100); }
+
+        /* --- MOLECULAR & ATOMIC COMPONENT STYLES (Dependencies) --- */
+        /* Action Button */
+        .btn { display: inline-flex; align-items: center; justify-content: center; font-weight: var(--font-weight-medium); font-size: var(--font-size-sm); padding: var(--space-2) var(--space-4); border-radius: var(--border-radius-md); cursor: pointer; transition: all 0.15s ease; border: 1px solid transparent; }
+        .btn:focus-visible { outline: none; box-shadow: var(--shadow-focus-ring); }
+        .btn--primary { background-color: var(--color-primary-700); color: var(--color-neutral-white); border-color: var(--color-primary-700); }
+        .btn--primary:hover { background-color: var(--color-primary-800); border-color: var(--color-primary-800); }
+        .btn--secondary { background-color: var(--color-neutral-white); color: var(--color-neutral-700); border-color: var(--color-neutral-300); box-shadow: var(--shadow-sm); }
+        .btn--secondary:hover { background-color: var(--color-neutral-50); }
+
+        /* Form Header & Statusbar */
+        .form-header { background-color: var(--color-neutral-white); padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-neutral-200); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-4); }
+        .form-header__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+        .form-header__statusbar { display: flex; flex-wrap: nowrap; overflow-x: auto; }
+        .statusbar__item { position: relative; display: flex; align-items: center; padding: var(--space-2) var(--space-3) var(--space-2) 20px; margin-right: -10px; font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); text-transform: uppercase; white-space: nowrap; border: none; background-color: var(--color-neutral-100); color: var(--color-neutral-500); cursor: default; }
+        .statusbar__item::before, .statusbar__item::after { content: ''; position: absolute; top: 0; height: 100%; width: 15px; background-color: inherit; transform: skewX(-20deg); }
+        .statusbar__item::before { left: 0; }
+        .statusbar__item::after { right: -8px; z-index: 1; }
+        .statusbar__item.is-current { background-color: var(--color-primary-700); color: var(--color-neutral-white); z-index: 2; }
+        .statusbar__item.is-past { background-color: var(--color-neutral-300); color: var(--color-neutral-700); }
+        
+        /* Smart Button Box */
+        .smart-button-box { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
+        .smart-button { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2); border-radius: var(--border-radius-md); text-decoration: none; color: inherit; transition: background-color 0.2s ease; }
+        .smart-button:hover { background-color: var(--color-neutral-100); }
+        .smart-button__icon svg { width: 20px; height: 20px; color: var(--color-primary-700); }
+        .smart-button__content { display: flex; flex-direction: column; line-height: 1.3; }
+        .smart-button__count { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-neutral-800); }
+        .smart-button__label { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-neutral-500); }
+
+        /* Notebook Tabs */
+        .notebook { width: 100%; }
+        .notebook__tabs { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--color-neutral-200); }
+        .notebook__tab { padding: var(--space-3) var(--space-4); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-neutral-500); background-color: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; margin-bottom: -1px; }
+        .notebook__tab:hover { color: var(--color-neutral-900); }
+        .notebook__tab.is-active { color: var(--color-primary-700); border-bottom-color: var(--color-primary-700); font-weight: var(--font-weight-semibold); }
+        .notebook__panel { padding-top: var(--space-5); }
+        .notebook__panel.is-hidden { display: none; }
+        
+        /* Chatter/Log Area */
+        .chatter { background-color: var(--color-neutral-50); border-top: 1px solid var(--color-neutral-200); padding: var(--space-4); font-size: var(--font-size-sm); color: var(--color-neutral-700); text-align: center;}
+        
+        /* Field Widgets */
+        .field-group { display: flex; flex-direction: column; gap: var(--space-1); }
+        .field-group__label { font-weight: var(--font-weight-medium); color: var(--color-neutral-700); }
+        .field-group__label.is-required::after { content: ' *'; color: var(--color-semantic-error); }
+        .field-widget { width: 100%; padding: var(--space-2) var(--space-3); border: 1px solid var(--color-neutral-300); border-radius: var(--border-radius-md); font-family: inherit; font-size: inherit;}
+        .field-widget:focus-visible { outline: none; border-color: var(--color-primary-500); box-shadow: var(--shadow-focus-ring); }
+        .field-widget--readonly { background-color: transparent; border: none; padding-left: 0; padding-right: 0; color: var(--color-neutral-900); }
+        .field-widget--many2one.field-widget--readonly { color: var(--color-primary-700); font-weight: var(--font-weight-medium); cursor: pointer; }
+        .field-widget--many2one.field-widget--readonly:hover { text-decoration: underline; }
+
+        /* --- ORGANISM: Master Data Form View --- */
+        .o_form_view { background-color: var(--color-neutral-100); }
+        .o_form_sheet_bg { padding: var(--space-8) var(--space-4); }
+        .o_form_sheet { max-width: 1024px; margin: 0 auto; background-color: var(--color-neutral-white); border-radius: var(--border-radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--color-neutral-200); }
+        .o_form_sheet__header { padding: var(--space-4) var(--space-6) 0; }
+        .o_form_sheet__title h1 { font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin: 0; display: flex; align-items: center; gap: var(--space-3);}
+        .o_form_sheet__title input { font-size: inherit; font-weight: inherit; border: none; padding: 0; width: 100%; background: transparent;}
+        .o_form_sheet__main { padding: var(--space-4) var(--space-6) var(--space-6); }
+        
+        /* Form Layout Grid */
+        .o_group { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-8); }
+        .o_group__title { grid-column: 1 / -1; font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); padding-bottom: var(--space-2); border-bottom: 1px solid var(--color-neutral-200); margin: var(--space-4) 0 var(--space-2) 0;}
+
+        /* Responsive Adaptations */
+        @media (max-width: 768px) {
+            body { padding: 0; }
+            .o_form_sheet_bg { padding: 0; }
+            .o_form_sheet { border-radius: 0; border-left: none; border-right: none; }
+            .o_group { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+            .form-header { flex-direction: column; align-items: stretch; }
+            .form-header__statusbar { width: 100%; justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<main class="o_form_view" id="vehicle-form-read-only">
+    <header class="form-header">
+        <div class="form-header__actions">
+            <button class="btn btn--primary">Edit</button>
+            <button class="btn btn--secondary">Create</button>
+        </div>
+        <nav class="form-header__statusbar" aria-label="Status workflow">
+            <div class="statusbar__item is-current" aria-current="step">Active</div>
+            <div class="statusbar__item">Inactive</div>
+        </nav>
+    </header>
+    
+    <div class="o_form_sheet_bg">
+        <div class="o_form_sheet">
+            <header class="o_form_sheet__header">
+                <div class="smart-button-box" role="group">
+                    <a href="#" class="smart-button" aria-label="View 5 related trips">
+                        <div class="smart-button__icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H3.375A2.25 2.25 0 001.125 6.75v10.5a2.25 2.25 0 002.25 2.25z" /></svg>
+                        </div>
+                        <div class="smart-button__content">
+                            <span class="smart-button__count">5</span>
+                            <span class="smart-button__label">Trips</span>
+                        </div>
+                    </a>
+                    <a href="#" class="smart-button" aria-label="View 12 related expenses">
+                         <div class="smart-button__icon" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg>
+                        </div>
+                        <div class="smart-button__content">
+                            <span class="smart-button__count">12</span>
+                            <span class="smart-button__label">Expenses</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="o_form_sheet__title">
+                    <h1>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-neutral-500);"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><circle cx="6" cy="16" r="2"></circle><circle cx="18" cy="16" r="2"></circle></svg>
+                        <span>KA-01-AB-1234</span>
+                    </h1>
+                </div>
+            </header>
+            <main class="o_form_sheet__main">
+                <section class="o_group">
+                    <div class="field-group">
+                        <label class="field-group__label">Model</label>
+                        <div class="field-widget field-widget--readonly">Tata Signa 4825.TK</div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-group__label">Capacity (Tons)</label>
+                        <div class="field-widget field-widget--readonly">25</div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-group__label">Ownership Type</label>
+                        <div class="field-widget field-widget--readonly">Company-Owned</div>
+                    </div>
+                    <div class="field-group">
+                        <label class="field-group__label">Fuel Type</label>
+                        <div class="field-widget field-widget--readonly">Diesel</div>
+                    </div>
+                </section>
+                <div class="notebook">
+                    <div class="notebook__tabs" role="tablist">
+                        <button class="notebook__tab is-active" role="tab" aria-selected="true">Compliance</button>
+                        <button class="notebook__tab" role="tab" aria-selected="false">Service History</button>
+                    </div>
+                    <div class="notebook__panels">
+                        <div class="notebook__panel">
+                             <div class="o_group">
+                                <div class="field-group">
+                                    <label class="field-group__label">Last Service Date</label>
+                                    <div class="field-widget field-widget--readonly">15-Mar-2024</div>
+                                </div>
+                                <div class="field-group">
+                                    <label class="field-group__label">Next Service Due Date</label>
+                                    <div class="field-widget field-widget--readonly">15-Sep-2024</div>
+                                </div>
+                             </div>
+                        </div>
+                        <div class="notebook__panel is-hidden">Service history content...</div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <footer class="chatter">
+        Chatter/Log area for audit trail and notes.
+    </footer>
+</main>
+
+<div style="margin-top: 4rem; padding: 2rem; background-color: #e0e7ff;">
+    <h2 style="text-align: center; font-size: 2rem; margin-bottom: 2rem; color: var(--color-primary-800);">States Showcase</h2>
+
+    <!-- EDIT STATE -->
+    <div class="o_form_view" id="vehicle-form-edit-mode" style="margin-bottom: 2rem;">
+        <header class="form-header">
+            <div class="form-header__actions">
+                <button class="btn btn--primary">Save</button>
+                <button class="btn btn--secondary">Discard</button>
+            </div>
+            <nav class="form-header__statusbar" aria-label="Status workflow">
+                <div class="statusbar__item is-current" aria-current="step">Active</div>
+            </nav>
+        </header>
+        <div class="o_form_sheet_bg">
+            <div class="o_form_sheet">
+                <header class="o_form_sheet__header">
+                    <div class="o_form_sheet__title">
+                        <h1>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-neutral-500);"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><circle cx="6" cy="16" r="2"></circle><circle cx="18" cy="16" r="2"></circle></svg>
+                            <input type="text" class="field-widget" value="KA-01-AB-1234">
+                        </h1>
+                    </div>
+                </header>
+                <main class="o_form_sheet__main">
+                    <section class="o_group">
+                         <h3 class="o_group__title">Vehicle Details</h3>
+                        <div class="field-group">
+                            <label class="field-group__label is-required">Model</label>
+                            <input type="text" class="field-widget" value="Tata Signa 4825.TK">
+                        </div>
+                        <div class="field-group">
+                            <label class="field-group__label is-required">Capacity (Tons)</label>
+                            <input type="number" class="field-widget" value="25">
+                        </div>
+                         <h3 class="o_group__title">Ownership</h3>
+                        <div class="field-group">
+                            <label class="field-group__label">Ownership Type</label>
+                            <select class="field-widget">
+                                <option selected>Company-Owned</option>
+                                <option>Outsourced</option>
+                            </select>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-group__label">Fuel Type</label>
+                            <select class="field-widget">
+                                <option selected>Diesel</option>
+                                <option>Petrol</option>
+                                <option>CNG</option>
+                            </select>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="showcase"> <h2> Component Variations</h2>
+      <div>
+        <h3>Variant Name: Vehicle Form</h3>
+		<p> The primary form for creating and managing Vehicle master data. Includes fields for registration, capacity, ownership, and maintenance schedules. It contains tabs for compliance documents and service history.</p>
+      </div>
+      <div>
+        <h3>Variant Name: Driver Form (Inherited)</h3>
+		<p> Extends the standard Odoo HR Employee form. It adds a 'TMS Driver Information' tab that becomes visible when an employee is flagged as a driver. This tab contains fields for license number, expiry date, and a copy of the license.</p>
+      </div>
+      <div>
+        <h3>Variant Name: Customer Form (Inherited)</h3>
+		<p> Extends the standard Odoo Partner (Contact) form. It adds TMS-specific fields such as a tab for 'Rate Agreements' and another for managing multiple 'Shipping Locations' for the customer.</p>
+      </div>
+       <div>
+        <h3>Variant Name: Route Form</h3>
+		<p> A simple master data form for defining standard transportation routes. It includes fields for a unique Route Name, Source Location, Destination Location, Standard Distance, and Estimated Transit Time.</p>
+      </div>
+       <div>
+        <h3>Variant Name: Material Form</h3>
+		<p> A simple master data form for defining types of materials that can be transported. It includes fields for a unique Material Name and optional 'Special Handling Instructions'.</p>
+      </div>
+	 </div>
+
+</body>
+</html>

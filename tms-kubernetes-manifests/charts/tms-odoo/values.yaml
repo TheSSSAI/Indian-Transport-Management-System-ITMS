@@ -1,0 +1,168 @@
+# Default values for tms-odoo chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- Number of pods to run. For production, this should be overridden to 3 or more for high availability (REQ-1-502).
+replicaCount: 1
+
+image:
+  # -- The repository for the Docker image of the Odoo application.
+  repository: "123456789012.dkr.ecr.ap-south-1.amazonaws.com/tms-odoo"
+  # -- The pull policy for the image.
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  # This will be updated by the CI/CD pipeline upon a new build.
+  tag: "latest"
+
+# -- A name to override the default chart name.
+nameOverride: ""
+# -- A name to override the default fullname.
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created.
+  create: true
+  # -- Annotations to add to the service account.
+  # This is critical for IAM Roles for Service Accounts (IRSA) to grant access to AWS S3, etc.
+  annotations: {}
+  # -- The name of the service account to use. If not set and create is true, a name is generated.
+  name: ""
+
+# -- Security context for the pods. Odoo requires root to install dependencies, but runs as odoo user.
+podSecurityContext:
+  fsGroup: 101 # odoo group
+
+# -- Security context for the containers.
+securityContext:
+  # Odoo container runs as user 'odoo' (uid 101) by default.
+  # We do not set runAsUser to allow the default behavior of the official Odoo image.
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  # -- The type of Kubernetes service to create.
+  type: ClusterIP
+  # -- The port the service will expose for Odoo web traffic.
+  port: 8069
+  # -- The target port on the container.
+  targetPort: 8069
+  # -- The port the service will expose for Odoo longpolling.
+  longpollingPort: 8072
+  # -- The target port on the container for longpolling.
+  longpollingTargetPort: 8072
+
+ingress:
+  # -- Enable or disable the Ingress resource.
+  enabled: true
+  # -- The IngressClass to use.
+  className: "alb"
+  # -- Annotations for the Ingress resource, used by the AWS Load Balancer Controller.
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /web/health
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+  # -- Hostname configuration for the Ingress.
+  hosts:
+    - host: tms.example.com
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  # -- TLS configuration for the Ingress.
+  tls:
+   - hosts:
+       - tms.example.com
+     # secretName: tms-tls - for manual secret, or use ACM annotations
+
+# -- Resource requests and limits for the container.
+resources:
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+  requests:
+    cpu: 1000m
+    memory: 2Gi
+
+# -- Pod-level annotations. Critical for integrating with monitoring tools like Prometheus (REQ-1-602).
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/tms/metrics"
+  prometheus.io/port: "8069"
+
+# -- Node affinity for pod scheduling.
+nodeSelector: {}
+tolerations: []
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - {{ .Chart.Name }}
+        topologyKey: topology.kubernetes.io/zone
+
+# -- Configuration for fetching secrets from AWS Secrets Manager using the CSI driver.
+# This directly supports REQ-1-503 and REQ-1-014.
+secrets:
+  # -- The name of the SecretProviderClass resource to be created.
+  secretProviderClassName: "tms-odoo-secrets"
+  aws:
+    # -- The AWS region where the secrets are stored.
+    region: "ap-south-1"
+    # -- A list of secrets to fetch from AWS Secrets Manager.
+    objects:
+      - secretName: "arn:aws:secretsmanager:ap-south-1:123456789012:secret:tms/database-AbCdEf"
+        data:
+          # RDS credentials
+          - key: HOST # Key in the Kubernetes secret
+            objectName: host # Key in the AWS Secret JSON
+          - key: PORT
+            objectName: port
+          - key: USER
+            objectName: username
+          - key: PASSWORD
+            objectName: password
+      - secretName: "arn:aws:secretsmanager:ap-south-1:123456789012:secret:tms/api-keys-GhIjKl"
+        data:
+          # External API keys
+          - key: GSP_API_KEY
+            objectName: gsp_api_key
+          - key: GPS_PROVIDER_TOKEN
+            objectName: gps_provider_token
+
+# -- Application-specific environment variables for Odoo.
+# These are non-sensitive configurations.
+env:
+  - name: "DB_NAME"
+    value: "tms_prod"
+  - name: "S3_BUCKET"
+    value: "tms-prod-attachments" # Fulfills REQ-1-014
+  - name: "ADMIN_PASSWORD"
+    value: "" # Should be set via a secret for the first run
+  - name: "ODOO_RC"
+    value: |
+      [options]
+      admin_passwd = $ADMIN_PASSWORD
+      db_host = $HOST
+      db_port = $PORT
+      db_user = $USER
+      db_password = $PASSWORD
+      db_name = $DB_NAME
+      db_template = template0
+      dbfilter = ^%d$
+      http_interface = 0.0.0.0
+      http_port = 8069
+      longpolling_port = 8072
+      workers = 4
+      max_cron_threads = 2
+      ir_attachment.location = s3
+      ir_attachment.s3.bucket = $S3_BUCKET
+      ir_attachment.s3.access_key_id = "" # Will use IRSA
+      ir_attachment.s3.secret_key = "" # Will use IRSA

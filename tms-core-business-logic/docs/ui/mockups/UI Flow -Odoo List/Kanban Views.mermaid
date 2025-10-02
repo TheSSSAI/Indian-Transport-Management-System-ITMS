@@ -1,0 +1,58 @@
+flowchart TD
+    subgraph User Interaction
+        User["User (e.g., Dispatch Manager)"]
+    end
+
+    subgraph "Odoo Web Client Framework"
+        ActionWindow["Trip Action Window (Entry Point)"]
+        ControlPanel["Control Panel (Search, Filter, Group By)"]
+        
+        ViewSwitcher["View Switcher (List/Kanban/Map)"]
+        
+        subgraph "List View (Tree)"
+            direction LR
+            ListView_Headers["Column Headers (Sortable)<br/>Trip ID, Customer, Status..."]
+            ListView_Rows["Data Rows (Clickable Records)"]
+            ListView_Pagination["Pagination Controls"]
+            ListView_Headers -- "Defines columns for" --> ListView_Rows
+            ListView_Rows -- "Navigated by" --> ListView_Pagination
+        end
+
+        subgraph "Kanban View"
+            direction TD
+            Kanban_Columns["Kanban Columns (Stages)<br/>e.g., Planned, Assigned, In-Transit"]
+            subgraph "Assigned Stage"
+                Kanban_Card1["Kanban Card<br/>(Trip 101)"]
+                Kanban_Card2["Kanban Card<br/>(Trip 102)"]
+            end
+            Kanban_Columns -- "Contains" --> Kanban_Card1
+            Kanban_Columns -- "Contains" --> Kanban_Card2
+        end
+
+        FormView["Trip Form View (Details)"]
+    end
+
+    %% --- Flow and Relationships ---
+    User --> ActionWindow
+    ActionWindow --> ControlPanel
+    ActionWindow --> ViewSwitcher
+
+    ViewSwitcher --> ListView
+    ViewSwitcher --> KanbanView
+    
+    ControlPanel -- "Applies filters to" --> ListView
+    ControlPanel -- "Applies filters to" --> KanbanView
+
+    ListView_Rows -->|Click Record| FormView
+    Kanban_Card1 -->|Click Card| FormView
+    Kanban_Card2 -->|Click Card| FormView
+    Kanban_Card1 -->|Drag & Drop| Kanban_Columns
+
+    %% --- Styling ---
+    classDef viewContainer fill:#f9f9f9,stroke:#ddd,stroke-width:2px,rx:8,ry:8
+    classDef component fill:#e3f2fd,stroke:#2196f3,color:#000
+    classDef entrypoint fill:#e8f5e9,stroke:#4caf50,color:#000
+
+    class ListView,KanbanView viewContainer
+    class ControlPanel,ViewSwitcher,ListView_Headers,ListView_Rows,ListView_Pagination,Kanban_Columns,Kanban_Card1,Kanban_Card2 component
+    class ActionWindow entrypoint

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!--
+        Template for the StatusBadge component.
+        Renders a simple span with dynamic classes and text content
+        based on the component's props.
+    -->
+    <t t-name="tms_driver_portal.StatusBadge" owl="1">
+        <span t-att-class="badgeClass">
+            <t t-esc="props.text"/>
+        </span>
+    </t>
+</templates>

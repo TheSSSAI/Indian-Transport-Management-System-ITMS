@@ -1,0 +1,18 @@
+.txt
+# This file contains dependencies for development and testing.
+# It includes production requirements and adds tools for linting, formatting, and testing.
+
+-r requirements.txt
+
+# Testing Framework
+pytest
+pytest-cov
+pytest-odoo
+
+# Code Quality & Formatting
+flake8
+black
+isort
+
+# Odoo Debugging
+odoo-debug

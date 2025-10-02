@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanban Card (Trip) Component</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* --- DESIGN TOKENS --- */
+    :root {
+      /* Colors */
+      --color-primary-50: #EFF6FF; --color-primary-100: #DBEAFE; --color-primary-200: #BFDBFE; --color-primary-300: #93C5FD; --color-primary-400: #60A5FA; --color-primary-500: #3B82F6; --color-primary-600: #2563EB; --color-primary-700: #1D4ED8; --color-primary-800: #1E40AF; --color-primary-900: #1E3A8A;
+      --color-neutral-white: #FFFFFF; --color-neutral-50: #F9FAFB; --color-neutral-100: #F3F4F6; --color-neutral-200: #E5E7EB; --color-neutral-300: #D1D5DB; --color-neutral-500: #6B7280; --color-neutral-700: #374151; --color-neutral-900: #111827; --color-neutral-black: #000000;
+      --color-semantic-success: #16A34A; --color-semantic-success-bg: #F0FDF4;
+      --color-semantic-warning: #F59E0B; --color-semantic-warning-bg: #FFFBEB;
+      --color-semantic-error: #DC2626; --color-semantic-error-bg: #FEF2F2;
+      --color-semantic-info: #0284C7; --color-semantic-info-bg: #F0F9FF;
+      /* Typography */
+      --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-size-sm: 12px; --font-size-base: 14px; --font-size-lg: 16px;
+      --font-weight-normal: 400; --font-weight-medium: 500; --font-weight-semibold: 600; --font-weight-bold: 700;
+      /* Spacing */
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px; --space-8: 32px;
+      /* Borders */
+      --border-radius-sm: 4px; --border-radius-md: 6px; --border-radius-lg: 8px;
+      /* Shadows */
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-focus-ring: 0 0 0 3px var(--color-primary-200);
+    }
+
+    /* --- BASE & SHOWCASE STYLES --- */
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font-family-primary); font-size: var(--font-size-base); color: var(--color-neutral-900); background-color: var(--color-neutral-50); padding: var(--space-8); }
+    h1, h2, h3, h4 { margin: 0 0 var(--space-4) 0; font-weight: var(--font-weight-semibold); line-height: 1.3; }
+    h1 { font-size: 2.25rem; } h2 { font-size: 1.5rem; margin-top: var(--space-8); border-bottom: 1px solid var(--color-neutral-200); padding-bottom: var(--space-3); } h3 { font-size: 1.125rem; margin-top: var(--space-6); color: var(--color-primary-700); }
+    p { margin: 0 0 var(--space-4) 0; color: var(--color-neutral-500); max-width: 65ch; }
+    .showcase { max-width: 1200px; margin: 0 auto; }
+    .showcase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6); align-items: start; }
+    .demo-hover:hover .kanban-card {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+
+    /* --- ATOMIC DEPENDENCY: STATUS BADGE --- */
+    .badge { display: inline-block; padding: var(--space-1) var(--space-2); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); border-radius: var(--border-radius-md); text-transform: capitalize; }
+    .badge--default { background-color: var(--color-neutral-100); color: var(--color-neutral-700); }
+    .badge--info { background-color: var(--color-semantic-info-bg); color: var(--color-semantic-info); }
+    .badge--success { background-color: var(--color-semantic-success-bg); color: var(--color-semantic-success); }
+    .badge--warning { background-color: var(--color-semantic-warning-bg); color: var(--color-semantic-warning); }
+    .badge--error { background-color: var(--color-semantic-error-bg); color: var(--color-semantic-error); }
+
+    /* --- MOLECULAR COMPONENT: KANBAN CARD --- */
+    .kanban-card {
+      background-color: var(--color-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-neutral-200);
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      cursor: grab;
+      transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out, border-color 0.2s ease-in-out;
+      width: 100%;
+      max-width: 320px; /* Typical Kanban column width */
+    }
+
+    .kanban-card:focus-visible {
+      outline: none;
+      box-shadow: var(--shadow-focus-ring);
+    }
+
+    /* States */
+    .kanban-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .kanban-card.is-dragging {
+      cursor: grabbing;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px) rotate(1deg) scale(1.02);
+      border-color: var(--color-primary-300);
+    }
+    
+    /* Variants */
+    .kanban-card--on-hold {
+      border-left: 4px solid var(--color-semantic-warning);
+      background-color: var(--color-semantic-warning-bg);
+    }
+
+    /* BEM Elements */
+    .kanban-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .kanban-card__id {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-900);
+      font-size: var(--font-size-base);
+    }
+
+    .kanban-card__menu-btn {
+      background: none;
+      border: none;
+      padding: var(--space-1);
+      color: var(--color-neutral-500);
+      cursor: pointer;
+      border-radius: var(--border-radius-sm);
+    }
+    
+    .kanban-card__menu-btn:hover {
+      background-color: var(--color-neutral-100);
+      color: var(--color-neutral-900);
+    }
+
+    .kanban-card__body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+    
+    .kanban-card__route {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-weight: var(--font-weight-medium);
+      font-size: var(--font-size-base);
+      color: var(--color-neutral-700);
+    }
+
+    .kanban-card__route_icon {
+      color: var(--color-neutral-500);
+      flex-shrink: 0;
+    }
+
+    .kanban-card__details {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      font-size: var(--font-size-sm);
+      color: var(--color-neutral-500);
+    }
+
+    .kanban-card__detail-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .kanban-card__footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: var(--space-2);
+      padding-top: var(--space-3);
+      border-top: 1px solid var(--color-neutral-100);
+    }
+
+    .kanban-card__driver-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background-color: var(--color-primary-100);
+      color: var(--color-primary-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+      border: 2px solid var(--color-white);
+    }
+
+    /* Accessibility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      .kanban-card { transition: none; }
+      .kanban-card:hover, .kanban-card.is-dragging { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="showcase">
+    <h1>Kanban Card (Trip)</h1>
+    <p>This component provides an at-a-glance summary of a trip, designed for use in a Kanban board. It includes states for hover and dragging, and a variant for trips that are 'On Hold'.</p>
+
+    <h2>Default Variant</h2>
+    <div class="showcase-grid">
+      <div>
+        <h3>Default State</h3>
+        <p>The standard appearance of the card.</p>
+        <article class="kanban-card" tabindex="0" aria-labelledby="trip-id-1" aria-describedby="trip-desc-1">
+          <header class="kanban-card__header">
+            <h4 class="kanban-card__id" id="trip-id-1">TRIP-2025-0123</h4>
+            <button class="kanban-card__menu-btn" aria-label="More options for TRIP-2025-0123">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/></svg>
+            </button>
+          </header>
+          <div class="kanban-card__body">
+            <div class="kanban-card__route">
+              <span>Mumbai</span>
+              <svg class="kanban-card__route_icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg>
+              <span>Pune</span>
+            </div>
+            <div class="kanban-card__details">
+              <div class="kanban-card__detail-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/></svg>
+                <span>Reliance Industries</span>
+              </div>
+              <div class="kanban-card__detail-item">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732l.732-.732.6-3L11.39 4.732a.5.5 0 0 0-.4-.232H1.5v7.456zm2.456-1.456a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+                <span>MH-01-AB-1234</span>
+              </div>
+            </div>
+          </div>
+          <footer class="kanban-card__footer">
+            <div class="kanban-card__driver-avatar" title="John Doe">JD</div>
+            <span class="badge badge--info">In-Transit</span>
+          </footer>
+          <div class="sr-only" id="trip-desc-1">Trip from Mumbai to Pune for Reliance Industries. Assigned to vehicle MH-01-AB-1234. Current status is In-Transit.</div>
+        </article>
+      </div>
+
+      <div>
+        <h3>Hover State</h3>
+        <p>Card elevates slightly to provide feedback on hover.</p>
+        <div class="demo-hover">
+        <article class="kanban-card" tabindex="0" aria-labelledby="trip-id-2" aria-describedby="trip-desc-2">
+            <header class="kanban-card__header">
+                <h4 class="kanban-card__id" id="trip-id-2">TRIP-2025-0124</h4>
+            </header>
+            <div class="kanban-card__body">
+                <div class="kanban-card__route">
+                    <span>Delhi</span>
+                    <svg class="kanban-card__route_icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg>
+                    <span>Jaipur</span>
+                </div>
+                 <div class="kanban-card__details">
+                    <div class="kanban-card__detail-item"><span>Adani Logistics</span></div>
+                </div>
+            </div>
+            <footer class="kanban-card__footer">
+                <div class="kanban-card__driver-avatar" title="Raj Patel">RP</div>
+                <span class="badge badge--success">Delivered</span>
+            </footer>
+            <div class="sr-only" id="trip-desc-2">Trip from Delhi to Jaipur for Adani Logistics. Current status is Delivered.</div>
+        </article>
+        </div>
+      </div>
+
+      <div>
+        <h3>Dragged State</h3>
+        <p>Card lifts and rotates slightly when being dragged.</p>
+        <article class="kanban-card is-dragging" tabindex="0" aria-labelledby="trip-id-3" aria-describedby="trip-desc-3">
+            <header class="kanban-card__header">
+                <h4 class="kanban-card__id" id="trip-id-3">TRIP-2025-0125</h4>
+            </header>
+            <div class="kanban-card__body">
+                <div class="kanban-card__route">
+                    <span>Chennai</span>
+                    <svg class="kanban-card__route_icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg>
+                    <span>Bengaluru</span>
+                </div>
+            </div>
+            <footer class="kanban-card__footer">
+                <div class="kanban-card__driver-avatar" title="Sita Verma">SV</div>
+                <span class="badge badge--default">Assigned</span>
+            </footer>
+            <div class="sr-only" id="trip-desc-3">Trip from Chennai to Bengaluru. Current status is Assigned.</div>
+        </article>
+      </div>
+    </div>
+    
+    <h2>'On Hold' Variant</h2>
+    <div class="showcase-grid">
+      <div>
+        <h3>Default State</h3>
+        <p>An 'On Hold' trip card has a distinct left border and background tint to draw attention.</p>
+        <article class="kanban-card kanban-card--on-hold" tabindex="0" aria-labelledby="trip-id-4" aria-describedby="trip-desc-4">
+          <header class="kanban-card__header">
+            <h4 class="kanban-card__id" id="trip-id-4">TRIP-2025-0126</h4>
+          </header>
+          <div class="kanban-card__body">
+            <div class="kanban-card__route">
+              <span>Kolkata</span>
+              <svg class="kanban-card__route_icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg>
+              <span>Patna</span>
+            </div>
+            <div class="kanban-card__details">
+              <div class="kanban-card__detail-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732l.732-.732.6-3L11.39 4.732a.5.5 0 0 0-.4-.232H1.5v7.456zm2.456-1.456a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+                <span>MH-04-CD-5678</span>
+              </div>
+            </div>
+          </div>
+          <footer class="kanban-card__footer">
+            <div class="kanban-card__driver-avatar" title="Anil Kumar">AK</div>
+            <span class="badge badge--warning">On Hold</span>
+          </footer>
+          <div class="sr-only" id="trip-desc-4">Trip from Kolkata to Patna for vehicle MH-04-CD-5678. Current status is On Hold.</div>
+        </article>
+      </div>
+
+       <div>
+        <h3>Hover State</h3>
+        <p>The hover effect applies to the 'On Hold' card as well.</p>
+        <div class="demo-hover">
+            <article class="kanban-card kanban-card--on-hold" tabindex="0" aria-labelledby="trip-id-5" aria-describedby="trip-desc-5">
+              <header class="kanban-card__header">
+                <h4 class="kanban-card__id" id="trip-id-5">TRIP-2025-0127</h4>
+              </header>
+              <div class="kanban-card__body">
+                <div class="kanban-card__route">
+                  <span>Ahmedabad</span>
+                  <svg class="kanban-card__route_icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg>
+                  <span>Surat</span>
+                </div>
+              </div>
+              <footer class="kanban-card__footer">
+                <div class="kanban-card__driver-avatar" title="Priya Singh">PS</div>
+                <span class="badge badge--warning">On Hold</span>
+              </footer>
+              <div class="sr-only" id="trip-desc-5">Trip from Ahmedabad to Surat. Current status is On Hold.</div>
+            </article>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  
+  <div class="showcase" style="margin-top: 48px;">
+      <h2> Component Variations</h2>
+      <div>
+        <h3>Variant Name: "default"</h3>
+		<p>The standard appearance for a trip card on the Kanban board. It uses a neutral color palette and relies on the status badge for state information.</p>
+      </div>
+      <div>
+        <h3>Variant Name: "on_hold (highlighted)"</h3>
+		<p>A visually distinct variant used for trips that are in an exception state ('On Hold'). It uses a colored left border and a light background tint based on the semantic 'warning' color to immediately draw the user's attention.</p>
+      </div>
+	</div>
+
+</body>
+</html>

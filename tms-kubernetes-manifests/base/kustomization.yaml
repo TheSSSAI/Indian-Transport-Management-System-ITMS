@@ -1,0 +1,56 @@
+#
+# Kustomize Base Configuration for the Transport Management System (TMS)
+#
+# This file serves as the entry point for the "base" layer of the application's
+# Kubernetes manifests. It aggregates all common, environment-agnostic resources
+# and renders the Helm charts with their default values.
+#
+# This base is then consumed and patched by environment-specific overlays
+# (e.g., overlays/staging, overlays/production) to create the final deployment
+# manifests for each target environment.
+#
+# For more information on Kustomize, see: https://kustomize.io/
+#
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Set the common namespace for all resources generated from this base.
+# This ensures all application components are deployed into the 'tms' namespace
+# by default, simplifying service discovery and network policy management.
+namespace: tms
+
+# List of raw Kubernetes manifest files or directories to include in the base.
+# These are standard Kubernetes resources that are common across all environments.
+resources:
+  # The 'tms' namespace must be created before any other resources are applied.
+  - namespace.yaml
+
+  # Include all network policies defined in the network-policies directory.
+  # This enforces a secure-by-default networking posture, starting with a
+  # default-deny rule as per security best practices.
+  - network-policies/
+
+# The helmCharts section is used to render Helm charts into raw Kubernetes manifests
+# which can then be processed and patched by Kustomize. This hybrid approach
+# allows us to leverage Helm for application packaging and Kustomize for
+# environment-specific configuration management.
+helmCharts:
+  # Render the 'tms-odoo' Helm chart.
+  - name: tms-odoo
+    # The releaseName sets the prefix for all resources created by this chart,
+    # ensuring they are uniquely identifiable (e.g., 'tms-odoo-deployment').
+    releaseName: tms-odoo
+    # The version must match the version specified in the Chart.yaml file.
+    version: 0.1.0
+    # The path is relative to this kustomization.yaml file.
+    repo: file://../../charts/tms-odoo
+    # We explicitly include the default values.yaml from the chart.
+    # Overlays will provide their own values files to override these defaults.
+    valuesFile: ../../charts/tms-odoo/values.yaml
+
+  # Render the 'tms-gps-service' Helm chart for the FastAPI microservice.
+  - name: tms-gps-service
+    releaseName: tms-gps-service
+    version: 0.1.0
+    repo: file://../../charts/tms-gps-service
+    valuesFile: ../../charts/tms-gps-service/values.yaml

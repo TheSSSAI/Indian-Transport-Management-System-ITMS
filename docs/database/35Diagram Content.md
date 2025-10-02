@@ -1,0 +1,24 @@
+erDiagram
+    VehicleLocation {
+        DateTime time PK "Primary time index"
+        INT vehicle_id PK, FK "Dimension"
+        DECIMAL latitude "Measure"
+        DECIMAL longitude "Measure"
+        DECIMAL speed_kmh "Measure"
+    }
+    GeofenceEvent {
+        DateTime time PK
+        INT vehicle_id PK, FK "Dimension"
+        INT geofence_id FK "Dimension"
+        VARCHAR event_type "ENUM('Entry', 'Exit')"
+    }
+    "Vehicle (Relational)" {
+        INT vehicle_id PK
+    }
+    "Geofence (Relational)" {
+        INT geofence_id PK
+    }
+
+    "Vehicle (Relational)" ||--o{ VehicleLocation : "generates"
+    "Vehicle (Relational)" ||--o{ GeofenceEvent : "triggers"
+    "Geofence (Relational)" ||--o{ GeofenceEvent : "contains"

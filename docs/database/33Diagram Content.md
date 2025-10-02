@@ -1,0 +1,96 @@
+erDiagram
+    Role {
+        Guid roleId PK
+    }
+    User {
+        Guid userId PK
+        Guid roleId FK
+    }
+    Customer {
+        Guid customerId PK
+    }
+    Driver {
+        Guid driverId PK
+    }
+    Vehicle {
+        Guid vehicleId PK
+    }
+    VehicleDocument {
+        Guid vehicleDocumentId PK
+        Guid vehicleId FK
+    }
+    Material {
+        Guid materialId PK
+    }
+    Trip {
+        Guid tripId PK
+        Guid customerId FK
+        Guid vehicleId FK
+        Guid driverId FK
+        Guid materialId FK
+    }
+    TripExpense {
+        Guid tripExpenseId PK
+        Guid tripId FK
+        Guid driverId FK
+    }
+    Invoice {
+        Guid invoiceId PK
+        Guid tripId FK
+        Guid customerId FK
+    }
+    Payment {
+        Guid paymentId PK
+        Guid invoiceId FK
+        Guid customerId FK
+    }
+    VehicleLocation {
+        Guid vehicleLocationId PK
+        Guid vehicleId FK
+    }
+    Geofence {
+        Guid geofenceId PK
+    }
+    GeofenceEvent {
+        Guid geofenceEventId PK
+        Guid geofenceId FK
+        Guid vehicleId FK
+    }
+    Card {
+        Guid cardId PK
+        Guid assignedVehicleId FK
+    }
+    ProofOfDelivery {
+        Guid podId PK
+        Guid tripId FK
+    }
+    TripEventLog {
+        Guid tripEventLogId PK
+        Guid tripId FK
+        Guid driverId FK
+    }
+    AuditLog {
+        Guid auditLogId PK
+        Guid userId FK
+    }
+
+    Role ||--o{ User : RoleHasUsers
+    User ||--o{ AuditLog : UserCreatesAuditLogs
+    Customer ||--o{ Trip : CustomerHasTrips
+    Customer ||--o{ Invoice : CustomerReceivesInvoices
+    Customer ||--o{ Payment : CustomerMakesPayments
+    Driver ||--o{ Trip : DriverAssignedToTrips
+    Driver ||--o{ TripExpense : DriverSubmitsExpenses
+    Driver ||--o{ TripEventLog : DriverLogsTripEvents
+    Vehicle ||--o{ Trip : VehiclePerformsTrips
+    Vehicle ||--o{ VehicleDocument : VehicleHasDocuments
+    Vehicle ||--o{ VehicleLocation : VehicleHasLocations
+    Vehicle ||--o{ GeofenceEvent : VehicleTriggersGeofenceEvents
+    Vehicle ||--o{ Card : VehicleAssignedCards
+    Material ||--o{ Trip : MaterialTransportedInTrips
+    Trip ||--o{ TripExpense : TripHasExpenses
+    Trip ||--o{ TripEventLog : TripHasEventLogs
+    Trip |o--|| Invoice : TripGeneratesInvoice
+    Trip |o--|| ProofOfDelivery : TripHasProofOfDelivery
+    Invoice ||--o{ Payment : InvoiceHasPayments
+    Geofence ||--o{ GeofenceEvent : GeofenceHasEvents

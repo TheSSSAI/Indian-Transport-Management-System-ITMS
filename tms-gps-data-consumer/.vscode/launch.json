@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Odoo: Attach Debugger (debugpy)",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+                "host": "localhost",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "${workspaceFolder}",
+                    "remoteRoot": "/mnt/extra-addons"
+                }
+            ],
+            "justMyCode": false,
+            "preLaunchTask": "docker-compose up -d",
+            "postDebugTask": "docker-compose down"
+        }
+    ]
+}

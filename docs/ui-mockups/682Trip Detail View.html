@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Detail View</title>
+    <style>
+        /* CSS Reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Design System Tokens */
+        :root {
+            /* Typography */
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-size-h1: 24px;
+            --font-size-h2: 18px;
+            --font-size-body: 16px;
+            --font-size-caption: 14px;
+            --font-size-small: 12px;
+            --font-weight-bold: 700;
+            --font-weight-semibold: 600;
+            --font-weight-normal: 400;
+
+            /* Color Palette */
+            --color-primary-500: #3B82F6;
+            --color-primary-600: #2563EB;
+            --color-primary-700: #1D4ED8;
+            --color-primary-100: #DBEAFE;
+            --color-primary-50: #EFF6FF;
+
+            --color-neutral-white: #FFFFFF;
+            --color-neutral-50: #F9FAFB;
+            --color-neutral-100: #F3F4F6;
+            --color-neutral-200: #E5E7EB;
+            --color-neutral-500: #6B7280;
+            --color-neutral-700: #374151;
+            --color-neutral-900: #111827;
+
+            --color-success-500: #22C55E;
+            --color-success-100: #DCFCE7;
+            --color-success-700: #15803D;
+
+            --color-warning-500: #F59E0B;
+            --color-warning-100: #FEF9C3;
+            --color-warning-700: #B45309;
+
+            --color-error-500: #EF4444;
+            --color-error-100: #FEE2E2;
+            --color-error-700: #B91C1C;
+            
+            --color-info-500: #0284C7;
+            --color-info-100: #E0F2FE;
+            --color-info-700: #0369A1;
+
+            /* Spacing System */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+
+            /* Borders & Shadows */
+            --border-radius-md: 8px;
+            --border-radius-full: 9999px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        /* Base Styles */
+        html, body {
+            height: 100%;
+        }
+        body {
+            font-family: var(--font-family-primary);
+            background-color: var(--color-neutral-50);
+            color: var(--color-neutral-900);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Screen Layout */
+        .screen-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            max-width: 480px; /* Centered layout on larger screens */
+            margin: 0 auto;
+            background-color: var(--color-neutral-white);
+            box-shadow: var(--shadow-md);
+        }
+
+        .screen-header {
+            display: flex;
+            align-items: center;
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--color-neutral-200);
+            background-color: var(--color-neutral-white);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .screen-header h1 {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-semibold);
+            margin-left: var(--space-md);
+        }
+
+        .screen-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: var(--space-lg);
+            padding-bottom: 120px; /* Space for the sticky footer */
+            background-color: var(--color-neutral-50);
+        }
+        
+        .screen-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: var(--space-md);
+            background: linear-gradient(to top, var(--color-neutral-white) 80%, rgba(255,255,255,0));
+            z-index: 10;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        /* Components */
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: var(--space-sm);
+            border-radius: var(--border-radius-full);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .icon-btn:hover {
+            background-color: var(--color-neutral-100);
+        }
+        .icon-btn svg {
+            width: 24px;
+            height: 24px;
+            color: var(--color-neutral-700);
+        }
+
+        .status-tag {
+            display: inline-block;
+            padding: var(--space-xs) var(--space-sm);
+            font-size: var(--font-size-small);
+            font-weight: var(--font-weight-semibold);
+            border-radius: var(--border-radius-full);
+            text-transform: uppercase;
+        }
+        .status--assigned {
+            background-color: var(--color-info-100);
+            color: var(--color-info-700);
+        }
+        .status--in-transit {
+            background-color: var(--color-success-100);
+            color: var(--color-success-700);
+        }
+        .status--on-hold {
+            background-color: var(--color-warning-100);
+            color: var(--color-warning-700);
+        }
+        .status--delivered {
+            background-color: var(--color-primary-100);
+            color: var(--color-primary-700);
+        }
+
+        .card {
+            background-color: var(--color-neutral-white);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--color-neutral-200);
+            padding: var(--space-md);
+            margin-bottom: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card__header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding-bottom: var(--space-md);
+            margin-bottom: var(--space-md);
+            border-bottom: 1px solid var(--color-neutral-200);
+        }
+
+        .card__header h2 {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-neutral-900);
+        }
+
+        .card__header svg {
+            width: 20px;
+            height: 20px;
+            color: var(--color-neutral-500);
+        }
+
+        .key-value-list {
+            display: grid;
+            gap: var(--space-sm) var(--space-md);
+        }
+
+        .key-value-list dt {
+            font-size: var(--font-size-caption);
+            color: var(--color-neutral-500);
+            font-weight: var(--font-weight-normal);
+        }
+
+        .key-value-list dd {
+            font-size: var(--font-size-body);
+            color: var(--color-neutral-900);
+            font-weight: var(--font-weight-semibold);
+        }
+        
+        .route-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        .route-path {
+            flex-grow: 1;
+        }
+        .route-path .location {
+            font-size: 18px;
+            font-weight: var(--font-weight-semibold);
+        }
+        .route-path .arrow {
+            text-align: center;
+            color: var(--color-neutral-500);
+            margin: var(--space-xs) 0;
+        }
+        .map-link {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--color-primary-600);
+            font-size: var(--font-size-small);
+            font-weight: var(--font-weight-semibold);
+            padding: var(--space-sm);
+            border-radius: var(--border-radius-md);
+        }
+        .map-link:hover {
+            background-color: var(--color-primary-50);
+        }
+        .map-link svg {
+            width: 32px;
+            height: 32px;
+            margin-bottom: var(--space-xs);
+        }
+
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: var(--space-md);
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-semibold);
+            border-radius: var(--border-radius-md);
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        .action-btn--primary {
+            background-color: var(--color-primary-600);
+            color: var(--color-neutral-white);
+            box-shadow: var(--shadow-md);
+        }
+        .action-btn--primary:hover {
+            background-color: var(--color-primary-700);
+        }
+        .action-btn--secondary {
+            background-color: var(--color-neutral-200);
+            color: var(--color-neutral-900);
+            margin-bottom: var(--space-md);
+        }
+        .action-btn--secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .action-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* States */
+        .error-panel, .loading-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+            padding: var(--space-xl);
+        }
+        .error-panel svg {
+            width: 64px;
+            height: 64px;
+            color: var(--color-error-500);
+            margin-bottom: var(--space-md);
+        }
+        .error-panel h2 {
+            font-size: var(--font-size-h2);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-sm);
+        }
+        .error-panel p {
+            color: var(--color-neutral-500);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .skeleton {
+            background-color: var(--color-neutral-200);
+            border-radius: 4px;
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            50% { opacity: 0.5; }
+        }
+        .skeleton-text { height: 1em; }
+        .skeleton-header { width: 40%; height: 24px; margin-bottom: 16px;}
+        .skeleton-line { width: 80%; }
+        .skeleton-line--short { width: 50%; }
+
+        /* Variants Section for Demo */
+        .screen-variations {
+            padding: 2rem;
+            background-color: #f0f2f5;
+        }
+        .variation-group {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .variation-group h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+        }
+        .variation-group p {
+            margin-bottom: 1.5rem;
+            color: #555;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Mockup: "Loaded" state for an 'Assigned' trip -->
+    <div class="screen-container">
+        <header class="screen-header">
+            <button class="icon-btn" aria-label="Back to trip list">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                </svg>
+            </button>
+            <h1>TRIP-2025-001</h1>
+        </header>
+        
+        <main class="screen-content">
+            <div class="card">
+                <div class="card__header">
+                    <h2>Trip Status</h2>
+                    <span class="status-tag status--assigned">Assigned</span>
+                </div>
+                <dl class="key-value-list" style="grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <dt>Expected Delivery</dt>
+                        <dd>25 Oct 2024</dd>
+                    </div>
+                    <div>
+                        <dt>Material</dt>
+                        <dd>Steel Coils (25 Tons)</dd>
+                    </div>
+                </dl>
+            </div>
+            
+            <div class="card">
+                <div class="card__header">
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503-8.998l-.007-.006c-.048-.034-.1-  .058-.154-.078a4.5 4.5 0 00-6.364 0l-.007.006a4.5 4.5 0 00-6.364 6.364l6.364 6.364 6.364-6.364a4.5 4.5 0 000-6.364z" />
+                    </svg>
+                    <h2>Route Information</h2>
+                </div>
+                <div class="route-info">
+                    <div class="route-path">
+                        <div class="location">Mumbai Port</div>
+                        <div class="arrow">↓</div>
+                        <div class="location">Delhi Warehouse</div>
+                    </div>
+                    <a href="#" class="map-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503-8.998l-.007-.006c-.048-.034-.1-.058-.154-.078a4.5 4.5 0 00-6.364 0l-.007.006a4.5 4.5 0 00-6.364 6.364l6.364 6.364 6.364-6.364a4.5 4.5 0 000-6.364z" />
+                        </svg>
+                        View Map
+                    </a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card__header">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                       <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5v-1.875a3.375 3.375 0 003.375-3.375h1.5a1.125 1.125 0 011.125 1.125v-1.5a3.375 3.375 0 00-3.375-3.375H3.375" />
+                    </svg>
+                    <h2>Assignment Details</h2>
+                </div>
+                <dl class="key-value-list">
+                    <div>
+                        <dt>Vehicle Number</dt>
+                        <dd>MH-04-AB-1234</dd>
+                    </div>
+                    <div>
+                        <dt>Customer</dt>
+                        <dd>JSW Steel Ltd.</dd>
+                    </div>
+                </dl>
+            </div>
+             <div class="card">
+                <div class="card__header">
+                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                   </svg>
+                    <h2>Documents</h2>
+                </div>
+                <dl class="key-value-list">
+                    <dt><a href="#" style="color: var(--color-primary-600); text-decoration: underline;">View Vehicle Documents</a></dt>
+                </dl>
+            </div>
+        </main>
+        
+        <footer class="screen-footer">
+            <button class="action-btn action-btn--primary">Start Trip</button>
+        </footer>
+    </div>
+    
+    <!-- Screen Variations Section -->
+    <div class="screen-variations">
+        <h2>Screen Variations</h2>
+        
+        <div class="variation-group">
+            <h3>Variant Name: "Loaded (In-Transit status)"</h3>
+            <p>The screen after the driver has started the trip. The status tag is updated, and the primary action buttons in the footer change to reflect the new available actions.</p>
+            <div class="screen-container" style="position: relative; height: 800px; overflow: hidden;">
+                <header class="screen-header">
+                    <button class="icon-btn" aria-label="Back to trip list">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                    </button>
+                    <h1>TRIP-2025-001</h1>
+                </header>
+                <main class="screen-content">
+                    <div class="card">
+                        <div class="card__header">
+                            <h2>Trip Status</h2>
+                            <span class="status-tag status--in-transit">In-Transit</span>
+                        </div>
+                    </div>
+                    <!-- Other card content would be identical -->
+                </main>
+                <footer class="screen-footer">
+                    <div class="action-group">
+                         <button class="action-btn action-btn--secondary">Log Event / Submit Expense</button>
+                         <button class="action-btn action-btn--primary">Upload Proof of Delivery</button>
+                    </div>
+                </footer>
+            </div>
+        </div>
+
+        <div class="variation-group">
+            <h3>Variant Name: "Loading State"</h3>
+            <p>The screen's appearance while fetching trip data from the server, using skeleton placeholders to indicate where content will appear.</p>
+            <div class="screen-container" style="position: relative; height: 800px; overflow: hidden;">
+                <header class="screen-header">
+                    <button class="icon-btn" aria-label="Back to trip list">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                    </button>
+                    <h1><div class="skeleton skeleton-text" style="width: 150px; height: 28px;"></div></h1>
+                </header>
+                <main class="screen-content">
+                    <div class="card">
+                         <div class="skeleton skeleton-header"></div>
+                         <div class="skeleton skeleton-text skeleton-line"></div>
+                         <div class="skeleton skeleton-text skeleton-line--short" style="margin-top: 8px;"></div>
+                    </div>
+                    <div class="card">
+                         <div class="skeleton skeleton-header"></div>
+                         <div class="skeleton skeleton-text skeleton-line"></div>
+                         <div class="skeleton skeleton-text skeleton-line" style="margin-top: 8px;"></div>
+                    </div>
+                    <div class="card">
+                         <div class="skeleton skeleton-header"></div>
+                         <div class="skeleton skeleton-text skeleton-line--short"></div>
+                         <div class="skeleton skeleton-text skeleton-line" style="margin-top: 16px;"></div>
+                    </div>
+                </main>
+                <footer class="screen-footer">
+                    <button class="action-btn action-btn--primary" style="background-color: var(--color-neutral-200);" disabled></button>
+                </footer>
+            </div>
+        </div>
+        
+        <div class="variation-group">
+            <h3>Variant Name: "Error State"</h3>
+            <p>Displayed when the trip details fail to load due to a network error or other issue, providing a clear message and a retry action.</p>
+            <div class="screen-container" style="position: relative; height: 800px; overflow: hidden;">
+                 <header class="screen-header">
+                    <button class="icon-btn" aria-label="Back to trip list">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                    </button>
+                    <h1>Error</h1>
+                </header>
+                <main class="screen-content" style="padding-bottom: 0;">
+                    <div class="error-panel">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                        </svg>
+                        <h2>Could Not Load Trip</h2>
+                        <p>There was a problem fetching the trip details. Please check your network connection and try again.</p>
+                        <button class="action-btn action-btn--primary" style="max-width: 200px;">Retry</button>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

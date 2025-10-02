@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="tms_driver_portal.PodFormScreen" owl="1">
+        <div class="d-flex flex-column h-100 bg-light">
+            <HeaderNav title="'Submit Proof of Delivery'"/>
+            <div class="flex-grow-1 overflow-auto p-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <form t-on-submit.prevent="_onSubmit">
+                            <!-- Recipient Name -->
+                            <div class="mb-4">
+                                <label for="recipientName" class="form-label fw-bold">Recipient Name</label>
+                                <input type="text" id="recipientName" class="form-control form-control-lg" placeholder="Enter full name" t-model="state.form.recipient_name" t-att-class="{ 'is-invalid': state.validationErrors.recipient_name }"/>
+                                <div t-if="state.validationErrors.recipient_name" class="invalid-feedback" t-esc="state.validationErrors.recipient_name"/>
+                            </div>
+
+                            <!-- POD Method Tabs -->
+                            <div class="d-flex nav nav-pills nav-fill mb-3">
+                                <button
+                                    class="nav-link"
+                                    t-att-class="{ 'active': state.form.pod_method === 'photo' }"
+                                    t-on-click="() => state.form.pod_method = 'photo'"
+                                >
+                                    <i class="fa fa-camera me-2"/>Upload Photo
+                                </button>
+                                <button
+                                    class="nav-link"
+                                    t-att-class="{ 'active': state.form.pod_method === 'signature' }"
+                                    t-on-click="() => state.form.pod_method = 'signature'"
+                                >
+                                    <i class="fa fa-signature me-2"/>Capture Signature
+                                </button>
+                            </div>
+
+                            <!-- Photo Uploader -->
+                            <div t-if="state.form.pod_method === 'photo'" class="mb-3">
+                                <label class="form-label fw-bold">POD Document</label>
+                                <FileUploader onFile-selected="_onFileSelected" accepted_files="'image/jpeg,image/png'"/>
+                                <div t-if="state.validationErrors.pod_file" class="d-block invalid-feedback" t-esc="state.validationErrors.pod_file"/>
+                            </div>
+
+                            <!-- Signature Pad -->
+                            <div t-if="state.form.pod_method === 'signature'" class="mb-3">
+                                <label class="form-label fw-bold">Recipient's Signature</label>
+                                <SignaturePad t-ref="signaturePad"/>
+                                <div t-if="state.validationErrors.pod_signature" class="d-block invalid-feedback" t-esc="state.validationErrors.pod_signature"/>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 bg-white border-top shadow-lg">
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success btn-lg" t-on-click="_onSubmit" t-att-disabled="state.isSubmitting">
+                        <span t-if="state.isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"/>
+                        Confirm Delivery
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

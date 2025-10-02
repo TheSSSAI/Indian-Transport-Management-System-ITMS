@@ -1,0 +1,562 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Header with Statusbar - Component Specifications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .component-type-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .section h2 {
+            color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4f46e5;
+            display: inline-block;
+        }
+        
+        .section h3 {
+            color: #4f46e5;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .info-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .variations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .variation-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .variation-name {
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 8px;
+        }
+        
+        .variation-code {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #1e293b;
+            overflow-x: auto;
+            margin: 8px 0;
+            border-left: 4px solid #4f46e5;
+        }
+        
+        .variation-description {
+            font-size: 13px;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .feature-category {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .feature-category h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .feature-category ul {
+            list-style: none;
+        }
+        
+        .feature-category li {
+            padding: 6px 0;
+            color: #4b5563;
+            font-size: 14px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .feature-category li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .tokens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        
+        .token {
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            border: 1px solid #bae6fd;
+            text-align: center;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 16px 0;
+            line-height: 1.4;
+        }
+        
+        .stats-bar {
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .stat {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Form Header with Statusbar</h1>
+            <div class="component-type-badge">molecular Component</div>
+        </div>
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Variations</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">13</span>
+                <span class="stat-label">Design Tokens</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">3</span>
+                <span class="stat-label">Breakpoints</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">5</span>
+                <span class="stat-label">A11y Features</span>
+            </div>
+        </div><div class="content">
+        <div class="section">
+            <h2>Component Information</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Component Id</h4>
+                    <p>MU-MOLC-001</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Name</h4>
+                    <p>Form Header with Statusbar</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Type</h4>
+                    <p>molecular</p>
+                </div>
+                <div class="info-card">
+                    <h4>Description</h4>
+                    <p>A molecular component that combines primary form action buttons and a status workflow indicator (statusbar). It serves as the main control header for Odoo form views, allowing users to perform actions and track the lifecycle state of a record.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Design System Alignment</h4>
+                    <p>This component is composed of atomic 'Action Button' and 'Status Badge' components. It utilizes the design system's primary and neutral colors for actions and states, and the standard spacing scale for layout and padding.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Organism Map</h4>
+                    <p>Master Data Form View,Trip Form View</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Design Tokens Used</h2>
+            <div class="tokens-grid"><div class="token">--color-primary-600</div><div class="token">--color-primary-700</div><div class="token">--color-white</div><div class="token">--color-gray-100</div><div class="token">--color-gray-300</div><div class="token">--color-gray-500</div><div class="token">--color-gray-900</div><div class="token">--space-1</div><div class="token">--space-2</div><div class="token">--space-3</div><div class="token">--space-4</div><div class="token">--font-size-sm</div><div class="token">--font-weight-semibold</div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Responsive Specifications</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Mobile Adaptations</h4>
+                    <ul><li>Flex container wraps to stack action buttons and statusbar vertically on screens < 768px.</li><li>Statusbar becomes horizontally scrollable if it exceeds the viewport width.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Tablet Adaptations</h4>
+                    <ul><li>Generally maintains the desktop layout, but actions may wrap if there are many of them.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Desktop Enhancements</h4>
+                    <ul><li>Side-by-side layout with actions on the left and statusbar on the right.</li><li>Hover effects on clickable statusbar items.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Accessibility Features</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Keyboard Support</h4><p>Action buttons and clickable statusbar items are keyboard-focusable and can be activated with Enter/Space.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Screen Reader Support</h4><p>The statusbar is wrapped in a `<nav>` element with an `aria-label` to provide context. The current status has `aria-current="step"` for screen readers.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Focus Management</h4><p>Visible focus rings are applied to all interactive elements (buttons, statusbar items).</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Aria Attributes</h4><ul><li>aria-label="Status workflow"</li><li>aria-current="step"</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Color Contrast</h4><p>Current status text on background meets WCAG AA contrast ratios. Past/Future states use standard text colors.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>CSS Implementation</h2>
+            <div class="code-block">/* Component: Form Header with Statusbar */
+
+/* Base Styles */
+.form-header {
+  background-color: var(--color-gray-100);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-gray-300);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.form-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Statusbar Styles */
+.form-header__statusbar {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: var(--space-1); /* For scrollbar */
+}
+
+.statusbar__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3) var(--space-2) 20px; /* Space for chevron */
+  margin-right: -10px; /* Overlap chevrons */
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: none;
+  background-color: transparent;
+  color: var(--color-gray-500);
+  cursor: default;
+}
+
+.statusbar__item::before,
+.statusbar__item::after {
+  content: &#039;&#039;;
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 15px; /* Width of the chevron point */
+  background-color: inherit;
+  transform: skewX(-20deg);
+  border-top: 1px solid var(--color-gray-300);
+  border-bottom: 1px solid var(--color-gray-300);
+}
+
+.statusbar__item::before {
+  left: 0;
+  border-left: 1px solid var(--color-gray-300);
+}
+
+.statusbar__item::after {
+  right: -8px; /* Position the right point */
+  border-right: 1px solid var(--color-gray-300);
+  z-index: 1;
+}
+
+/* Default State (Read-only) */
+.statusbar__item--readonly {
+    background-color: var(--color-gray-100);
+}
+
+.statusbar__item--readonly.is-current {
+    background-color: var(--color-gray-300);
+    color: var(--color-gray-900);
+}
+
+.statusbar__item--readonly.is-current::before,
+.statusbar__item--readonly.is-current::after {
+    border-color: var(--color-gray-500);
+}
+
+/* Clickable State */
+.statusbar__item--clickable {
+  background-color: var(--color-gray-100);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.statusbar__item--clickable:hover {
+    background-color: var(--color-gray-300);
+}
+
+.statusbar__item--clickable.is-current {
+  background-color: var(--color-primary-600);
+  color: var(--color-white);
+  z-index: 2;
+}
+
+.statusbar__item--clickable.is-current::before,
+.statusbar__item--clickable.is-current::after {
+  border-color: var(--color-primary-700);
+}
+
+/* Remove left border on first item */
+.statusbar__item:first-child::before {
+    border-left: none;
+}
+
+/* Responsive Adaptations */
+@media (max-width: 768px) {
+  .form-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-header__statusbar {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}</div>
+        </div>
+        <div class="section">
+            <h2>Implementation Notes</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Embedded Css Architecture</h4>
+                    <p>All styles, including design tokens, base styles, atomic component styles (Action Button, Status Badge), and the molecular Form Header styles, are embedded in a single `<style>` tag. BEM is used for clarity.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Organization</h4>
+                    <p>The HTML file showcases the component in a clean container, with `<h2>` and `<h3>` tags labeling the component and its variants. The showcase provides realistic examples of how the component appears in different contexts.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Responsive Design</h4>
+                    <p>A simple media query for screens below 768px adjusts the flex-direction to stack the action buttons and statusbar, ensuring usability on smaller screens. Horizontal scrolling is enabled for the statusbar if needed.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Accessibility Compliance</h4>
+                    <p>WCAG 2.1 AA compliance is ensured through semantic HTML (`<nav>`, `<button>`), ARIA attributes for state, visible focus indicators, and sufficient color contrast.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Browser Support</h4>
+                    <p>Uses modern CSS like flexbox and custom properties, compatible with all target browsers. The chevron effect is achieved with CSS transforms and pseudo-elements.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Usage Guidelines</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>When To Use</h4><p>Use at the top of all main Odoo form views (e.g., Trip Form, Vehicle Form) to provide primary actions and a visual representation of the record's lifecycle.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Content Guidelines</h4><p>Action button text should be concise and verb-oriented (e.g., 'Save', 'Approve'). Statusbar text should be short, one-to-two word states (e.g., 'Planned', 'In-Transit').</p>
+                </div>
+                <div class="info-card">
+                    <h4>Placement Rules</h4><p>This component should always be placed at the very top of a form view, directly below the main application header and breadcrumbs.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Customization Options</h4><ul><li style="list-style: disc; margin-left: 16px; padding-left: 0;">Use `.form-header__statusbar--standard` for a read-only status bar.</li><li style="list-style: disc; margin-left: 16px; padding-left: 0;">Use `.form-header__statusbar--clickable` for an interactive status bar where users can click to change states.</li><li style="list-style: disc; margin-left: 16px; padding-left: 0;">Add the `.is-current` class to the current status item to apply the highlight style.</li></ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Testing Recommendations</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Browser Testing</h4><p>Test in Chrome, Firefox, Safari on both desktop and tablet viewports.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Device Testing</h4><p>Verify responsive behavior on screen widths around 768px to ensure the stacking transition is smooth.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Accessibility Testing</h4><ul><li>Test keyboard navigation to ensure all buttons and status items are reachable and activatable.</li><li>Use a screen reader (NVDA, VoiceOver) to verify `aria-label` and `aria-current` are announced correctly.</li><li>Check focus indicator visibility.</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Performance Testing</h4><p>Not applicable at the component level, but the component should not cause performance issues when rendered within a larger form.</p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+</html>

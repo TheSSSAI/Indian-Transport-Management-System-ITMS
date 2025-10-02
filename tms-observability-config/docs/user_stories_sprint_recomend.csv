@@ -1,0 +1,6 @@
+"sprint_number","story_ids","total_points","sprint_goal","dependencies_resolved"
+"1","[""US-058"",""US-001"",""US-004"",""US-070""]","12","Establish the foundational security and user management framework, including login and Role-Based Access Control (RBAC).","true"
+"2","[""US-015"",""US-011"",""US-006"",""US-019"",""US-020""]","9","Implement core master data models for Customers, Drivers, Vehicles, Routes, and Materials.","true"
+"3","[""US-071"",""US-012"",""US-014"",""US-008"",""US-026"",""US-076""]","12","Complete master data validations and deliver the core trip creation functionality.","true"
+"4","[""US-027"",""US-074"",""US-075"",""US-031"",""US-046""]","14","Enable trip assignment with all business rule validations and launch the basic Driver Portal with login.","true"
+"5","[""US-047"",""US-049"",""US-050"",""US-077"",""US-030""]","15","Develop core driver on-trip actions: viewing trips, starting trips, and logging critical events, plus the manager's resolution workflow.","true"

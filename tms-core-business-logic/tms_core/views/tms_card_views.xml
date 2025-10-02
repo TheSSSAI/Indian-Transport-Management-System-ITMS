@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- TMS Card Tree View -->
+        <record id="tms_card_view_tree" model="ir.ui.view">
+            <field name="name">tms.card.view.tree</field>
+            <field name="model">tms.card</field>
+            <field name="arch" type="xml">
+                <tree string="Cards">
+                    <field name="name" string="Card"/>
+                    <field name="card_type"/>
+                    <field name="provider"/>
+                    <field name="assigned_vehicle_id"/>
+                    <field name="current_balance" widget="monetary"/>
+                    <field name="low_balance_threshold" widget="monetary"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- TMS Card Form View -->
+        <record id="tms_card_view_form" model="ir.ui.view">
+            <field name="name">tms.card.view.form</field>
+            <field name="model">tms.card</field>
+            <field name="arch" type="xml">
+                <form string="Card">
+                    <sheet>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                        <group>
+                            <group>
+                                <field name="card_number"/>
+                                <field name="card_type" required="1"/>
+                                <field name="provider"/>
+                            </group>
+                            <group>
+                                <field name="assigned_vehicle_id" options="{'no_create': True}"/>
+                                <field name="active" widget="boolean_toggle"/>
+                            </group>
+                        </group>
+                        <group string="Balance Management">
+                            <field name="current_balance" widget="monetary"/>
+                            <field name="low_balance_threshold" widget="monetary"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- TMS Card Search View -->
+        <record id="tms_card_view_search" model="ir.ui.view">
+            <field name="name">tms.card.view.search</field>
+            <field name="model">tms.card</field>
+            <field name="arch" type="xml">
+                <search string="Search Cards">
+                    <field name="card_number"/>
+                    <field name="provider"/>
+                    <field name="assigned_vehicle_id"/>
+                    <filter name="fastag" string="FASTag" domain="[('card_type', '=', 'fastag')]"/>
+                    <filter name="diesel" string="Diesel" domain="[('card_type', '=', 'diesel')]"/>
+                    <separator/>
+                    <filter name="inactive" string="Archived" domain="[('active', '=', False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Card Type" name="group_by_card_type" context="{'group_by': 'card_type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- TMS Card Action -->
+        <record id="action_tms_card" model="ir.actions.act_window">
+            <field name="name">Card Management</field>
+            <field name="res_model">tms.card</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new card record.
+                </p><p>
+                    Manage your fleet's FASTag and diesel cards here.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

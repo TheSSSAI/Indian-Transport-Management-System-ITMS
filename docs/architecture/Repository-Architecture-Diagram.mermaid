@@ -1,0 +1,78 @@
+%%{init: {'theme': 'base', 'themeVariables': {'background': '#FFFFFF', 'primaryColor': '#FFFFFF', 'primaryTextColor': '#333', 'lineColor': '#444', 'fontFamily': 'Arial, sans-serif', 'fontSize': '14px'}}}%%
+graph TD
+    subgraph External Services
+        direction LR
+        extGpsApi["Third-Party<br>GPS Provider API<br>(REST)"]
+        extGspApi["Third-Party<br>GSP API<br>(REST)"]
+    end
+
+    subgraph User Interfaces
+        direction LR
+        userAdmin["Admin / Manager<br>(Web Browser)"]
+        userDriver["Driver<br>(Mobile Browser)"]
+    end
+
+    subgraph AWS Cloud Platform [AWS Cloud Platform - Amazon EKS]
+        direction TB
+
+        subgraph Application Services Layer
+            repoGpsSvc("<b>REPO-GPS-SVC</b><br>tms-gps-ingestion-service<br>[FastAPI Microservice]"):::appsvc
+        end
+
+        subgraph Odoo Application Layer
+            direction LR
+            repoDrvUi("<b>REPO-DRV-UI</b><br>tms-driver-portal-ui<br>[OWL Frontend]"):::app
+            repoTmsCore("<b>REPO-TMS-CORE</b><br>tms-core-business-logic<br>[Odoo Backend & DB Logic]"):::app
+            repoGpsCon("<b>REPO-GPS-CON</b><br>tms-gps-data-consumer<br>[RabbitMQ Consumer]"):::app
+            repoGspInt("<b>REPO-GSP-INT</b><br>tms-gsp-integration-client<br>[GSP Adapter]"):::app
+        end
+
+        subgraph Platform Services
+            direction LR
+            svcRabbitMq["<b>Amazon MQ</b><br>RabbitMQ Broker"]:::platform
+            svcDb["<b>Amazon RDS</b><br>PostgreSQL Database"]:::platform
+            svcCache["<b>Amazon ElastiCache</b><br>Redis Cache"]:::platform
+            svcStorage["<b>Amazon S3</b><br>File Storage"]:::platform
+        end
+    end
+
+    subgraph DevOps & IaC [Platform as Code Repositories (GitOps)]
+        direction LR
+        repoInfra("<b>REPO-TMS-INFRA</b><br>tms-infrastructure<br>[Terraform]"):::iac
+        repoK8s("<b>REPO-TMS-K8S</b><br>tms-kubernetes-manifests<br>[Helm]"):::iac
+        repoObs("<b>REPO-TMS-OBS</b><br>tms-observability-config<br>[Prometheus/Grafana]"):::iac
+    end
+
+    %% User Interactions
+    userAdmin -- "HTTPS / Odoo UI" --> repoTmsCore
+    userDriver -- "HTTPS / OWL UI" --> repoDrvUi
+
+    %% Core Application Dependencies
+    repoDrvUi -- "1. Consumes API<br>(HTTP/JSON-RPC)" --> repoTmsCore
+    repoGspInt -- "2. Consumes ORM API<br>(Python Call)" --> repoTmsCore
+    repoGpsCon -- "3. Consumes ORM API<br>(Python Call)" --> repoTmsCore
+
+    %% Data Persistence & Caching
+    repoTmsCore -- "Reads/Writes" --> svcDb
+    repoTmsCore -- "Reads/Writes Cache" --> svcCache
+    repoTmsCore -- "Stores/Retrieves Files" --> svcStorage
+
+    %% Asynchronous GPS Data Flow
+    extGpsApi -- "Polls for location data" --> repoGpsSvc
+    repoGpsSvc -- "4. Publishes Event<br>'VehicleLocationUpdated'" -.-> svcRabbitMq
+    svcRabbitMq -- "5. Consumes Event<br>(AMQP)" -.-> repoGpsCon
+
+    %% Synchronous GSP Integration Flow
+    repoGspInt -- "6. Makes API Call<br>(Sync w/ Async Fallback)" --> extGspApi
+
+    %% IaC and GitOps Flow
+    repoInfra -- "Provisions" --> Platform Services
+    repoK8s -- "Deploys" --> repoGpsSvc
+    repoK8s -- "Deploys" --> Odoo Application Layer
+    repoObs -- "Configures" --> repoK8s
+
+    %% Styling
+    classDef app fill:#e1f5fe,stroke:#333,stroke-width:2px,color:#000
+    classDef appsvc fill:#d1c4e9,stroke:#333,stroke-width:2px,color:#000
+    classDef platform fill:#e8f5e9,stroke:#333,stroke-width:2px,color:#000
+    classDef iac fill:#fff3e0,stroke:#333,stroke-width:2px,color:#000

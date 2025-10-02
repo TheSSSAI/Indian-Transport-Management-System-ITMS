@@ -1,0 +1,25 @@
+flowchart TD
+    subgraph "Happy Path Workflow"
+        Start([Start]) -- "1. Create Trip" --> Planned(Planned)
+        Planned -- "2. Assign Vehicle & Driver" --> Assigned(Assigned)
+    end
+
+    subgraph "Exception Handling Workflow"
+        OnHold(On Hold) -- "3. Resolve & Resume Trip" --> InTransit(In-Transit)
+        
+        Planned -- "4. Cancel Trip" --> Canceled([Canceled])
+        Assigned -- "4. Cancel Trip" --> Canceled
+        InTransit -- "4. Cancel Trip" --> Canceled
+        OnHold -- "4. Cancel Trip" --> Canceled
+    end
+
+    %% Styling Definitions
+    classDef stateNode fill:#e1f5fe,stroke:#0288d1,color:#000
+    classDef exceptionNode fill:#ffecb3,stroke:#f57f17,color:#000
+    classDef terminalNode fill:#ffebee,stroke:#c62828,color:#000
+    classDef startNode fill:#f5f5f5,stroke:#616161,color:#000
+
+    class Planned,Assigned,InTransit stateNode
+    class OnHold exceptionNode
+    class Canceled terminalNode
+    class Start startNode

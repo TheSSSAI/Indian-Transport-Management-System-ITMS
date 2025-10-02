@@ -1,0 +1,66 @@
+graph TD
+    subgraph "Level 1: Atomic Components"
+        direction LR
+        A1["Action Button"]
+        A2["Field Widgets (Text, M2O, etc.)"]
+        A3["Status Badge"]
+    end
+
+    subgraph "Level 2: Molecular Components"
+        direction LR
+        M1["Form Header with Statusbar"]
+        M2["Kanban Card (Trip)"]
+        M3["Smart Button Box"]
+        M4["Notebook Tabs"]
+        M5["Chatter/Log Area"]
+    end
+
+    subgraph "Level 3: Organism Components"
+        direction LR
+        O1["Master Data Form View"]
+        O2["Trip Form View"]
+        O3["Trip Kanban Board"]
+    end
+
+    subgraph "Level 4: Screens (Templates)"
+        direction LR
+        S1["Master Data Screen (e.g., Vehicle Form)"]
+        S2["Trip Detail Screen"]
+        S3["Trip Management Dashboard (Kanban)"]
+    end
+
+    %% --- Relationships ---
+
+    %% Atoms to Molecules
+    A1 --> M1
+    A3 --> M2
+
+    %% Molecules to Organisms
+    M1 --> O1
+    M4 --> O1
+    M5 --> O1
+    A2 --> O1
+
+    M1 --> O2
+    M3 --> O2
+    M4 --> O2
+    M5 --> O2
+    A2 --> O2
+
+    M2 --> O3
+
+    %% Organisms to Screens
+    O1 --> S1
+    O2 --> S2
+    O3 --> S3
+
+    %% Styling
+    classDef atom fill:#e3f2fd,stroke:#2196f3,stroke-width:2px;
+    classDef molecule fill:#e8f5e9,stroke:#4caf50,stroke-width:2px;
+    classDef organism fill:#fff3e0,stroke:#fb8c00,stroke-width:2px;
+    classDef screen fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px;
+
+    class A1,A2,A3 atom;
+    class M1,M2,M3,M4,M5 molecule;
+    class O1,O2,O3 organism;
+    class S1,S2,S3 screen;

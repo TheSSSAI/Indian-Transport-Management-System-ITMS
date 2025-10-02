@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TMS Driver Portal - Atomic Components</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ---------------------------------- */
+    /*         DESIGN TOKENS (CSS)        */
+    /* ---------------------------------- */
+    :root {
+      /* Colors - Primary */
+      --color-primary-100: #DBEAFE;
+      --color-primary-500: #3B82F6;
+      --color-primary-600: #2563EB;
+      --color-primary-700: #1D4ED8;
+
+      /* Colors - Neutrals */
+      --color-white: #FFFFFF;
+      --color-gray-50: #F9FAFB;
+      --color-gray-100: #F3F4F6;
+      --color-gray-300: #D1D5DB;
+      --color-gray-500: #6B7280;
+      --color-gray-700: #374151;
+      --color-gray-900: #111827;
+
+      /* Colors - Semantic */
+      --color-success-base: #16A34A;
+      --color-success-light: #ECFDF5;
+      --color-success-dark: #14532D;
+      --color-warning-base: #F59E0B;
+      --color-warning-light: #FFFBEB;
+      --color-warning-dark: #78350F;
+      --color-error-base: #DC2626;
+      --color-error-light: #FEF2F2;
+      --color-error-dark: #7F1D1D;
+      --color-info-base: #0284C7;
+      --color-info-light: #F0F9FF;
+      --color-info-dark: #0C4A6E;
+
+      /* Fonts */
+      --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-size-sm: 14px;
+      --font-size-base: 16px;
+      --font-size-lg: 18px;
+      --font-weight-normal: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+
+      /* Spacing */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      --spacing-2xl: 48px;
+
+      /* Borders */
+      --border-radius-md: 6px;
+      --border-radius-lg: 8px;
+
+      /* Transitions */
+      --transition-fast: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ---------------------------------- */
+    /*       BASE & LAYOUT STYLES         */
+    /* ---------------------------------- */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: var(--font-family-primary);
+      background-color: var(--color-gray-100);
+      color: var(--color-gray-900);
+      margin: 0;
+      padding: var(--spacing-lg);
+    }
+    .mobile-showcase {
+      max-width: 420px;
+      min-width: 360px;
+      margin: 0 auto;
+      background-color: var(--color-white);
+      padding: var(--spacing-lg);
+      border-radius: var(--border-radius-lg);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+    h1, h2, h3, h4, p { margin: 0; }
+    h1 { font-size: 24px; margin-bottom: var(--spacing-sm); }
+    h2 { font-size: 20px; margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-sm); border-bottom: 1px solid var(--color-gray-300); }
+    h3 { font-size: var(--font-size-lg); margin-bottom: var(--spacing-md); }
+    h4 { font-size: var(--font-size-base); margin-bottom: var(--spacing-sm); color: var(--color-gray-500); font-weight: var(--font-weight-medium);}
+    .component-section { margin-bottom: var(--spacing-xl); }
+    .component-group { margin-bottom: var(--spacing-lg); }
+    .state-grid { display: grid; grid-template-columns: 1fr; gap: var(--spacing-md); }
+
+    /* ---------------------------------- */
+    /*    LARGE ACTION BUTTON (MOBILE)    */
+    /* ---------------------------------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+      min-height: 48px;
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-bold);
+      text-decoration: none;
+      border: 1px solid transparent;
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:focus-visible {
+        outline: 2px solid var(--color-primary-500);
+        outline-offset: 2px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn[disabled] {
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    /* Primary Variant */
+    .btn--primary {
+      background-color: var(--color-primary-600);
+      color: var(--color-white);
+    }
+    .btn--primary:hover { background-color: var(--color-primary-700); }
+    .btn--primary[disabled] {
+      background-color: var(--color-primary-100);
+      color: var(--color-white);
+    }
+    /* Secondary Variant */
+    .btn--secondary {
+      background-color: var(--color-white);
+      color: var(--color-primary-600);
+      border-color: var(--color-gray-300);
+    }
+    .btn--secondary:hover { background-color: var(--color-gray-50); }
+    .btn--secondary[disabled] {
+      background-color: var(--color-white);
+      color: var(--color-gray-300);
+      border-color: var(--color-gray-100);
+    }
+    /* Danger Variant */
+    .btn--danger {
+      background-color: var(--color-error-base);
+      color: var(--color-white);
+    }
+    .btn--danger:hover { background-color: #B91C1C; }
+    .btn--danger[disabled] {
+      background-color: #FECACA;
+      color: var(--color-white);
+    }
+    /* Success Variant */
+    .btn--success {
+      background-color: var(--color-success-base);
+      color: var(--color-white);
+    }
+    .btn--success:hover { background-color: #15803D; }
+    .btn--success[disabled] {
+      background-color: #BBF7D0;
+      color: var(--color-white);
+    }
+    /* Loading State */
+    .btn--loading .btn-text { visibility: hidden; }
+    .btn--loading::after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border: 3px solid;
+      border-color: currentColor currentColor currentColor transparent;
+      border-radius: 50%;
+      animation: btn-spinner 0.6s linear infinite;
+    }
+    @keyframes btn-spinner { to { transform: rotate(360deg); } }
+
+    /* ---------------------------------- */
+    /*       FORM INPUTS (MOBILE)         */
+    /* ---------------------------------- */
+    .form-group { margin-bottom: var(--spacing-md); }
+    .form-label { display: block; font-weight: var(--font-weight-medium); margin-bottom: var(--spacing-sm); }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px var(--spacing-md);
+      font-size: var(--font-size-base);
+      font-family: var(--font-family-primary);
+      border: 1px solid var(--color-gray-300);
+      border-radius: var(--border-radius-md);
+      transition: var(--transition-fast);
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--color-primary-500);
+      box-shadow: 0 0 0 2px var(--color-primary-100);
+    }
+    .form-input::placeholder { color: var(--color-gray-500); }
+    /* Error State */
+    .form-input.error, .form-select.error {
+      border-color: var(--color-error-base);
+    }
+    .form-input.error:focus, .form-select.error:focus {
+      box-shadow: 0 0 0 2px var(--color-error-light);
+    }
+    .form-error-message { color: var(--color-error-base); font-size: var(--font-size-sm); margin-top: var(--spacing-xs); }
+    /* Read-Only State */
+    .form-input[readonly] {
+      background-color: var(--color-gray-100);
+      color: var(--color-gray-500);
+      cursor: default;
+      border-color: var(--color-gray-300);
+    }
+    /* Select Wrapper for Icon */
+    .form-select-wrapper { position: relative; }
+    .form-select-wrapper::after {
+      content: '▾';
+      position: absolute;
+      right: var(--spacing-md);
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--color-gray-500);
+      font-size: 20px;
+    }
+    .form-select { appearance: none; -webkit-appearance: none; }
+
+    /* ---------------------------------- */
+    /*            STATUS TAGS             */
+    /* ---------------------------------- */
+    .status-tag {
+      display: inline-block;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      border-radius: 9999px;
+    }
+    .tag-container { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); }
+    .status-tag--info { background-color: var(--color-info-light); color: var(--color-info-dark); }
+    .status-tag--primary { background-color: var(--color-primary-100); color: var(--color-primary-700); }
+    .status-tag--success { background-color: var(--color-success-light); color: var(--color-success-dark); }
+    .status-tag--warning { background-color: var(--color-warning-light); color: var(--color-warning-dark); }
+    .status-tag--error { background-color: var(--color-error-light); color: var(--color-error-dark); }
+
+    /* ---------------------------------- */
+    /*         TOAST NOTIFICATION         */
+    /* ---------------------------------- */
+    .toast-container { position: fixed; top: var(--spacing-md); left: 0; right: 0; display: flex; justify-content: center; z-index: 100; }
+    .toast {
+      display: flex;
+      align-items: center;
+      width: calc(100% - 2 * var(--spacing-md));
+      max-width: 420px;
+      padding: var(--spacing-md);
+      border-radius: var(--border-radius-md);
+      box-shadow: var(--shadow-md);
+      margin-bottom: var(--spacing-md);
+    }
+    .toast-icon { margin-right: var(--spacing-sm); font-size: 20px; line-height: 1; }
+    .toast--success { background-color: var(--color-success-light); color: var(--color-success-dark); }
+    .toast--success .toast-icon { color: var(--color-success-base); }
+    .toast--error { background-color: var(--color-error-light); color: var(--color-error-dark); }
+    .toast--error .toast-icon { color: var(--color-error-base); }
+    .toast--info { background-color: var(--color-info-light); color: var(--color-info-dark); }
+    .toast--info .toast-icon { color: var(--color-info-base); }
+
+  </style>
+</head>
+<body>
+
+  <div class="mobile-showcase">
+    <header>
+      <h1>Atomic Components</h1>
+      <p style="color: var(--color-gray-500); margin-bottom: var(--spacing-xl);">Mobile-First Components for the Driver Portal</p>
+    </header>
+
+    <main>
+
+      <!-- ================== BUTTONS ================== -->
+      <section class="component-section">
+        <h2>Large Action Buttons</h2>
+        <div class="component-group">
+          <h3>Primary</h3>
+          <div class="state-grid">
+            <button class="btn btn--primary"><span class="btn-text">Default</span></button>
+            <button class="btn btn--primary btn--loading"><span class="btn-text">Loading</span></button>
+            <button class="btn btn--primary" disabled><span class="btn-text">Disabled</span></button>
+          </div>
+        </div>
+        <div class="component-group">
+          <h3>Secondary</h3>
+          <div class="state-grid">
+            <button class="btn btn--secondary"><span class="btn-text">Default</span></button>
+            <button class="btn btn--secondary" disabled><span class="btn-text">Disabled</span></button>
+          </div>
+        </div>
+        <div class="component-group">
+          <h3>Danger</h3>
+          <div class="state-grid">
+            <button class="btn btn--danger"><span class="btn-text">Default</span></button>
+            <button class="btn btn--danger" disabled><span class="btn-text">Disabled</span></button>
+          </div>
+        </div>
+        <div class="component-group">
+          <h3>Success</h3>
+          <div class="state-grid">
+            <button class="btn btn--success"><span class="btn-text">Default</span></button>
+            <button class="btn btn--success" disabled><span class="btn-text">Disabled</span></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================== FORM CONTROLS ================== -->
+      <section class="component-section">
+        <h2>Form Controls</h2>
+        <div class="component-group">
+          <h3>Form Inputs</h3>
+          <div class="state-grid">
+            <div class="form-group">
+              <label for="text-default" class="form-label">Default</label>
+              <input type="text" id="text-default" class="form-input" placeholder="e.g., John Doe">
+            </div>
+            <div class="form-group">
+              <label for="text-focused" class="form-label">Focused</label>
+              <input type="text" id="text-focused" class="form-input" value="This input is focused.">
+            </div>
+            <div class="form-group">
+              <label for="text-error" class="form-label">Error</label>
+              <input type="email" id="text-error" class="form-input error" value="not-an-email">
+              <p class="form-error-message">Please enter a valid email address.</p>
+            </div>
+            <div class="form-group">
+              <label for="text-readonly" class="form-label">Read-Only</label>
+              <input type="text" id="text-readonly" class="form-input" value="TRIP-00123" readonly>
+            </div>
+            <div class="form-group">
+              <label for="text-numeric" class="form-label">Numeric</label>
+              <input type="number" id="text-numeric" class="form-input" placeholder="e.g., 5000">
+            </div>
+            <div class="form-group">
+              <label for="text-password" class="form-label">Password</label>
+              <input type="password" id="text-password" class="form-input" value="secretpassword">
+            </div>
+            <div class="form-group">
+              <label for="text-textarea" class="form-label">Text Area</label>
+              <textarea id="text-textarea" class="form-input" rows="4" placeholder="Enter notes here..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="component-group">
+          <h3>Dropdown Select</h3>
+          <div class="state-grid">
+            <div class="form-group">
+              <label for="select-default" class="form-label">Default</label>
+              <div class="form-select-wrapper">
+                <select id="select-default" class="form-select">
+                  <option>Select Expense Type...</option>
+                  <option>Diesel</option>
+                  <option>Toll</option>
+                  <option>Food</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="select-error" class="form-label">Error</label>
+              <div class="form-select-wrapper">
+                <select id="select-error" class="form-select error">
+                  <option>Select Expense Type...</option>
+                </select>
+              </div>
+              <p class="form-error-message">This field is required.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================== FEEDBACK ELEMENTS ================== -->
+      <section class="component-section">
+        <h2>Feedback Elements</h2>
+        <div class="component-group">
+          <h3>Status Tags</h3>
+          <div class="tag-container">
+            <span class="status-tag status-tag--info">Assigned</span>
+            <span class="status-tag status-tag--primary">In-Transit</span>
+            <span class="status-tag status-tag--success">Delivered</span>
+            <span class="status-tag status-tag--warning">On-Hold</span>
+            <span class="status-tag status-tag--error">Canceled</span>
+          </div>
+        </div>
+        <div class="component-group">
+            <h3>Toast Notifications</h3>
+            <p style="margin-bottom: var(--spacing-md); color: var(--color-gray-500);">Note: These are typically positioned at the top of the viewport.</p>
+            <div class="state-grid">
+              <div class="toast toast--success">
+                <span class="toast-icon">✓</span>
+                <span class="toast-message">Expense submitted successfully.</span>
+              </div>
+              <div class="toast toast--error">
+                <span class="toast-icon">✗</span>
+                <span class="toast-message">Upload failed. Please try again.</span>
+              </div>
+              <div class="toast toast--info">
+                <span class="toast-icon">ℹ</span>
+                <span class="toast-message">Your trip has been assigned.</span>
+              </div>
+            </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // Simple script to demonstrate focus state on the 'Focused' example input
+    document.addEventListener('DOMContentLoaded', function() {
+      const focusedInput = document.getElementById('text-focused');
+      if(focusedInput) {
+        focusedInput.focus();
+        focusedInput.blur(); // Remove initial focus to allow user interaction
+      }
+    });
+  </script>
+
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atomic Components Implementation Overview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 32px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0 0 8px 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .content {
+            padding: 32px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4f46e5;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 32px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 14px;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+            color: white;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: top;
+        }
+        
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #fcfcfd;
+        }
+        
+        tr:nth-child(even):hover {
+            background-color: #f1f5f9;
+        }
+        
+        .component-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 15px;
+        }
+        
+        .feature-list {
+            max-width: 280px;
+        }
+        
+        .feature-list ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .feature-list li {
+            background: #f1f5f9;
+            margin: 3px 0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            border-left: 3px solid #e2e8f0;
+        }
+        
+        .states-list li {
+            border-left-color: #10b981;
+            background: #ecfdf5;
+            color: #065f46;
+        }
+        
+        .variants-list li {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+            color: #92400e;
+        }
+        
+        .accessibility-list li {
+            border-left-color: #8b5cf6;
+            background: #f3e8ff;
+            color: #5b21b6;
+        }
+        
+        .feature-count {
+            display: inline-block;
+            background: #4f46e5;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .implementation-section {
+            margin-top: 32px;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .implementation-section h3 {
+            color: #1e293b;
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .implementation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 16px;
+        }
+        
+        .implementation-item {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .implementation-item h4 {
+            color: #4f46e5;
+            margin: 0 0 12px 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .implementation-item p {
+            color: #64748b;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-primary {
+            background: #ddd6fe;
+            color: #5b21b6;
+        }
+        
+        .badge-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            th, td {
+                padding: 12px 8px;
+                font-size: 13px;
+            }
+            
+            .feature-list {
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Atomic Components Implementation</h1>
+            <p>Complete overview of all implemented atomic UI components</p>
+        </div>
+        
+        <div class="content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">5</span>
+                    <div class="stat-label">Components</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">12</span>
+                    <div class="stat-label">Total States</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">18</span>
+                    <div class="stat-label">Total Variants</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">10</span>
+                    <div class="stat-label">Accessibility Features</div>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component Name</th>
+                            <th>States Implemented</th>
+                            <th>Variants</th>
+                            <th>Accessibility Features</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="component-name">Large Action Button (Mobile)</div>
+                                <span class="badge badge-primary">Atomic</span>
+                            </td>
+                            <td>
+                                <div class="feature-list states-list">
+                                    <span class="feature-count">4</span>
+                                    <ul>
+                                        <li>default</li><li>active</li><li>disabled</li><li>loading</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="feature-list variants-list">
+                                    <span class="feature-count">4</span>
+                                    <ul>
+                                        <li>primary</li><li>secondary</li><li>danger</li><li>success</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="feature-list accessibility-list">
+                                    <span class="feature-count">3</span>
+                                    <ul>
+                                        <li>min-height for touch target</li><li>focus-visible state</li><li>semantic <button> tag</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="component-name">Form Input (Mobile)</div>
+                                <span class="badge badge-primary">Atomic</span>
+                            </td>
+                            <td>
+                                <div class="feature-list states-list">
+                                    <span class="feature-count">4</span>
+                                    <ul>
+                                        <li>default</li><li>focused</li><li>error</li><li>read-only</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="feature-list variants-list">
+                                    <span class="feature-count">5</span>
+                                    <ul>
+                                        <li>text</li><li>email</li><li>password</li><li>numeric</li><li>textarea</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="feature-list accessibility-list">
+                                    <span class="feature-count">2</span>
+                                    <ul>
+                                        <li>semantic <label> for each input</li><li>error message linked via context</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="component-name">Dropdown Select (Mobile)</div>
+                                <span class="badge badge-primary">Atomic</span>
+                            </td>
+                            <td>
+                                <div class="feature-list states-list">
+                                    <span class="feature-count">2</span>
+                                    <ul>
+                                        <li>default</li><li>error</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="feature-list variants-list">
+                                    <span class="feature-count">1</span>
+                                    <ul>
+                                        <li>standard</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="feature-list accessibility-list">
+                                    <span class="feature-count">2</span>
+                                    <ul>
+                                        <li>semantic <label></li><li>styled to use native OS dropdown</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="component-name">Status Tag</div>
+                                <span class="badge badge-primary">Atomic</span>
+                            </td>
+                            <td>
+                                <div class="feature-list states-list">
+                                    <span class="feature-count">1</span>
+                                    <ul>
+                                        <li>default</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="feature-list variants-list">
+                                    <span class="feature-count">5</span>
+                                    <ul>
+                                        <li>Assigned (info)</li><li>In-Transit (primary)</li><li>Delivered (success)</li><li>On-Hold (warning)</li><li>Canceled (error)</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="feature-list accessibility-list">
+                                    <span class="feature-count">1</span>
+                                    <ul>
+                                        <li>sufficient color contrast between text and background</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="component-name">Toast Notification</div>
+                                <span class="badge badge-primary">Atomic</span>
+                            </td>
+                            <td>
+                                <div class="feature-list states-list">
+                                    <span class="feature-count">1</span>
+                                    <ul>
+                                        <li>visible</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="feature-list variants-list">
+                                    <span class="feature-count">3</span>
+                                    <ul>
+                                        <li>success</li><li>error</li><li>info</li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="feature-list accessibility-list">
+                                    <span class="feature-count">2</span>
+                                    <ul>
+                                        <li>icon provides non-color-based feedback</li><li>would use ARIA roles in a dynamic implementation</li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="implementation-section">
+                <h3>Implementation Guidelines & Notes</h3>
+                <div class="implementation-grid">
+                    <div class="implementation-item">
+                        <h4>Css Architecture</h4>
+                        <p>All styles are embedded in the `<style>` tag, using CSS custom properties for design tokens. A mobile-first approach is taken, with the showcase itself constrained to a mobile viewport for demonstration purposes.</p>
+                    </div>
+                    <div class="implementation-item">
+                        <h4>Component Organization</h4>
+                        <p>Components are grouped by category (Buttons, Forms, Feedback) within `<section>` tags for clear organization. Each variant and its states are clearly labeled.</p>
+                    </div>
+                    <div class="implementation-item">
+                        <h4>Responsive Design</h4>
+                        <p>Components are designed to be full-width, with large touch targets and increased font sizes, as specified for the mobile-first Driver Portal.</p>
+                    </div>
+                    <div class="implementation-item">
+                        <h4>Accessibility Compliance</h4>
+                        <p>WCAG 2.1 AA compliance is addressed through semantic HTML (`<label>`, `<button>`), sufficient color contrast, highly visible focus states (`:focus-visible`), and minimum touch target sizes (`min-height: 48px`).</p>
+                    </div>
+                    <div class="implementation-item">
+                        <h4>Browser Support</h4>
+                        <p>Styles use modern CSS features supported by all evergreen browsers (Chrome, Firefox, Safari, Edge).</p>
+                    </div>
+                    <div class="implementation-item">
+                        <h4>File Purpose</h4>
+                        <p>This file serves as a static style guide and visual reference for all atomic components in the TMS Driver Portal. It allows developers and designers to review the implementation of the design system in a single place.</p>
+                    </div>
+                    <div class="implementation-item">
+                        <h4>Development Workflow</h4>
+                        <p>Developers can copy the HTML structure and CSS classes for a given component directly from this file into their Odoo OWL templates and stylesheets.</p>
+                    </div>
+                    <div class="implementation-item">
+                        <h4>Testing Scenarios</h4>
+                        <p>This file is the source of truth for visual regression testing. Automated tests can take screenshots of this page to detect any unintended visual changes to components.</p>
+                    </div>
+                    <div class="implementation-item">
+                        <h4>Stakeholder Review</h4>
+                        <p>This HTML file can be shared with designers and product managers for visual review and approval of the component library's implementation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

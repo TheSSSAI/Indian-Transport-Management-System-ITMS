@@ -1,0 +1,46 @@
+# .yamllint config
+# For more info, see https://yamllint.readthedocs.io/
+
+extends: default
+
+rules:
+  # 2 spaces for indentation
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+    check-multi-line-strings: false
+  
+  # Max line length
+  line-length:
+    max: 120
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+  
+  # No trailing spaces
+  trailing-spaces: enable
+
+  # Use --- to separate documents
+  document-start: disable
+
+  # Allow for empty values
+  empty-values:
+    forbid-in-block-mappings: false
+    forbid-in-flow-mappings: false
+  
+  # Braces for flow mappings and sequences
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+    min-spaces-inside-empty: -1
+    max-spaces-inside-empty: -1
+  
+  # Brackets for flow sequences
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+    min-spaces-inside-empty: -1
+    max-spaces-inside-empty: -1
+
+ignore: |
+  # Ignore specific files if necessary
+  # /path/to/ignored/file.yaml

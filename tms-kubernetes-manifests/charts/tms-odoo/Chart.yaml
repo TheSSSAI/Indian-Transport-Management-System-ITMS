@@ -1,0 +1,21 @@
+# Helm chart metadata for the TMS Odoo Application.
+# This file defines the chart's identity and version, making it a manageable
+# and versionable deployment package for the core monolith.
+
+apiVersion: v2
+name: tms-odoo
+description: A Helm chart for deploying the Transport Management System (Odoo Monolith).
+# This chart is an application chart.
+type: application
+
+# This is the chart version. This should be incremented anytime changes are made
+# to the chart and its templates.
+version: 0.1.0
+
+# This is the version number of the application being deployed. This version number
+# should be in sync with the application's semantic version.
+appVersion: "18.0"
+
+maintainers:
+  - name: TMS Platform Team
+    email: platform@tms.example.com

@@ -1,0 +1,35 @@
+.flake8
+[flake8]
+# Odoo's code style has some specific conventions that deviate from standard PEP8.
+# This configuration adapts flake8 to be more Odoo-friendly.
+max-line-length = 120
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    .tox,
+    docs,
+    build,
+    dist,
+    node_modules,
+    */static/lib/*,
+    */__init__.py
+ignore =
+    # E501: line too long (handled by black)
+    E501,
+    # W503: line break before binary operator (black handles this differently)
+    W503,
+    # E203: whitespace before ':' (black formatting)
+    E203,
+    # E712: comparison to True should be 'if cond is True:' or 'if cond:' (Odoo uses `== True` in domains)
+    E712,
+    # F401: module imported but unused (Odoo's __init__.py patterns)
+    F401,
+    # F811: redefinition of unused name (common in Odoo tests)
+    F811
+
+[flake8:local-plugins]
+extension =
+    # Add any local flake8 plugins here if needed
+paths =
+    # Path to local plugins directory

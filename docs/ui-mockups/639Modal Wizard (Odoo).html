@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organism: Modal Wizard (Odoo)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* --- DESIGN TOKENS --- */
+    :root {
+      /* Colors */
+      --color-primary-50: #EFF6FF; --color-primary-100: #DBEAFE; --color-primary-200: #BFDBFE; --color-primary-300: #93C5FD; --color-primary-400: #60A5FA; --color-primary-500: #3B82F6; --color-primary-600: #2563EB; --color-primary-700: #1D4ED8; --color-primary-800: #1E40AF; --color-primary-900: #1E3A8A;
+      --color-neutral-white: #FFFFFF; --color-neutral-50: #F9FAFB; --color-neutral-100: #F3F4F6; --color-neutral-200: #E5E7EB; --color-neutral-300: #D1D5DB; --color-neutral-500: #6B7280; --color-neutral-700: #374151; --color-neutral-900: #111827;
+      --color-semantic-error: #DC2626; --color-semantic-error-bg: #FEF2F2;
+      /* Typography */
+      --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-size-sm: 14px; --font-size-base: 16px; --font-size-lg: 18px;
+      --font-weight-normal: 400; --font-weight-medium: 500; --font-weight-semibold: 600;
+      /* Spacing */
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px; --space-8: 32px;
+      /* Borders */
+      --border-radius-md: 6px; --border-radius-lg: 8px;
+      --border-width-default: 1px;
+      /* Shadows */
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-focus-ring: 0 0 0 3px var(--color-primary-200);
+    }
+    /* --- BASE & LAYOUT STYLES --- */
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font-family-primary); font-size: var(--font-size-base); color: var(--color-neutral-900); background-color: var(--color-neutral-100); }
+    .showcase { padding: var(--space-8); }
+    .showcase-header { text-align: center; margin-bottom: var(--space-8); }
+    .showcase-header h1 { font-size: 2.25rem; }
+    .component-wrapper { position: relative; height: 550px; background-color: var(--color-neutral-white); border-radius: var(--border-radius-lg); overflow: hidden; box-shadow: var(--shadow-lg); }
+    .component-wrapper h2 { font-size: 1.5rem; text-align: center; padding: var(--space-6); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+    
+    /* --- ATOMIC COMPONENT DEPENDENCIES --- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; font-weight: var(--font-weight-medium); font-size: var(--font-size-sm); padding: var(--space-2) var(--space-4); border-radius: var(--border-radius-md); text-decoration: none; cursor: pointer; transition: all 0.15s ease; border: var(--border-width-default) solid transparent; }
+    .btn:focus-visible { outline: none; box-shadow: var(--shadow-focus-ring); }
+    .btn--primary { background-color: var(--color-primary-700); color: var(--color-neutral-white); border-color: var(--color-primary-700); }
+    .btn--primary:hover { background-color: var(--color-primary-800); border-color: var(--color-primary-800); }
+    .btn--primary:disabled { background-color: var(--color-primary-200); border-color: var(--color-primary-200); cursor: not-allowed; }
+    .btn--secondary { background-color: var(--color-neutral-white); color: var(--color-neutral-700); border-color: var(--color-neutral-300); box-shadow: var(--shadow-sm); }
+    .btn--secondary:hover { background-color: var(--color-neutral-50); }
+    .btn--secondary:disabled { color: var(--color-neutral-300); cursor: not-allowed; }
+
+    .field-group { display: flex; flex-direction: column; }
+    .field-group label { font-weight: var(--font-weight-medium); font-size: var(--font-size-sm); margin-bottom: var(--space-2); color: var(--color-neutral-700); }
+    .field-group label.is-required::after { content: ' *'; color: var(--color-semantic-error); }
+    .field-group .error-message { color: var(--color-semantic-error); font-size: var(--font-size-sm); margin-top: var(--space-2); }
+    .form-input { width: 100%; padding: var(--space-2) var(--space-3); font-family: var(--font-family-primary); font-size: var(--font-size-sm); border: var(--border-width-default) solid var(--color-neutral-300); border-radius: var(--border-radius-md); transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+    .form-input:focus-visible { outline: none; border-color: var(--color-primary-500); box-shadow: var(--shadow-focus-ring); }
+    .field-group.has-error .form-input { border-color: var(--color-semantic-error); }
+
+    /* --- MODAL WIZARD ORGANISM --- */
+    .modal-backdrop {
+      position: absolute; /* Changed to absolute for showcase */
+      inset: 0;
+      background-color: rgba(17, 24, 39, 0.6);
+      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(4px);
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+    }
+    .modal-dialog {
+      background-color: var(--color-neutral-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+      overflow: hidden;
+      animation: modal-fade-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes modal-fade-in {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    .modal__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--color-neutral-200);
+      flex-shrink: 0;
+    }
+    
+    .modal__title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-neutral-900);
+      margin: 0;
+    }
+
+    .modal__close-btn {
+        background: none;
+        border: none;
+        padding: var(--space-1);
+        cursor: pointer;
+        color: var(--color-neutral-500);
+        border-radius: 50%;
+    }
+    .modal__close-btn:hover {
+        background-color: var(--color-neutral-100);
+        color: var(--color-neutral-900);
+    }
+    .modal__close-btn svg {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .modal__content {
+      padding: var(--space-6);
+      overflow-y: auto;
+    }
+    
+    .modal__footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      background-color: var(--color-neutral-50);
+      border-top: 1px solid var(--color-neutral-200);
+      flex-shrink: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .modal-dialog { animation: none; }
+    }
+
+    @media (max-width: 768px) {
+        .modal__header, .modal__footer { padding: var(--space-3); }
+        .modal__content { padding: var(--space-4); }
+    }
+  </style>
+</head>
+<body>
+  <div class="showcase">
+    <div class="showcase-header">
+        <h1>Modal Wizard (Odoo)</h1>
+    </div>
+
+    <div class="component-wrapper">
+        <h2 class="sr-only">Modal Showcase</h2>
+        <!-- Backdrop -->
+        <div class="modal-backdrop">
+            <!-- Modal Dialog Component -->
+            <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title-1" aria-describedby="modal-description-1">
+                <header class="modal__header">
+                    <h2 class="modal__title" id="modal-title-1">Resume Trip</h2>
+                    <button class="modal__close-btn" aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </header>
+                <div class="modal__content" id="modal-description-1">
+                    <div class="field-group">
+                        <label for="resolution-comment" class="is-required">Resolution Comment</label>
+                        <textarea id="resolution-comment" class="form-input" rows="4" placeholder="Enter the reason for resuming the trip..."></textarea>
+                    </div>
+                </div>
+                <footer class="modal__footer">
+                    <button class="btn btn--secondary">Cancel</button>
+                    <button class="btn btn--primary">Confirm</button>
+                </footer>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <div class="showcase">
+    <div class="component-wrapper">
+        <h2 class="sr-only">Error State Showcase</h2>
+        <!-- Backdrop -->
+        <div class="modal-backdrop">
+            <!-- Modal Dialog Component in Error State -->
+            <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title-2" aria-describedby="modal-description-2">
+                <header class="modal__header">
+                    <h2 class="modal__title" id="modal-title-2">Resume Trip</h2>
+                    <button class="modal__close-btn" aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </header>
+                <div class="modal__content" id="modal-description-2">
+                    <div class="field-group has-error">
+                        <label for="resolution-comment-error" class="is-required">Resolution Comment</label>
+                        <textarea id="resolution-comment-error" class="form-input" rows="4" placeholder="Enter the reason for resuming the trip..." aria-describedby="comment-error-msg"></textarea>
+                        <div class="error-message" id="comment-error-msg">A resolution comment is required.</div>
+                    </div>
+                </div>
+                <footer class="modal__footer">
+                    <button class="btn btn--secondary">Cancel</button>
+                    <button class="btn btn--primary">Confirm</button>
+                </footer>
+            </div>
+        </div>
+    </div>
+  </div>
+
+	
+	<div class="showcase"> <h2> Component Variations</h2>
+      <div>
+        <h3>Variant Name: "Reason Input (Resume Trip)"</h3>
+		<normal>This is the primary variant, used to capture a mandatory text input before an action is confirmed. It includes a header, a textarea for input, and a footer with confirm/cancel actions.</normal>
+		<div style="position: relative; height: 350px; margin-top: 1rem; border-radius: 8px; overflow: hidden; background: #eee;">
+            <div class="modal-backdrop">
+                <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title-var1">
+                    <header class="modal__header">
+                        <h2 class="modal__title" id="modal-title-var1">Resume Trip</h2>
+                        <button class="modal__close-btn" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                    </header>
+                    <div class="modal__content">
+                        <div class="field-group">
+                            <label for="resolution-comment-var1" class="is-required">Resolution Comment</label>
+                            <textarea id="resolution-comment-var1" class="form-input" rows="4" placeholder="Enter the reason for resuming the trip..."></textarea>
+                        </div>
+                    </div>
+                    <footer class="modal__footer">
+                        <button class="btn btn--secondary">Cancel</button>
+                        <button class="btn btn--primary">Confirm</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+      </div>
+	 </div>
+	
+	</body>
+</html>

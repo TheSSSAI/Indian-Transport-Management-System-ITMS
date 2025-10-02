@@ -1,0 +1,5 @@
+"component_name","business_criticality","technical_complexity","change_frequency","test_types_required","unit_test_coverage","integration_test_coverage","e2e_test_coverage","automation_percentage","manual_test_effort","automated_test_effort","total_test_cases","risk_mitigation_score","quality_confidence","maintenance_overhead","tool_compatibility","team_skill_alignment"
+"Odoo Monolith (TMS Addon)","Critical","High","High","[""Unit"",""Integration"",""E2E"",""Security"",""Performance""]","85","90","75","90","80","240","150","0.95","High","Medium","Excellent","Good"
+"FastAPI GPS Microservice","Medium","Medium","Low","[""Unit"",""Integration"",""Performance""]","95","95","","100","","60","40","0.98","Very High","Low","Excellent","Excellent"
+"AWS Infrastructure (Terraform)","Critical","High","Medium","[""Integration"",""Security"",""Disaster Recovery""]","","70","","60","40","20","20","0.9","High","Medium","Good","Medium"
+"Data Migration Scripts","High","Medium","One-Time","[""Unit"",""Integration""]","80","95","100","95","10","30","15","0.95","High","Low","Excellent","Good"

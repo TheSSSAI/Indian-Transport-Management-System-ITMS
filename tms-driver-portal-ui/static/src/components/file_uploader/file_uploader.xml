@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!--
+        Template for the FileUploader component.
+        This template handles the different visual states:
+        - Empty: Prompt to upload a file.
+        - Selected: Show a preview/icon and filename.
+        - Error: Display a validation error message.
+    -->
+    <div t-name="tms_driver_portal.FileUploader" owl="1" class="tms-file-uploader-wrapper">
+        <input type="file" t-att-id="props.id" t-att-accept="props.acceptedFileTypes" t-ref="fileInput" t-on-change="onFileChanged" class="d-none"/>
+
+        <!-- Error State -->
+        <div t-if="state.errorMsg" class="alert alert-danger p-2 small" role="alert">
+            <i class="fa fa-exclamation-triangle me-1"/>
+            <t t-esc="state.errorMsg"/>
+        </div>
+
+        <!-- Empty State -->
+        <div t-if="!state.fileName"
+             class="tms-file-uploader-empty border-dashed d-flex flex-column align-items-center justify-content-center p-4 text-center text-muted"
+             t-on-click="onClick" role="button" t-att-aria-label="'Upload a file'">
+            <i class="fa fa-upload fa-2x mb-2"/>
+            <span>Tap to upload receipt</span>
+            <small class="mt-1">
+                (<t t-esc="getFriendlyFileTypes()"/>, Max <t t-esc="props.maxFileSizeMB"/>MB)
+            </small>
+        </div>
+
+        <!-- Selected State -->
+        <div t-if="state.fileName" class="tms-file-uploader-selected border rounded d-flex align-items-center p-2">
+            <!-- Image Preview -->
+            <t t-if="state.previewUrl and state.previewUrl.startsWith('data:image')">
+                <img t-att-src="state.previewUrl" class="tms-file-preview-img me-2" alt="File preview"/>
+            </t>
+            <!-- Icon Preview -->
+            <t t-else="">
+                <div class="tms-file-preview-icon me-2 text-center">
+                    <i t-att-class="'fa ' + state.previewUrl + ' fa-2x'"/>
+                </div>
+            </t>
+            
+            <span class="tms-file-name text-truncate flex-grow-1" t-esc="state.fileName"/>
+
+            <button class="btn btn-sm btn-light ms-2" t-on-click.stop="clearFile" aria-label="Clear file">
+                <i class="fa fa-times"/>
+            </button>
+        </div>
+    </div>
+</templates>

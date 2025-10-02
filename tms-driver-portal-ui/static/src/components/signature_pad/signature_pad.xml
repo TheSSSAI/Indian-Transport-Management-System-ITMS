@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!--
+        Template for the SignaturePad component.
+        This provides the canvas for drawing and a "Clear" button.
+        It is designed to be simple and mobile-friendly.
+    -->
+    <div t-name="tms_driver_portal.SignaturePad" owl="1" class="tms-signature-pad-wrapper d-flex flex-column h-100 border rounded bg-white">
+        <div class="tms-signature-pad-canvas-container flex-grow-1 position-relative">
+            <canvas t-ref="signatureCanvas" class="w-100 h-100"/>
+        </div>
+        <div class="tms-signature-pad-actions p-2 border-top text-end">
+            <button class="btn btn-secondary" t-on-click="clear">
+                <i class="fa fa-eraser me-1"/> Clear Signature
+            </button>
+        </div>
+    </div>
+</templates>

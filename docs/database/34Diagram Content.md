@@ -1,0 +1,136 @@
+erDiagram
+    tms_trip {
+        int id PK
+        int customer_id FK
+        int vehicle_id FK
+        int driver_id FK
+        int material_id FK
+        varchar status
+        datetime expected_delivery_date
+    }
+
+    "User (res.users)" {
+        int id PK
+        varchar name
+        varchar login
+    }
+
+    "Role (res.groups)" {
+        int id PK
+        varchar name
+    }
+
+    "Customer (res.partner)" {
+        int id PK
+        varchar name
+        boolean is_tms_customer
+    }
+
+    "Driver (hr.employee)" {
+        int id PK
+        varchar name
+        varchar license_number
+        boolean is_tms_driver
+    }
+
+    tms_vehicle {
+        int id PK
+        varchar truck_number
+        varchar status
+        decimal capacity_tons
+    }
+
+    tms_expense {
+        int id PK
+        int trip_id FK
+        int driver_id FK
+        varchar expense_type
+        decimal amount
+    }
+
+    "Invoice (account.move)" {
+        int id PK
+        int tms_trip_id FK "UC"
+        varchar irn
+    }
+
+    tms_pod {
+        int id PK
+        int trip_id FK "UC"
+        varchar pod_type
+        varchar recipient_name
+    }
+
+    tms_trip_event_log {
+        int id PK
+        int trip_id FK
+        int driver_id FK
+        varchar event_type
+    }
+
+    tms_audit_log {
+        int id PK
+        int user_id FK
+        varchar model_name
+        int record_id
+        varchar action_type
+    }
+
+    tms_material {
+        int id PK
+        varchar name
+    }
+
+    tms_vehicle_document {
+        int id PK
+        int vehicle_id FK
+        varchar document_type
+        date expiry_date
+    }
+
+    tms_card {
+        int id PK
+        int assigned_vehicle_id FK
+        varchar card_number
+        varchar card_type
+    }
+
+    tms_alert {
+        int id PK
+        varchar alert_type
+        text message
+        varchar res_model
+        int res_id
+    }
+
+    tms_route {
+        int id PK
+        varchar name
+        varchar source_location
+        varchar destination_location
+    }
+
+    tms_geofence {
+        int id PK
+        varchar name
+        GEOMETRY area
+    }
+
+    "Customer (res.partner)" ||--o{ tms_trip : "requests"
+    "Driver (hr.employee)" ||--o{ tms_trip : "drives"
+    tms_vehicle ||--o{ tms_trip : "performs"
+    tms_material ||--o{ tms_trip : "transports"
+    
+    tms_trip ||--o{ tms_expense : "has"
+    tms_trip ||--o{ tms_trip_event_log : "logs"
+    tms_trip |o--|| "Invoice (account.move)" : "invoiced as"
+    tms_trip ||--|| tms_pod : "has proof of delivery"
+    
+    "Driver (hr.employee)" ||--o{ tms_expense : "submits"
+    "Driver (hr.employee)" ||--o{ tms_trip_event_log : "reports"
+    
+    tms_vehicle ||--o{ tms_vehicle_document : "has document"
+    tms_vehicle |o--o{ tms_card : "assigned"
+
+    "User (res.users)" ||--o{ tms_audit_log : "triggers"
+    "User (res.users)" }o--o{ "Role (res.groups)" : "belongs to"

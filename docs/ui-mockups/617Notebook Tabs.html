@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notebook Tabs Component</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* --- DESIGN TOKENS --- */
+    :root {
+      /* Colors */
+      --color-primary-500: #3B82F6;
+      --color-primary-700: #1D4ED8;
+      --color-neutral-50: #F9FAFB;
+      --color-neutral-200: #E5E7EB;
+      --color-neutral-500: #6B7280;
+      --color-neutral-700: #374151;
+      --color-neutral-900: #111827;
+      --color-neutral-white: #FFFFFF;
+
+      /* Typography */
+      --font-family-primary: 'Inter', sans-serif;
+      --font-size-sm: 14px;
+      --font-size-base: 16px;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+
+      /* Spacing */
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+
+      /* Borders */
+      --border-radius-sm: 4px;
+      --border-radius-lg: 8px;
+
+      /* Shadows */
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+
+    /* --- BASE & LAYOUT STYLES --- */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-base);
+      color: var(--color-neutral-900);
+      background-color: var(--color-neutral-50);
+      padding: var(--space-6);
+    }
+    .showcase {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .showcase__header {
+      text-align: center;
+      margin-bottom: var(--space-6);
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--color-primary-700);
+      margin: 0 0 var(--space-3);
+    }
+    .showcase__header p {
+      color: var(--color-neutral-500);
+      font-size: 1.1rem;
+      max-width: 60ch;
+      margin: 0 auto;
+    }
+    .component-container {
+      background-color: var(--color-neutral-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: var(--space-5);
+      border: 1px solid var(--color-neutral-200);
+    }
+    .panel-content {
+        color: var(--color-neutral-700);
+        font-size: var(--font-size-sm);
+        line-height: 1.7;
+    }
+    .panel-content h4 {
+        margin: 0 0 var(--space-3) 0;
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-neutral-900);
+    }
+
+    /* --- COMPONENT: Notebook Tabs --- */
+    
+    /* Main container for the whole component */
+    .notebook {
+      width: 100%;
+    }
+
+    /* Container for the tab buttons */
+    .notebook__tabs {
+      display: flex;
+      flex-wrap: wrap; /* Allows tabs to wrap on smaller screens */
+      border-bottom: 1px solid var(--color-neutral-200);
+    }
+    
+    /* Individual tab button style */
+    .notebook__tab {
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-neutral-500);
+      background-color: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      margin-bottom: -1px; /* Allows active tab's border to overlap the container border */
+      transition: color 0.2s ease, border-color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    /* States */
+    .notebook__tab:hover {
+      color: var(--color-neutral-900);
+      background-color: var(--color-neutral-50);
+    }
+
+    .notebook__tab:focus-visible {
+      outline: 2px solid var(--color-primary-500);
+      outline-offset: 2px;
+      border-radius: var(--border-radius-sm);
+      z-index: 1; /* Ensure focus ring is on top */
+    }
+    
+    /* Panel Styles */
+    .notebook__panels {
+      padding: var(--space-5) 0;
+    }
+
+    .notebook__panel {
+      display: none; /* Hide all panels by default */
+    }
+
+    /* CSS-only interactivity for mockup */
+    /* This section simulates tab switching without JavaScript */
+    .notebook__radio {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    /* Show the panel corresponding to the checked radio button */
+    #tab-radio-1:checked ~ .notebook__panels > #panel-1,
+    #tab-radio-2:checked ~ .notebook__panels > #panel-2,
+    #tab-radio-3:checked ~ .notebook__panels > #panel-3 {
+        display: block;
+    }
+    
+    /* Style the active tab label when its radio is checked */
+    .notebook__radio:checked + .notebook__tab {
+        color: var(--color-primary-700);
+        border-bottom-color: var(--color-primary-700);
+        font-weight: var(--font-weight-semibold);
+    }
+    
+    /* Responsive Adaptations */
+    @media (max-width: 480px) {
+      .notebook__tabs {
+        flex-direction: column;
+        border-bottom: none;
+      }
+      .notebook__tab {
+        width: 100%;
+        text-align: left;
+        margin-bottom: 0;
+        border-bottom: 1px solid var(--color-neutral-200);
+        border-radius: 0;
+      }
+      .notebook__radio:checked + .notebook__tab {
+        border-bottom: 1px solid var(--color-neutral-200);
+        border-left: 3px solid var(--color-primary-700);
+        background-color: var(--color-neutral-50);
+      }
+    }
+    
+  </style>
+</head>
+<body>
+
+  <div class="showcase">
+    <header class="showcase__header">
+      <h1>Notebook Tabs</h1>
+      <p>A molecular component for organizing content into switchable panes. Ideal for complex forms in Odoo, such as the Trip or Vehicle details screens.</p>
+    </header>
+
+    <div class="component-container">
+      <div class="notebook">
+        <!-- Radio buttons for CSS-only state management -->
+        <input class="notebook__radio" type="radio" name="tabs" id="tab-radio-1" checked>
+        <input class="notebook__radio" type="radio" name="tabs" id="tab-radio-2">
+        <input class="notebook__radio" type="radio" name="tabs" id="tab-radio-3">
+
+        <!-- Tab List -->
+        <div class="notebook__tabs" role="tablist">
+          <label class="notebook__tab" for="tab-radio-1" role="tab" aria-selected="true" aria-controls="panel-1" id="tab-1">Service History</label>
+          <label class="notebook__tab" for="tab-radio-2" role="tab" aria-selected="false" aria-controls="panel-2" id="tab-2">Compliance Documents</label>
+          <label class="notebook__tab" for="tab-radio-3" role="tab" aria-selected="false" aria-controls="panel-3" id="tab-3">Notes</label>
+        </div>
+
+        <!-- Tab Panels -->
+        <div class="notebook__panels">
+          <div class="notebook__panel panel-content" id="panel-1" role="tabpanel" aria-labelledby="tab-1">
+            <h4>Vehicle Service History</h4>
+            <p>This section contains a chronological log of all maintenance and service activities performed on the vehicle. Each entry includes details such as service date, type, cost, and odometer reading. This information is crucial for tracking the vehicle's total cost of ownership and scheduling future preventative maintenance.</p>
+          </div>
+          <div class="notebook__panel panel-content" id="panel-2" role="tabpanel" aria-labelledby="tab-2">
+            <h4>Compliance Documents</h4>
+            <p>Here you will find all uploaded compliance documents for the vehicle. This includes, but is not limited to, the Registration Certificate (RC), Insurance Policy, and Fitness Certificate. Each document is listed with its type and expiry date to facilitate proactive renewals.</p>
+          </div>
+          <div class="notebook__panel panel-content" id="panel-3" role="tabpanel" aria-labelledby="tab-3">
+            <h4>Internal Notes</h4>
+            <p>This is a space for internal notes and comments related to the vehicle. Dispatch Managers, Admins, or other authorized personnel can add remarks about the vehicle's condition, specific operational constraints, or any other relevant information that doesn't fit into a structured field.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="showcase" style="margin-top: 2rem;">
+    <div class="component-container">
+      <h2>Component Variations</h2>
+      <div>
+        <h3>Variant Name: "horizontal_tabs"</h3>
+        <p>The standard and only variant for this component. It presents tabs in a horizontal line above the content area on wider screens. On smaller screens, the tabs may wrap to the next line or stack vertically to maintain usability, as demonstrated by this page if you shrink your browser window.</p>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

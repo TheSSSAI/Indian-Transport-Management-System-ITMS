@@ -1,0 +1,5 @@
+"component_name","business_criticality","technical_complexity","change_frequency","test_types_required","unit_test_coverage","integration_test_coverage","e2e_test_coverage","automation_percentage","manual_test_effort","automated_test_effort","total_test_cases","risk_mitigation_score","quality_confidence","maintenance_overhead","tool_compatibility","team_skill_alignment"
+"E-Invoicing GSP Integration","Critical","High","Medium","[""Unit"",""Integration"",""E2E"",""Security""]","90","95","70","95","8","60","30","0.98","High","Medium","Excellent","Good"
+"GPS Data Ingestion Microservice","High","High","Medium","[""Unit"",""Integration"",""Performance"",""Chaos""]","95","90","85","100","2","50","20","0.95","High","Medium","Excellent","Good"
+"Driver Portal UI","High","Medium","High","[""Unit"",""E2E"",""Usability"",""Accessibility"",""Compatibility""]","70","","90","75","24","45","50","0.9","Medium","High","Good","Good"
+"Master Data Management (CRUD)","Medium","Low","Low","[""Unit"",""Integration"",""E2E""]","90","80","70","90","4","30","40","0.99","High","Low","Excellent","Excellent"

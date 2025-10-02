@@ -1,0 +1,63 @@
+sequenceDiagram
+    participant DispatchManager as "Dispatch Manager"
+    participant Driver as "Driver"
+    participant FinanceOfficer as "Finance Officer"
+    participant DriverPortalUIOWL as "Driver Portal UI (OWL)"
+    participant TMSCoreBusinessLogic as "TMS Core Business Logic"
+
+    %% 1. Trip Creation
+    DispatchManager->>TMSCoreBusinessLogic: 1. createTrip(vals: dict)
+    activate TMSCoreBusinessLogic
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 1.1. Validate required fields per BR-006
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 1.2. Create tms.trip record with state = 'Planned'
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 1.3. Create audit trail entry for 'Trip Created'
+    TMSCoreBusinessLogic-->>DispatchManager: Returns new trip record ID
+
+    %% 2. Resource Assignment
+    DispatchManager->>TMSCoreBusinessLogic: 2. assignVehicleAndDriver(trip_id, vehicle_id, driver_id)
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 2.1. Validate vehicle capacity vs trip weight (BR-007)
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 2.2. Validate driver's license expiry date (BR-003)
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 2.3. [State Transition] Update tms.trip state: 'Planned' -> 'Assigned'
+    TMSCoreBusinessLogic-->>DispatchManager: Returns success status
+
+    %% 3. Trip Start
+    activate Driver
+    activate DriverPortalUIOWL
+    Driver->>DriverPortalUIOWL: 3. Taps 'Start Trip' button
+    DriverPortalUIOWL->>TMSCoreBusinessLogic: 4. startTrip(trip_id)
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 4.1. [State Transition] Update tms.trip state: 'Assigned' -> 'In-Transit'
+    TMSCoreBusinessLogic-->>DriverPortalUIOWL: Returns success status
+    deactivate Driver
+
+    %% 4. Proof of Delivery
+    activate Driver
+    Driver->>DriverPortalUIOWL: 5. Uploads Proof of Delivery (POD)
+    DriverPortalUIOWL->>TMSCoreBusinessLogic: 6. submitPOD(trip_id, pod_file, recipient_name)
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 6.1. Upload pod_file to Amazon S3 and create ir.attachment
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 6.2. [State Transition] Update tms.trip state: 'In-Transit' -> 'Delivered'
+    TMSCoreBusinessLogic-->>DriverPortalUIOWL: Returns success status
+    deactivate Driver
+    deactivate DriverPortalUIOWL
+
+    %% 5. Trip Completion
+    DispatchManager->>TMSCoreBusinessLogic: 7. completeTrip(trip_id)
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 7.1. [State Transition] Update tms.trip state: 'Delivered' -> 'Completed'
+    TMSCoreBusinessLogic-->>DispatchManager: Returns success status
+
+    %% 6. Invoicing
+    activate FinanceOfficer
+    FinanceOfficer->>TMSCoreBusinessLogic: 8. generateInvoice(trip_id)
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 8.1. Validate trip state is 'Completed' (BR-010)
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 8.2. Create account.move record from trip data
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 8.3. [State Transition] Update tms.trip state: 'Completed' -> 'Invoiced'
+    TMSCoreBusinessLogic-->>FinanceOfficer: Returns new invoice record ID
+
+    %% 7. Payment Recording
+    FinanceOfficer->>TMSCoreBusinessLogic: 9. recordPayment(invoice_id, payment_data)
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 9.1. Reconcile payment and update invoice payment_state
+    TMSCoreBusinessLogic->>TMSCoreBusinessLogic: 9.2. IF all invoices for trip are paid, [State Transition] update tms.trip state: 'Invoiced' -> 'Paid'
+    TMSCoreBusinessLogic-->>FinanceOfficer: Returns success status
+    deactivate FinanceOfficer
+
+    note over TMSCoreBusinessLogic: All state transitions and critical financial operations must generate an immutable audit trail entry (REQ-DAT-008).
+    deactivate TMSCoreBusinessLogic

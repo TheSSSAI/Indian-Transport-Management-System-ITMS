@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+    This file defines the asset bundles required for the Driver Portal OWL application.
+    It tells Odoo's asset management system which JavaScript and CSS files to load
+    for the portal to function correctly.
+
+    Dependencies:
+    - REQ-1-001, REQ-1-112: The need for a custom, responsive UI requires custom CSS and JS.
+    - main.js (Level 5): This is the main entry point for our OWL application.
+    - main.scss (Level 1): This is the main entry point for our custom styles.
+    -->
+    <data>
+        <template id="tms_driver_portal_assets" name="TMS Driver Portal Assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <!-- 
+                SCSS Bundle for the Driver Portal.
+                This includes the main stylesheet which imports all other component-specific styles
+                and variables. Odoo will compile this SCSS file into a single CSS file.
+                -->
+                <link rel="stylesheet" type="text/scss" href="/tms_driver_portal/static/src/scss/main.scss"/>
+
+                <!-- 
+                JavaScript Bundle for the Driver Portal.
+                This includes the main entry point of the OWL application. Odoo's bundler will
+                traverse the import statements starting from this file to include all necessary
+                components, services, and libraries.
+                -->
+                <script type="text/javascript" src="/tms_driver_portal/static/src/main.js"/>
+            </xpath>
+        </template>
+    </data>
+</odoo>

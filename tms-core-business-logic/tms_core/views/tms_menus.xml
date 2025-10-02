@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Main TMS Application Menu -->
+        <menuitem
+            id="tms_menu_root"
+            name="Transport"
+            sequence="10"
+            web_icon="tms_core,static/description/icon.png"
+            groups="group_tms_dispatch_manager,group_tms_finance_officer,group_tms_admin"
+        />
+
+        <!-- Dashboard Menu -->
+        <!-- Note: This assumes an action for a dashboard view will be created. -->
+        <!-- For now, it can link to the trips kanban view as a sensible default dashboard. -->
+        <menuitem
+            id="tms_menu_dashboard"
+            name="Dashboard"
+            parent="tms_menu_root"
+            action="action_tms_trip"
+            sequence="1"
+            groups="group_tms_dispatch_manager,group_tms_finance_officer,group_tms_admin"
+        />
+
+        <!-- Operations Menu -->
+        <menuitem
+            id="tms_menu_operations"
+            name="Operations"
+            parent="tms_menu_root"
+            sequence="10"
+            groups="group_tms_dispatch_manager,group_tms_finance_officer,group_tms_admin"
+        />
+        <menuitem
+            id="tms_menu_trip"
+            name="Trips"
+            parent="tms_menu_operations"
+            action="action_tms_trip"
+            sequence="10"
+        />
+        <menuitem
+            id="tms_menu_expense_approval"
+            name="Expense Approvals"
+            parent="tms_menu_operations"
+            action="action_tms_expense_approval"
+            sequence="20"
+            groups="group_tms_dispatch_manager,group_tms_finance_officer,group_tms_admin"
+        />
+
+        <!-- Master Data Menu -->
+        <menuitem
+            id="tms_menu_master_data"
+            name="Master Data"
+            parent="tms_menu_root"
+            sequence="20"
+            groups="group_tms_dispatch_manager,group_tms_finance_officer,group_tms_admin"
+        />
+        <menuitem
+            id="tms_menu_customer"
+            name="Customers"
+            parent="tms_menu_master_data"
+            action="action_tms_customer"
+            sequence="10"
+        />
+        <menuitem
+            id="tms_menu_driver"
+            name="Drivers"
+            parent="tms_menu_master_data"
+            action="action_tms_driver"
+            sequence="20"
+        />
+        <menuitem
+            id="tms_menu_vehicle"
+            name="Vehicles"
+            parent="tms_menu_master_data"
+            action="action_tms_vehicle"
+            sequence="30"
+        />
+
+        <!-- Reporting Menu -->
+        <!-- Placeholder for report actions. These actions would need to be defined. -->
+        <menuitem
+            id="tms_menu_reporting"
+            name="Reporting"
+            parent="tms_menu_root"
+            sequence="30"
+            groups="group_tms_dispatch_manager,group_tms_finance_officer,group_tms_admin"
+        >
+            <!-- These menu items are placeholders for future reporting actions -->
+            <!-- They will become functional once the reporting actions are implemented -->
+            <menuitem
+                id="tms_menu_report_trip"
+                name="Trip Report"
+                action="action_tms_trip"
+                sequence="10"
+            />
+            <menuitem
+                id="tms_menu_report_profitability"
+                name="Profitability Analysis"
+                action="action_tms_trip"
+                sequence="20"
+            />
+        </menuitem>
+
+
+        <!-- Configuration Menu (Admin Only) -->
+        <menuitem
+            id="tms_menu_configuration"
+            name="Configuration"
+            parent="tms_menu_root"
+            sequence="100"
+            groups="group_tms_admin"
+        />
+        <menuitem
+            id="tms_menu_config_routes"
+            name="Routes"
+            parent="tms_menu_configuration"
+            action="action_tms_route"
+            sequence="10"
+        />
+        <menuitem
+            id="tms_menu_config_materials"
+            name="Materials"
+            parent="tms_menu_configuration"
+            action="action_tms_material"
+            sequence="20"
+        />
+        <menuitem
+            id="tms_menu_config_cards"
+            name="Card Management"
+            parent="tms_menu_configuration"
+            action="action_tms_card"
+            sequence="30"
+        />
+        <menuitem
+            id="tms_menu_config_alerts"
+            name="Alerts"
+            parent="tms_menu_configuration"
+            action="action_tms_alert"
+            sequence="40"
+        />
+
+    </data>
+</odoo>

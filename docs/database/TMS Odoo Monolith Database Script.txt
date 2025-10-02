@@ -1,0 +1,236 @@
+-- TMS Odoo Monolith Database Script for PostgreSQL 16
+-- This script recreates the database schema based on the provided design.
+-- It includes table definitions, constraints, custom types, and indexes.
+
+-- Enable PostGIS extension for GEOMETRY data type
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+-- =================================================================
+-- ENUM Type Definitions
+-- =================================================================
+CREATE TYPE tms_vehicle_ownership AS ENUM ('Company-Owned', 'Outsourced');
+CREATE TYPE tms_vehicle_status AS ENUM ('Active', 'Inactive', 'In-Maintenance');
+CREATE TYPE tms_trip_rate_type AS ENUM ('per_km', 'per_ton', 'fixed');
+CREATE TYPE tms_trip_status AS ENUM ('Planned', 'Assigned', 'In-Transit', 'On Hold', 'Delivered', 'Completed', 'Invoiced', 'Paid', 'Canceled');
+CREATE TYPE tms_expense_type AS ENUM ('Diesel', 'Toll', 'Food', 'Repair', 'Other');
+CREATE TYPE tms_expense_status AS ENUM ('Submitted', 'Approved', 'Rejected');
+CREATE TYPE tms_alert_type AS ENUM ('DocumentExpiry', 'LowBalance', 'CriticalTripEvent', 'Geofence');
+CREATE TYPE tms_alert_status AS ENUM ('New', 'Acknowledged', 'Resolved');
+CREATE TYPE tms_card_type AS ENUM ('FASTag', 'Diesel');
+CREATE TYPE tms_pod_type AS ENUM ('Photo', 'eSignature');
+CREATE TYPE tms_trip_event_type AS ENUM ('Accident', 'Repair', 'Government Stoppage', 'Fueling', 'Trip Start');
+CREATE TYPE tms_audit_action_type AS ENUM ('Create', 'Update', 'Delete');
+
+-- =================================================================
+-- Table Definitions
+-- =================================================================
+
+-- Entity: User (res.users)
+CREATE TABLE res_users (
+    id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    login VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT true
+);
+
+-- Entity: Role (res.groups)
+CREATE TABLE res_groups (
+    id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE
+);
+
+-- Entity: Customer (res.partner)
+CREATE TABLE res_partner (
+    id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    gstin VARCHAR(15),
+    is_tms_customer BOOLEAN NOT NULL DEFAULT true,
+    CONSTRAINT GSTIN_FORMAT_VALIDATION CHECK (gstin IS NULL OR length(gstin) = 15) -- Simplified validation
+);
+
+-- Entity: Driver (hr.employee)
+CREATE TABLE hr_employee (
+    id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    license_number VARCHAR(50) UNIQUE,
+    license_expiry_date DATE,
+    is_tms_driver BOOLEAN NOT NULL DEFAULT true
+);
+
+-- Entity: tms_vehicle
+CREATE TABLE tms_vehicle (
+    id INT PRIMARY KEY,
+    truck_number VARCHAR(20) NOT NULL UNIQUE,
+    model VARCHAR(100),
+    capacity_tons DECIMAL(10, 2) NOT NULL CHECK (capacity_tons > 0),
+    ownership_type tms_vehicle_ownership NOT NULL,
+    status tms_vehicle_status NOT NULL,
+    last_odometer_reading INT CHECK (last_odometer_reading >= 0),
+    last_latitude DECIMAL(9, 6),
+    last_longitude DECIMAL(9, 6),
+    last_location_timestamp TIMESTAMP,
+    create_date TIMESTAMP,
+    write_date TIMESTAMP
+);
+
+-- Entity: tms_vehicle_document
+CREATE TABLE tms_vehicle_document (
+    id INT PRIMARY KEY,
+    vehicle_id INT NOT NULL,
+    document_type VARCHAR(50) NOT NULL,
+    expiry_date DATE NOT NULL,
+    attachment_url VARCHAR(512) NOT NULL,
+    CONSTRAINT uc_tms_vehicle_document_vehicle_type UNIQUE (vehicle_id, document_type)
+);
+
+-- Entity: tms_material
+CREATE TABLE tms_material (
+    id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT
+);
+
+-- Entity: tms_route
+CREATE TABLE tms_route (
+    id INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    source_location VARCHAR(255) NOT NULL,
+    destination_location VARCHAR(255) NOT NULL,
+    standard_distance_km DECIMAL(10, 2) NOT NULL CHECK (standard_distance_km > 0)
+);
+
+-- Entity: tms_trip
+CREATE TABLE tms_trip (
+    id INT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    vehicle_id INT,
+    driver_id INT,
+    material_id INT NOT NULL,
+    source VARCHAR(255) NOT NULL,
+    destination VARCHAR(255) NOT NULL,
+    weight_tons DECIMAL(10, 3) NOT NULL CHECK (weight_tons > 0),
+    rate DECIMAL(12, 2) NOT NULL CHECK (rate > 0),
+    rate_type tms_trip_rate_type NOT NULL,
+    expected_delivery_date TIMESTAMP NOT NULL,
+    actual_delivery_date TIMESTAMP,
+    status tms_trip_status NOT NULL,
+    create_date TIMESTAMP
+);
+
+-- Entity: tms_expense
+CREATE TABLE tms_expense (
+    id INT PRIMARY KEY,
+    trip_id INT NOT NULL,
+    driver_id INT NOT NULL,
+    expense_type tms_expense_type NOT NULL,
+    amount DECIMAL(12, 2) NOT NULL CHECK (amount > 0),
+    receipt_url VARCHAR(512) NOT NULL,
+    status tms_expense_status NOT NULL,
+    fuel_quantity_liters DECIMAL(10, 2) CHECK (fuel_quantity_liters > 0),
+    odometer_reading INT CHECK (odometer_reading >= 0)
+);
+
+-- Entity: Invoice (account.move)
+CREATE TABLE account_move (
+    id INT PRIMARY KEY,
+    tms_trip_id INT UNIQUE,
+    irn VARCHAR(64) UNIQUE,
+    qr_code_data TEXT
+);
+
+-- Entity: tms_alert
+CREATE TABLE tms_alert (
+    id INT PRIMARY KEY,
+    alert_type tms_alert_type NOT NULL,
+    message TEXT NOT NULL,
+    res_model VARCHAR(100),
+    res_id INT,
+    status tms_alert_status NOT NULL,
+    create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Added based on index requirement
+);
+
+-- Entity: tms_geofence
+CREATE TABLE tms_geofence (
+    id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    area GEOMETRY(Geometry, 4326) NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT true,
+    CONSTRAINT check_area_geometry_type CHECK (GeometryType(area) IN ('POLYGON', 'MULTIPOLYGON'))
+);
+
+-- Entity: tms_card
+CREATE TABLE tms_card (
+    id INT PRIMARY KEY,
+    card_type tms_card_type NOT NULL,
+    card_number VARCHAR(50) NOT NULL UNIQUE,
+    assigned_vehicle_id INT,
+    balance DECIMAL(12, 2) NOT NULL,
+    low_balance_threshold DECIMAL(12, 2) NOT NULL
+);
+
+-- Entity: tms_pod
+CREATE TABLE tms_pod (
+    id INT PRIMARY KEY,
+    trip_id INT NOT NULL UNIQUE,
+    pod_type tms_pod_type NOT NULL,
+    pod_data_url VARCHAR(512) NOT NULL,
+    recipient_name VARCHAR(255) NOT NULL
+);
+
+-- Entity: tms_trip_event_log
+CREATE TABLE tms_trip_event_log (
+    id INT PRIMARY KEY,
+    trip_id INT NOT NULL,
+    driver_id INT NOT NULL,
+    event_type tms_trip_event_type NOT NULL,
+    event_timestamp TIMESTAMP NOT NULL,
+    photo_url VARCHAR(512),
+    notes TEXT
+);
+
+-- Entity: tms_audit_log
+CREATE TABLE tms_audit_log (
+    id INT PRIMARY KEY,
+    user_id INT NOT NULL,
+    "timestamp" TIMESTAMP NOT NULL,
+    action_type tms_audit_action_type NOT NULL,
+    model_name VARCHAR(100) NOT NULL,
+    record_id INT NOT NULL,
+    changes JSONB
+);
+
+
+-- =================================================================
+-- Foreign Key Constraints
+-- =================================================================
+ALTER TABLE tms_vehicle_document ADD CONSTRAINT fk_tms_vehicle_document_vehicle FOREIGN KEY (vehicle_id) REFERENCES tms_vehicle(id);
+ALTER TABLE tms_trip ADD CONSTRAINT fk_tms_trip_customer FOREIGN KEY (customer_id) REFERENCES res_partner(id);
+ALTER TABLE tms_trip ADD CONSTRAINT fk_tms_trip_vehicle FOREIGN KEY (vehicle_id) REFERENCES tms_vehicle(id);
+ALTER TABLE tms_trip ADD CONSTRAINT fk_tms_trip_driver FOREIGN KEY (driver_id) REFERENCES hr_employee(id);
+ALTER TABLE tms_trip ADD CONSTRAINT fk_tms_trip_material FOREIGN KEY (material_id) REFERENCES tms_material(id);
+ALTER TABLE tms_expense ADD CONSTRAINT fk_tms_expense_trip FOREIGN KEY (trip_id) REFERENCES tms_trip(id);
+ALTER TABLE tms_expense ADD CONSTRAINT fk_tms_expense_driver FOREIGN KEY (driver_id) REFERENCES hr_employee(id);
+ALTER TABLE account_move ADD CONSTRAINT fk_account_move_tms_trip FOREIGN KEY (tms_trip_id) REFERENCES tms_trip(id);
+ALTER TABLE tms_card ADD CONSTRAINT fk_tms_card_assigned_vehicle FOREIGN KEY (assigned_vehicle_id) REFERENCES tms_vehicle(id);
+ALTER TABLE tms_pod ADD CONSTRAINT fk_tms_pod_trip FOREIGN KEY (trip_id) REFERENCES tms_trip(id);
+ALTER TABLE tms_trip_event_log ADD CONSTRAINT fk_tms_trip_event_log_trip FOREIGN KEY (trip_id) REFERENCES tms_trip(id);
+ALTER TABLE tms_trip_event_log ADD CONSTRAINT fk_tms_trip_event_log_driver FOREIGN KEY (driver_id) REFERENCES hr_employee(id);
+ALTER TABLE tms_audit_log ADD CONSTRAINT fk_tms_audit_log_user FOREIGN KEY (user_id) REFERENCES res_users(id);
+
+-- =================================================================
+-- Indexes
+-- =================================================================
+CREATE INDEX idx_res_partner_is_tms_customer ON res_partner (is_tms_customer);
+CREATE INDEX idx_res_partner_gstin ON res_partner (gstin);
+CREATE INDEX idx_hr_employee_license_expiry_date ON hr_employee (license_expiry_date);
+CREATE INDEX idx_tms_vehicle_status ON tms_vehicle (status);
+CREATE INDEX idx_tms_vehicle_document_expiry_date ON tms_vehicle_document (expiry_date);
+CREATE INDEX idx_tms_trip_status_expected_delivery_date ON tms_trip (status, expected_delivery_date);
+CREATE INDEX idx_tms_trip_customer_id_status ON tms_trip (customer_id, status);
+CREATE INDEX idx_tms_trip_driver_id_status ON tms_trip (driver_id, status);
+CREATE INDEX idx_tms_expense_trip_id_status ON tms_expense (trip_id, status);
+CREATE INDEX idx_tms_alert_status_create_date ON tms_alert (status, create_date);
+CREATE INDEX idx_tms_geofence_area ON tms_geofence USING GIST (area);
+CREATE INDEX idx_tms_trip_event_log_trip_timestamp ON tms_trip_event_log (trip_id, event_timestamp);
+CREATE INDEX idx_tms_audit_log_record_timestamp ON tms_audit_log (model_name, record_id, "timestamp");

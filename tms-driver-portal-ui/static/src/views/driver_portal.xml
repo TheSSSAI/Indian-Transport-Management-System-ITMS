@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <!-- 
+        Root Template for the Driver Portal SPA (Single Page Application).
+
+        This template serves as the main layout and entry point for the entire driver portal UI.
+        It uses conditional rendering (`t-if`) to manage three primary states:
+        1. Loading State: A simple loading spinner is shown during the initial session check. This prevents a "flash of unauthenticated content" (FOUC) and provides immediate user feedback.
+        2. Unauthenticated State: If the user is not logged in, it renders the `LoginScreen` component, which handles the authentication workflow.
+        3. Authenticated State: If the user is logged in, it renders the main application layout. This includes a persistent `HeaderNav` component and a dynamic content area.
+        
+        The core of the SPA functionality is the `<t t-component="state.currentRoute.component"/>` tag. This is the "router outlet" where the OWL router service injects the currently active screen component (e.g., TripListScreen, TripDetailScreen). This allows for seamless navigation between different views without full page reloads.
+    -->
+    <t t-name="tms_driver_portal.DriverPortal" owl="1">
+        <div class="tms-driver-portal vh-100 d-flex flex-column bg-light">
+            <!-- Initial Loading State -->
+            <t t-if="state.isLoading">
+                <div class="d-flex justify-content-center align-items-center flex-grow-1">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </t>
+
+            <!-- Unauthenticated State: Render Login Screen -->
+            <t t-if="!state.isLoading and !state.isLoggedIn">
+                <LoginScreen/>
+            </t>
+
+            <!-- Authenticated State: Render Main App Layout -->
+            <t t-if="!state.isLoading and state.isLoggedIn">
+                <!-- Main Header Navigation -->
+                <HeaderNav/>
+                
+                <!-- Main Content Area: Router Outlet -->
+                <main class="tms-portal-main flex-grow-1 overflow-auto">
+                    <t t-if="state.currentRoute and state.currentRoute.component">
+                        <t t-component="state.currentRoute.component" t-props="componentProps"/>
+                    </t>
+                    <t t-else="">
+                        <!-- Fallback content if no route is matched (should not happen with proper routing) -->
+                        <div class="p-3">
+                            <div class="alert alert-danger" role="alert">
+                                Page not found.
+                            </div>
+                        </div>
+                    </t>
+                </main>
+            </t>
+        </div>
+    </t>
+</templates>

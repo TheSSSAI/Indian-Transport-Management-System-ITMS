@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 
+        Extends the account.move form view to add E-Invoicing capabilities.
+        - Adds buttons to the header for generating and retrying e-invoices.
+        - Adds a new "E-Invoicing" tab to display GSP-related data.
+        - Adds a filter to the search view to easily find invoices by their e-invoicing status.
+        This view is the primary user interface for interacting with the GSP integration,
+        implementing requirements from REQ-1-006 and user stories US-037, US-038.
+    -->
+
+    <record id="view_move_form_tms_gsp" model="ir.ui.view">
+        <field name="name">account.move.form.tms.gsp</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_generate_einvoice"
+                        string="Generate E-Invoice"
+                        type="object"
+                        class="oe_highlight"
+                        attrs="{'invisible': ['|', ('state', '!=', 'posted'), ('gsp_status', 'not in', ('not_generated', 'failed'))]}"/>
+                <button name="action_retry_einvoice"
+                        string="Retry E-Invoice"
+                        type="object"
+                        attrs="{'invisible': [('gsp_status', '!=', 'failed')]}"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="E-Invoicing" name="gsp_integration" attrs="{'invisible': [('move_type', '!=', 'out_invoice')]}">
+                    <group>
+                        <group>
+                            <field name="gsp_status"/>
+                            <field name="gsp_irn"/>
+                            <field name="gsp_error_message" attrs="{'invisible': [('gsp_status', '!=', 'failed')]}"/>
+                        </group>
+                        <group>
+                            <field name="gsp_qr_code" widget="image" string="QR Code" readonly="1" attrs="{'invisible': [('gsp_qr_code', '=', False)]}"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_move_filter_tms_gsp" model="ir.ui.view">
+        <field name="name">account.move.filter.tms.gsp</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='status']" position="after">
+                <separator/>
+                <filter string="E-Invoice Generated" name="gsp_status_generated" domain="[('gsp_status', '=', 'generated')]"/>
+                <filter string="E-Invoice Pending" name="gsp_status_pending" domain="[('gsp_status', '=', 'pending')]"/>
+                <filter string="E-Invoice Failed" name="gsp_status_failed" domain="[('gsp_status', '=', 'failed')]"/>
+                <separator/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                 <filter string="E-Invoice Status" name="gsp_status_groupby" domain="[]" context="{'group_by': 'gsp_status'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

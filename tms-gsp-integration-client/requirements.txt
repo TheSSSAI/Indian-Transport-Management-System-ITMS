@@ -1,0 +1,16 @@
+# Odoo Core
+odoo==18.0
+
+# External Libraries required by the addon
+requests
+boto3
+
+# Odoo Development & CI/CD Tools
+odoo-stubs==18.0.0.0.2
+pylint-odoo==6.1.1
+flake8==7.0.0
+flake8-bugbear==24.4.26
+pytest==8.2.0
+black==24.4.2
+isort==5.13.2
+pre-commit==3.7.0

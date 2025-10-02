@@ -1,0 +1,61 @@
+# -------------------------------------------------------------------
+# Grafana - Datasource Provisioning
+# -------------------------------------------------------------------
+# This file declaratively configures the datasources for Grafana.
+# Grafana's provisioning engine will automatically create these on startup.
+# This ensures a consistent setup across all environments as per REQ-1-602.
+# -------------------------------------------------------------------
+
+# API version for Grafana provisioning.
+apiVersion: 1
+
+# List of datasources to be provisioned.
+datasources:
+  # ---------------------------------------------------
+  # Prometheus Datasource
+  # ---------------------------------------------------
+  - name: Prometheus
+    # Unique identifier for the datasource. Can be used by dashboards.
+    uid: prometheus_tms
+    type: prometheus
+    # 'proxy' means the Grafana backend handles requests, hiding the URL from users.
+    access: proxy
+    # URL of the Prometheus server within the Kubernetes cluster.
+    # This service name is defined in the Kubernetes deployment for Prometheus.
+    url: http://prometheus-server.monitoring.svc.cluster.local:8080
+    # Set this as the default datasource for new panels of Prometheus type.
+    isDefault: true
+    # Allow Grafana to use Prometheus's internal ID for dashboards.
+    jsonData:
+      httpMethod: GET
+    # We do not include any secrets here, assuming Prometheus is not authenticated.
+    # If it were, we would use `secureJsonData` and reference secrets.
+    editable: false
+
+  # ---------------------------------------------------
+  # OpenSearch Datasource (for Log Visualization)
+  # ---------------------------------------------------
+  - name: OpenSearch
+    uid: opensearch_tms
+    type: opensearch
+    access: proxy
+    # URL of the OpenSearch cluster within the Kubernetes cluster.
+    url: https://${OPENSEARCH_HOST}:${OPENSEARCH_PORT}
+    # Database (index) name settings.
+    jsonData:
+      # Use a time-based index pattern.
+      database: '[tms-logs-]*'
+      # Specify the timestamp field from our structured logs.
+      timeField: 'timestamp'
+      # The version of OpenSearch/Elasticsearch.
+      esVersion: 'opensearch-2.x'
+      # Use Logstash-style index patterns (e.g., [prefix-]YYYY.MM.DD).
+      logstash_format_enabled: true
+      # Interval for index pattern resolution.
+      interval: Daily
+    # Securely provide credentials.
+    # These environment variables will be populated from AWS Secrets Manager (REQ-1-503).
+    secureJsonData:
+      user: ${OPENSEARCH_USER}
+      password: ${OPENSEARCH_PASSWD}
+    editable: false

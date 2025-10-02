@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="tms_driver_portal.TripDetailScreen" owl="1">
+        <div class="d-flex flex-column h-100 bg-light">
+            <HeaderNav title="state.trip ? state.trip.name : 'Trip Details'"/>
+            <div class="flex-grow-1 overflow-auto p-3">
+                <!-- Skeleton Loader -->
+                <div t-if="state.isLoading">
+                    <div class="card shadow-sm">
+                        <div class="card-body placeholder-glow">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title placeholder col-6 mb-0"/>
+                                <span class="placeholder col-3"/>
+                            </div>
+                            <div class="mb-3">
+                                <p class="card-text placeholder col-4 mb-1"/>
+                                <p class="card-text placeholder col-7"/>
+                            </div>
+                            <div class="mb-3">
+                                <p class="card-text placeholder col-3 mb-1"/>
+                                <p class="card-text placeholder col-5"/>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <p class="card-text placeholder col-5 mb-1"/>
+                                    <p class="card-text placeholder col-8"/>
+                                </div>
+                                <div class="col-6">
+                                    <p class="card-text placeholder col-5 mb-1"/>
+                                    <p class="card-text placeholder col-8"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div t-if="state.hasError and !state.isLoading" class="alert alert-danger" role="alert">
+                    <i class="fa fa-exclamation-triangle me-2"/>
+                    <t t-esc="state.errorMessage"/>
+                </div>
+
+                <!-- Trip Details -->
+                <div t-if="state.trip and !state.isLoading">
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title mb-0" t-esc="state.trip.name"/>
+                                <StatusBadge status="state.trip.status" />
+                            </div>
+                            <h6 class="card-subtitle mb-3 text-muted" t-esc="state.trip.customerName"/>
+                            
+                            <div class="mb-3">
+                                <p class="text-muted small mb-0">From</p>
+                                <p class="fw-bold fs-5 mb-0"><i class="fa fa-map-marker-alt text-primary me-2"/> <t t-esc="state.trip.sourceLocation"/></p>
+                            </div>
+
+                             <div class="mb-3">
+                                <p class="text-muted small mb-0">To</p>
+                                <p class="fw-bold fs-5 mb-0"><i class="fa fa-flag-checkered text-success me-2"/> <t t-esc="state.trip.destinationLocation"/></p>
+                            </div>
+
+                            <hr/>
+                            
+                            <div class="row text-center">
+                                <div class="col-6 border-end">
+                                    <p class="text-muted small mb-0">Material</p>
+                                    <p class="fw-bold mb-0" t-esc="state.trip.material"/>
+                                </div>
+                                <div class="col-6">
+                                    <p class="text-muted small mb-0">Expected Delivery</p>
+                                    <p class="fw-bold mb-0" t-esc="state.trip.expectedDelivery"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                             <h5 class="card-title">Vehicle &amp; Documents</h5>
+                             <p class="card-text mb-0"><span class="fw-bold">Vehicle:</span> <t t-esc="state.trip.vehicleNumber"/></p>
+                             <a href="#" class="btn btn-link px-0">View Vehicle Documents</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Action Buttons Footer -->
+            <div t-if="state.trip and !state.isLoading" class="p-3 bg-white border-top shadow-lg">
+                <div class="d-grid gap-3">
+                    <button t-if="canStartTrip" class="btn btn-primary btn-lg" t-on-click="_onStartTrip" t-att-disabled="state.isSubmitting">
+                        <span t-if="state.isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"/>
+                        <i t-else="" class="fa fa-play-circle me-2"/>
+                        Start Trip
+                    </button>
+                    <button t-if="canAddExpense" class="btn btn-secondary btn-lg" t-on-click="_onAddExpense">
+                        <i class="fa fa-plus-circle me-2"/> Add Expense
+                    </button>
+                     <button t-if="canDeliverTrip" class="btn btn-success btn-lg" t-on-click="_onDeliverTrip">
+                        <i class="fa fa-check-circle me-2"/> Mark as Delivered (POD)
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,68 @@
+#!/bin/bash
+#
+# This script creates the necessary Amazon Timestream resources for the
+# TMS High-Volume Telemetry Database.
+#
+# Prerequisites:
+# - AWS CLI installed and configured with appropriate permissions.
+#
+
+# --- Configuration ---
+DATABASE_NAME="tms_telemetry_db"
+REGION="us-east-1" # IMPORTANT: Change this to your desired AWS region
+
+# --- Database Creation ---
+echo "Attempting to create Timestream database: ${DATABASE_NAME}..."
+aws timestream-write create-database \
+  --database-name "${DATABASE_NAME}" \
+  --region "${REGION}"
+
+if [ $? -ne 0 ]; then
+  echo "Database '${DATABASE_NAME}' may already exist. Continuing..."
+else
+  echo "Database '${DATABASE_NAME}' created successfully."
+fi
+
+# --- Table: VehicleLocation ---
+# Description: Stores time-series GPS location data for each vehicle. (REQ-1-007, REQ-1-105)
+# Dimensions:
+#   - vehicle_id: Used for partitioning and querying data per vehicle.
+# Measures (defined on write):
+#   - latitude: The vehicle's latitude (DOUBLE).
+#   - longitude: The vehicle's longitude (DOUBLE).
+#   - speed_kmh: The vehicle's speed (DOUBLE).
+echo "Attempting to create Timestream table: VehicleLocation..."
+aws timestream-write create-table \
+  --database-name "${DATABASE_NAME}" \
+  --table-name "VehicleLocation" \
+  --retention-properties MemoryStoreRetentionPeriodInHours=24,MagneticStoreRetentionPeriodInDays=365 \
+  --region "${REGION}"
+
+if [ $? -ne 0 ]; then
+  echo "Table 'VehicleLocation' may already exist. Continuing..."
+else
+  echo "Table 'VehicleLocation' created successfully."
+fi
+
+
+# --- Table: GeofenceEvent ---
+# Description: Logs when a vehicle enters or exits a defined geofence. (REQ-1-106)
+# Dimensions:
+#   - vehicle_id: The identifier of the vehicle.
+#   - geofence_id: The identifier of the geofence.
+# Measures (defined on write):
+#   - event_type: 'Entry' or 'Exit' (VARCHAR).
+echo "Attempting to create Timestream table: GeofenceEvent..."
+aws timestream-write create-table \
+  --database-name "${DATABASE_NAME}" \
+  --table-name "GeofenceEvent" \
+  --retention-properties MemoryStoreRetentionPeriodInHours=48,MagneticStoreRetentionPeriodInDays=730 \
+  --region "${REGION}"
+
+if [ $? -ne 0 ]; then
+  echo "Table 'GeofenceEvent' may already exist. Continuing..."
+else
+  echo "Table 'GeofenceEvent' created successfully."
+fi
+
+echo "Timestream DDL script finished."

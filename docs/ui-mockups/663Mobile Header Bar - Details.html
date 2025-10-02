@@ -1,0 +1,561 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Header Bar - Component Specifications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .component-type-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .section h2 {
+            color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4f46e5;
+            display: inline-block;
+        }
+        
+        .section h3 {
+            color: #4f46e5;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .info-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .variations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .variation-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .variation-name {
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 8px;
+        }
+        
+        .variation-code {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #1e293b;
+            overflow-x: auto;
+            margin: 8px 0;
+            border-left: 4px solid #4f46e5;
+        }
+        
+        .variation-description {
+            font-size: 13px;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .feature-category {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .feature-category h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .feature-category ul {
+            list-style: none;
+        }
+        
+        .feature-category li {
+            padding: 6px 0;
+            color: #4b5563;
+            font-size: 14px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .feature-category li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .tokens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        
+        .token {
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            border: 1px solid #bae6fd;
+            text-align: center;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 16px 0;
+            line-height: 1.4;
+        }
+        
+        .stats-bar {
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .stat {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Mobile Header Bar</h1>
+            <div class="component-type-badge">molecular Component</div>
+        </div>
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Variations</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">12</span>
+                <span class="stat-label">Design Tokens</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">3</span>
+                <span class="stat-label">Breakpoints</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">5</span>
+                <span class="stat-label">A11y Features</span>
+            </div>
+        </div><div class="content">
+        <div class="section">
+            <h2>Component Information</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Component Id</h4>
+                    <p>MU-mole-001</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Name</h4>
+                    <p>Mobile Header Bar</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Type</h4>
+                    <p>molecular</p>
+                </div>
+                <div class="info-card">
+                    <h4>Description</h4>
+                    <p>A fixed navigation bar for the top of the mobile viewport. It provides context via a page title and offers primary navigation actions like 'back' or opening a menu. It is a foundational component for all screens in the mobile-first Driver Portal.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Design System Alignment</h4>
+                    <p>This component uses the design system's primary font family ('Inter'), color tokens (white background, gray-900 text), spacing for padding, and elevation (box-shadow) to ensure a consistent look and feel with the rest of the application.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Organism Map</h4>
+                    <p>Trip Detail View,Expense Submission Form,POD Submission Form</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Design Tokens Used</h2>
+            <div class="tokens-grid"><div class="token">--color-white</div><div class="token">--color-gray-100</div><div class="token">--color-gray-300</div><div class="token">--color-gray-700</div><div class="token">--color-gray-900</div><div class="token">--color-primary-500</div><div class="token">--font-family-primary</div><div class="token">--font-size-lg</div><div class="token">--font-weight-bold</div><div class="token">--spacing-sm</div><div class="token">--spacing-md</div><div class="token">--shadow-sm</div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Responsive Specifications</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Mobile Adaptations</h4>
+                    <ul><li>The component is designed exclusively for mobile viewports and is fixed to the top.</li><li>Title text truncates with an ellipsis if it's too long to fit the screen.</li><li>Actionable areas (icon buttons) have a minimum touch target size of 44x44px.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Tablet Adaptations</h4>
+                    <ul><li>The component will stretch to the tablet width, maintaining its height and fixed position. The layout remains the same.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Desktop Enhancements</h4>
+                    <ul><li>Not applicable. This component is specific to the mobile-first Driver Portal and is not intended for large desktop screens.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Accessibility Features</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Keyboard Support</h4><p>Icon buttons are focusable via Tab key and activatable with Enter/Space.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Screen Reader Support</h4><p>The component uses a semantic `<header>` tag. The title is a heading (`<h1>` or `<h2>`). All icon buttons have a descriptive `aria-label`.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Focus Management</h4><p>A clear, high-contrast focus ring appears on icon buttons during keyboard navigation.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Aria Attributes</h4><ul><li>aria-label for icon buttons.</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Color Contrast</h4><p>Text and icon colors provide a contrast ratio of at least 4.5:1 against the white background, meeting WCAG AA standards.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>CSS Implementation</h2>
+            <div class="code-block">/* Component: Mobile Header Bar CSS */
+
+/* Design System Tokens */
+:root {
+  /* Colors */
+  --color-white: #FFFFFF;
+  --color-gray-100: #F3F4F6;
+  --color-gray-300: #D1D5DB;
+  --color-gray-700: #374151;
+  --color-gray-900: #111827;
+  --color-primary-100: #DBEAFE;
+  --color-primary-500: #3B82F6;
+
+  /* Fonts */
+  --font-family-primary: &#039;Inter&#039;, -apple-system, BlinkMacSystemFont, &#039;Segoe UI&#039;, Roboto, Helvetica, Arial, sans-serif;
+  --font-size-lg: 18px;
+  --font-weight-bold: 700;
+
+  /* Spacing */
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+
+  /* Borders */
+  --border-radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+/* Icon Button (Dependency) */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: calc(var(--spacing-sm) * -1); /* Negative margin to increase tap area without affecting layout */
+  background-color: transparent;
+  color: var(--color-gray-700);
+  border: none;
+  border-radius: var(--border-radius-full);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.icon-btn:hover {
+  background-color: var(--color-gray-100);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+  background-color: var(--color-gray-100);
+}
+
+.icon-btn:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+
+.icon-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Mobile Header Bar Component Base */
+.mobile-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  height: 60px;
+  padding: 0 var(--spacing-md);
+  background-color: var(--color-white);
+  border-bottom: 1px solid var(--color-gray-300);
+  box-shadow: var(--shadow-sm);
+}
+
+.mobile-header__left,
+.mobile-header__right {
+  flex: 0 0 44px; /* Fixed width to ensure title centering */
+  display: flex;
+  align-items: center;
+}
+
+.mobile-header__left {
+  justify-content: flex-start;
+}
+
+.mobile-header__right {
+  justify-content: flex-end;
+}
+
+.mobile-header__title {
+  flex: 1 1 auto;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-900);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0 var(--spacing-sm);
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .icon-btn {
+    transition: none;
+  }
+  .icon-btn:active {
+    transform: none;
+  }
+}</div>
+        </div>
+        <div class="section">
+            <h2>Implementation Notes</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Embedded Css Architecture</h4>
+                    <p>All CSS is self-contained within the `<style>` tag. Design tokens are defined as CSS custom properties in `:root`. BEM is used for component classes (`mobile-header__title`).</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Organization</h4>
+                    <p>The HTML file showcases the component in a realistic mobile context, with placeholder content to demonstrate the fixed positioning. Variants are clearly labeled and explained.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Responsive Design</h4>
+                    <p>The component is inherently responsive due to its use of flexbox and percentage-based width. It is designed with a mobile-first approach.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Accessibility Compliance</h4>
+                    <p>WCAG 2.1 AA compliance is achieved through semantic HTML, sufficient color contrast, large touch targets, and ARIA labels for icon-only controls.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Browser Support</h4>
+                    <p>Targets modern mobile browsers (latest Chrome on Android, Safari on iOS). Uses standard CSS properties for wide compatibility.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Usage Guidelines</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>When To Use</h4><p>Use as the primary header on every screen of the Driver Portal to provide consistent navigation and context.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Content Guidelines</h4><p>The title should be concise and accurately reflect the content of the screen (e.g., 'My Trips', 'Submit Expense').</p>
+                </div>
+                <div class="info-card">
+                    <h4>Placement Rules</h4><p>Always fixed to the top of the viewport. The main content of the page should have a top margin or padding equal to the header's height to prevent content from being obscured.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Customization Options</h4><ul><li style="list-style: disc; margin-left: 16px; padding-left: 0;">The left and right slots can contain an `.icon-btn` or be left empty. If a slot is empty, its containing div (`.mobile-header__left` or `__right`) should still be present to ensure proper title centering.</li></ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Testing Recommendations</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Browser Testing</h4><p>Test on Chrome (Android) and Safari (iOS) via emulators or physical devices.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Device Testing</h4><p>Verify layout and text truncation on various mobile screen widths, from 360px to 420px.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Accessibility Testing</h4><ul><li>Test keyboard navigation to ensure buttons are focusable.</li><li>Use a screen reader (TalkBack/VoiceOver) to verify `aria-label`s are announced correctly.</li><li>Check color contrast ratios.</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Performance Testing</h4><p>Ensure the `box-shadow` and `position: fixed` do not cause performance issues during page scroll on mobile devices.</p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+</html>

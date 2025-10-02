@@ -1,0 +1,38 @@
+flowchart TD
+    subgraph "User: Dispatch Manager"
+        A("Start: Views 'On Hold' Trip") --> B["Clicks 'Resume Trip' button"]
+        B --> C{System displays modal}
+        C --> D["Enters resolution comment"] 
+        D --> E{Clicks 'Confirm'}
+    end
+
+    subgraph "System: Odoo Backend"
+        E --> F{Is comment provided?}
+        F -- "No" --> G["Displays validation error:\n'Comment is mandatory'"]
+        F -- "Yes" --> H["Validates user role (Manager/Admin)"]
+        H --> I["Updates trip status:\n'On Hold' -> 'In-Transit'"]
+        I --> J["Posts resolution comment to audit log (chatter)"]
+        J --> K["Commits transaction"]
+    end
+
+    subgraph "UI Feedback"
+        G --> C
+        K --> L("End: Modal closes, UI refreshes to show\n'In-Transit' status and new log entry")
+    end
+
+    %% Alternative Flow
+    C --> M{User clicks 'Cancel'}
+    M --> N("End: Modal closes,\nno changes are made")
+
+    %% Styling
+    classDef userAction fill:#f0f9ff,stroke:#0ea5e9,color:#000
+    classDef systemProcess fill:#f0fdf4,stroke:#22c55e,color:#000
+    classDef decision fill:#fffbeb,stroke:#f59e0b,color:#000
+    classDef errorState fill:#fef2f2,stroke:#ef4444,color:#000
+    classDef startEnd fill:#f3f4f6,stroke:#6b7280,color:#000
+
+    class A,L,N startEnd
+    class B,D,E,M userAction
+    class H,I,J,K systemProcess
+    class C,F decision
+    class G errorState

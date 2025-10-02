@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 
+    This file defines the menu structure and the client action that launches the Driver Portal OWL application.
+    It ensures that the portal is accessible from the Odoo backend UI for users with the appropriate role.
+    
+    Dependencies:
+    - REQ-1-008, REQ-1-112: Defines the need for a separate Driver Portal.
+    - US-004, US-070: Defines the Role-Based Access Control (RBAC) which is enforced here.
+    - tms-core-business-logic addon: Provides the security group 'group_tms_driver'.
+    - driver_portal.js (Level 4): The client action tag 'tms_driver_portal.app' must match the component registration name.
+    -->
+    <data>
+        <!-- Client Action to launch the OWL Application -->
+        <!-- This action tells the Odoo web client to start a specific client-side application (our OWL app)
+             identified by the 'tag'. The tag must match the name registered in the web.component_registry. -->
+        <record id="tms_driver_portal_action_client" model="ir.actions.client">
+            <field name="name">Driver Portal</field>
+            <field name="tag">tms_driver_portal.app</field>
+        </record>
+
+        <!-- Main Menu Item for the Driver Portal -->
+        <!-- This top-level menu item makes the Driver Portal discoverable.
+             It is restricted to the 'Driver' security group, ensuring that only drivers
+             can see and access the portal from the main Odoo application menu.
+             This is a critical security and usability feature.
+             We assume the driver group's external ID is 'tms_core_business_logic.group_tms_driver'.
+             A sequence number is provided to position it logically within the menu.
+        -->
+        <menuitem 
+            id="tms_driver_portal_menu_root" 
+            name="Driver Portal" 
+            sequence="1" 
+            web_icon="tms_driver_portal,static/description/icon.png"
+            groups="tms_core_business_logic.group_tms_driver"
+        />
+
+        <!-- Sub-Menu Item linking to the Client Action -->
+        <!-- This menu item actually launches the application. It's placed under the root menu. -->
+        <menuitem 
+            id="tms_driver_portal_menu_dashboard" 
+            name="My Dashboard" 
+            parent="tms_driver_portal_menu_root" 
+            action="tms_driver_portal_action_client" 
+            sequence="10"
+            groups="tms_core_business_logic.group_tms_driver"
+        />
+    </data>
+</odoo>

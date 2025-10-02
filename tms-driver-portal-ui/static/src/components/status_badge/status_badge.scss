@@ -1,0 +1,75 @@
+/** @odoo-module **/
+
+// Styles for the StatusBadge component.
+// Uses variables from _variables.scss for consistency.
+
+.tms-status-badge {
+    display: inline-block;
+    padding: var(--tms-spacing-1) var(--tms-spacing-2); // 4px 8px
+    font-size: 0.8em;
+    font-weight: 600;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    text-transform: uppercase;
+
+    // --- Color Variants ---
+
+    &.badge-default {
+        color: var(--tms-gray-700);
+        background-color: var(--tms-gray-200);
+    }
+
+    &.badge-light {
+        color: var(--tms-gray-600);
+        background-color: var(--tms-gray-100);
+        border: 1px solid var(--tms-gray-300);
+    }
+
+    &.badge-primary {
+        color: #fff;
+        background-color: var(--tms-primary-600);
+    }
+
+    &.badge-secondary {
+        color: #fff;
+        background-color: var(--tms-gray-500);
+    }
+
+    &.badge-info {
+        color: var(--tms-info-800);
+        background-color: var(--tms-info-100);
+    }
+
+    &.badge-success {
+        color: var(--tms-success-800);
+        background-color: var(--tms-success-100);
+    }
+
+    &.badge-success-dark {
+        color: #fff;
+        background-color: var(--tms-success-700);
+    }
+
+    &.badge-warning {
+        color: var(--tms-warning-800);
+        background-color: var(--tms-warning-100);
+    }
+
+    &.badge-error {
+        color: #fff;
+        background-color: var(--tms-error-600);
+    }
+
+    &.badge-error-light {
+        color: var(--tms-error-700);
+        background-color: var(--tms-error-100);
+    }
+
+    &.badge-dark {
+        color: #fff;
+        background-color: var(--tms-gray-800);
+    }
+}

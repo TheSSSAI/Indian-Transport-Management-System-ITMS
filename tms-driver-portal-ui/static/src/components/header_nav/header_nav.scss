@@ -1,0 +1,66 @@
+@use "../../scss/variables" as *;
+
+.tms-HeaderNav {
+    background-color: $white;
+    color: $gray-900;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    height: 60px; // Standard header height
+
+    &_start,
+    &_end {
+        flex: 0 0 50px; // Fixed width for button containers
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &_start {
+        justify-content: flex-start;
+    }
+
+    &_end {
+        justify-content: flex-end;
+    }
+
+    &_center {
+        flex: 1 1 auto;
+        text-align: center;
+    }
+
+    &_title {
+        color: inherit;
+        font-size: 1.1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &_button {
+        color: $gray-900;
+        text-decoration: none;
+        padding: $spacing-xs $spacing-sm;
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover,
+        &:focus {
+            color: $primary-700;
+            background-color: $gray-100;
+            border-radius: $border-radius;
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 2px rgba($primary-500, 0.4);
+            outline: none;
+        }
+
+        .fa {
+            font-size: 1.25rem;
+        }
+    }
+}

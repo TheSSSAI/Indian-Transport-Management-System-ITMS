@@ -1,0 +1,61 @@
+# .yamllint configuration for tms-kubernetes-manifests
+# This configuration enforces strict standards for readability and consistency
+# across all YAML files in the repository.
+
+extends: default
+
+rules:
+  # General
+  braces: enable
+  brackets: enable
+  colons:
+    max-spaces-before: 0
+    max-spaces-after: 1
+  commas:
+    max-spaces-before: 0
+    min-spaces-after: 1
+    max-spaces-after: 1
+  document-start: disable  # Helm templates often don't start with ---
+  document-end: disable
+  empty-lines:
+    max: 2
+    max-start: 0
+    max-end: 0
+  hyphens:
+    max-spaces-after: 1
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+    check-multi-line-strings: false
+
+  # Formatting
+  line-length:
+    max: 120
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+  new-line-at-end-of-file: enable
+  new-lines:
+    type: unix
+  trailing-spaces: enable
+
+  # Syntax and Semantics
+  empty-values: disable
+  key-duplicates: enable
+  key-ordering: disable # Don't enforce alphabetical key ordering
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+  quoted-strings:
+    quote-type: 'single'
+    required: false
+    extra-required:
+      - '{{' # Helm templates
+      - '}}'
+  truthy:
+    allowed-values: ['true', 'false']
+
+ignore: |
+  # Ignore vendored Helm dependency charts if any are added
+  charts/
+  # Ignore CRD definitions as they are from external sources and may not meet our linting standards
+  crds/

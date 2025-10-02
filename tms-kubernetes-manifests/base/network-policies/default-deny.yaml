@@ -1,0 +1,51 @@
+# ==============================================================================
+# Default-Deny Network Policy
+#
+# This policy establishes a zero-trust network security posture within the 'tms'
+# namespace. It selects all pods in the namespace and explicitly denies all
+# ingress (incoming) and egress (outgoing) traffic by default.
+#
+# This is a critical security measure that enforces the principle of least
+# privilege at the network level. With this policy in place, no pod can
+# communicate with any other pod, service, or external endpoint unless another
+# NetworkPolicy explicitly allows it.
+#
+# Subsequent, more specific NetworkPolicies must be created to whitelist
+# required communication paths, for example:
+# - Allow ingress from the Ingress Controller to the Odoo frontend pods.
+# - Allow egress from Odoo pods to the RDS PostgreSQL database endpoint.
+# - Allow egress from the GPS service pods to the RabbitMQ service.
+# - Allow egress from all pods to the Kubernetes DNS service (kube-dns).
+#
+# This manifest directly supports the security requirements outlined in the
+# REPO-TMS-K8S SDS, which call for robust security practices.
+# ==============================================================================
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  # The name clearly indicates the policy's function.
+  name: default-deny-all
+  # This policy must be applied to the 'tms' namespace.
+  namespace: tms
+spec:
+  # An empty podSelector selects all pods in the namespace. This ensures
+  # the deny-all rule is applied universally as a baseline.
+  podSelector: {}
+
+  # Specifying the policy types is crucial. This policy applies to both
+  # ingress and egress traffic. If this array were omitted, the behavior
+  # would depend on whether 'ingress' or 'egress' rules are defined.
+  # By explicitly including both, we ensure a comprehensive deny-all.
+  policyTypes:
+    - Ingress
+    - Egress
+
+  # An empty 'ingress' array means no ingress traffic is allowed.
+  # Any pod that needs to receive traffic will require another NetworkPolicy
+  # that defines a specific ingress rule to allow it.
+  ingress: []
+
+  # An empty 'egress' array means no egress traffic is allowed.
+  # Any pod that needs to make outbound connections will require another
+  # NetworkPolicy that defines a specific egress rule.
+  egress: []

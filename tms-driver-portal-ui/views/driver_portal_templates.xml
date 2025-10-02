@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+    This file contains the main QWeb template that serves as the root HTML document
+    for the Driver Portal Single Page Application (SPA). The controller defined in
+    `controllers/main.py` renders this template.
+
+    Dependencies:
+    - REQ-1-001: The viewport meta tag is critical for mobile responsiveness.
+    - REQ-1-112: The simplified UI starts with this clean HTML shell.
+    - main.py (Level 6): The controller will render this specific template by its ID.
+    - assets.xml (Level 7): The asset bundle defined there is loaded here via t-call-assets.
+    - main.js (Level 5): The JS code will mount the root OWL component into the `div.o_driver_portal_root`.
+    -->
+    <data>
+        <template id="driver_portal_root" name="Driver Portal">
+            <

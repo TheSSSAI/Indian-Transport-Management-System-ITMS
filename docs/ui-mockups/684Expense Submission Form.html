@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Submission Form</title>
+  <style>
+    /* CSS Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body {
+      height: 100%;
+    }
+
+    /* Design System Tokens */
+    :root {
+      /* Typography */
+      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-size-body: 16px;
+      --font-size-caption: 14px;
+      --font-size-h3: 24px;
+      --font-weight-normal: 400;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      
+      /* Colors */
+      --color-primary-600: #2563EB;
+      --color-primary-700: #1D4ED8;
+      --color-primary-800: #1E40AF;
+      --color-primary-100: #DBEAFE;
+      --color-primary-50: #EFF6FF;
+
+      --color-gray-900: #111827;
+      --color-gray-700: #374151;
+      --color-gray-500: #6B7280;
+      --color-gray-300: #D1D5DB;
+      --color-gray-200: #E5E7EB;
+      --color-gray-100: #F3F4F6;
+      --color-gray-50: #F9FAFB;
+      --color-white: #FFFFFF;
+
+      --color-error-600: #DC2626;
+      --color-error-50: #FEF2F2;
+
+      /* Spacing */
+      --space-xxs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+
+      /* Borders & Shadows */
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+    
+    /* Base Styles */
+    body {
+      font-family: var(--font-primary);
+      background-color: var(--color-gray-50);
+      color: var(--color-gray-900);
+      line-height: 1.5;
+      font-size: var(--font-size-body);
+    }
+
+    /* Screen Layout */
+    .screen-container {
+      max-width: 480px;
+      margin: 0 auto;
+      background-color: var(--color-white);
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .screen-header {
+      background-color: var(--color-white);
+      padding: var(--space-md) var(--space-lg);
+      border-bottom: 1px solid var(--color-gray-200);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .screen-header h1 {
+      font-size: var(--font-size-h3);
+      font-weight: var(--font-weight-semibold);
+      text-align: center;
+    }
+
+    .screen-content {
+      padding: var(--space-lg);
+      flex-grow: 1;
+    }
+
+    /* Form Styles */
+    .expense-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+      position: relative;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .form-group label {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-gray-700);
+    }
+    
+    .form-group label .required-indicator {
+      color: var(--color-error-600);
+      margin-left: var(--space-xxs);
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--color-gray-300);
+      border-radius: var(--border-radius-md);
+      font-size: var(--font-size-body);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+    
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--color-primary-600);
+      box-shadow: 0 0 0 3px var(--color-primary-100);
+    }
+
+    .form-select-wrapper {
+        position: relative;
+    }
+    
+    .form-select-wrapper::after {
+        content: '▼';
+        font-size: 0.8em;
+        position: absolute;
+        right: var(--space-md);
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--color-gray-500);
+    }
+
+    /* File Uploader Component */
+    .file-uploader {
+      border: 2px dashed var(--color-gray-300);
+      border-radius: var(--border-radius-lg);
+      padding: var(--space-xl);
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+
+    .file-uploader:hover {
+      border-color: var(--color-primary-600);
+      background-color: var(--color-primary-50);
+    }
+
+    .file-uploader input[type="file"] {
+      display: none;
+    }
+
+    .file-uploader-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto var(--space-sm);
+      color: var(--color-gray-500);
+    }
+
+    .file-uploader-text {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-primary-700);
+    }
+    
+    .file-uploader-text span {
+      color: var(--color-gray-500);
+      font-weight: var(--font-weight-normal);
+    }
+
+    .file-uploader-hint {
+      font-size: var(--font-size-caption);
+      color: var(--color-gray-500);
+      margin-top: var(--space-xs);
+    }
+    
+    .file-preview {
+        display: none;
+        margin-top: var(--space-md);
+        padding: var(--space-sm);
+        background-color: var(--color-gray-100);
+        border-radius: var(--border-radius-md);
+        font-size: var(--font-size-caption);
+        color: var(--color-gray-700);
+    }
+
+    /* Conditional Fields */
+    .conditional-fields {
+      display: none;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+
+    .conditional-fields.is-visible {
+      display: flex;
+    }
+
+    /* Action Button */
+    .action-button {
+      width: 100%;
+      padding: var(--space-md) var(--space-lg);
+      font-size: 18px;
+      font-weight: var(--font-weight-semibold);
+      background-color: var(--color-primary-600);
+      color: var(--color-white);
+      border: none;
+      border-radius: var(--border-radius-lg);
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .action-button:hover {
+      background-color: var(--color-primary-700);
+    }
+
+    .action-button:active {
+      background-color: var(--color-primary-800);
+    }
+
+    .action-button:disabled {
+      background-color: var(--color-primary-100);
+      cursor: not-allowed;
+    }
+
+    /* State: Validation Failed */
+    .form-group.has-error .form-input,
+    .form-group.has-error .form-select,
+    .form-group.has-error .file-uploader {
+      border-color: var(--color-error-600);
+    }
+    
+    .form-group.has-error .form-input:focus,
+    .form-group.has-error .form-select:focus {
+        box-shadow: 0 0 0 3px var(--color-error-50);
+    }
+
+    .validation-message {
+      display: none;
+      font-size: var(--font-size-caption);
+      color: var(--color-error-600);
+      margin-top: var(--space-xxs);
+    }
+
+    .form-group.has-error .validation-message {
+      display: block;
+    }
+
+    /* State: Submitting */
+    .submitting-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.7);
+      z-index: 20;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--border-radius-lg);
+    }
+    
+    .expense-form.is-submitting .submitting-overlay {
+        display: flex;
+    }
+    
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 5px solid var(--color-primary-100);
+      border-top-color: var(--color-primary-600);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Feedback Alert/Toast */
+    .feedback-alert {
+        position: fixed;
+        top: var(--space-lg);
+        left: var(--space-lg);
+        right: var(--space-lg);
+        padding: var(--space-md);
+        border-radius: var(--border-radius-md);
+        background-color: var(--color-error-50);
+        color: var(--color-error-600);
+        border: 1px solid var(--color-error-600);
+        font-weight: var(--font-weight-medium);
+        text-align: center;
+        z-index: 100;
+        display: none;
+    }
+
+    /* Variations Styling */
+    .screen-variations {
+      background-color: var(--color-gray-100);
+      padding: var(--space-xl) var(--space-lg);
+      border-top: 4px solid var(--color-gray-200);
+    }
+
+    .screen-variations h2 {
+      font-size: 20px;
+      margin-bottom: var(--space-lg);
+      color: var(--color-gray-700);
+      text-align: center;
+    }
+
+    .variation-group {
+      margin-bottom: var(--space-xl);
+      padding: var(--space-lg);
+      background-color: var(--color-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .variation-group h3 {
+      font-size: 18px;
+      font-weight: var(--font-weight-semibold);
+      margin-bottom: var(--space-xs);
+    }
+
+    .variation-group p.description {
+      font-size: var(--font-size-caption);
+      color: var(--color-gray-500);
+      margin-bottom: var(--space-md);
+    }
+  </style>
+</head>
+<body>
+  <div class="screen-container">
+    <header class="screen-header">
+      <h1>Submit Expense</h1>
+    </header>
+    
+    <main class="screen-content">
+      <form class="expense-form" id="main-expense-form">
+        <div class="form-group">
+          <label for="expenseType">Expense Type <span class="required-indicator">*</span></label>
+          <div class="form-select-wrapper">
+            <select id="expenseType" class="form-select" required>
+              <option value="">Select an expense type...</option>
+              <option value="Toll">Toll</option>
+              <option value="Food">Food</option>
+              <option value="Diesel">Diesel</option>
+              <option value="Maintenance">Maintenance</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="amount">Amount (₹) <span class="required-indicator">*</span></label>
+          <input type="number" id="amount" class="form-input" placeholder="e.g., 250.50" required step="0.01">
+        </div>
+
+        <div class="conditional-fields" id="diesel-fields">
+            <div class="form-group">
+              <label for="odometer">Odometer (km) <span class="required-indicator">*</span></label>
+              <input type="number" id="odometer" class="form-input" placeholder="e.g., 150250">
+            </div>
+            <div class="form-group">
+              <label for="quantity">Fuel Quantity (Liters) <span class="required-indicator">*</span></label>
+              <input type="number" id="quantity" class="form-input" placeholder="e.g., 75.5" step="0.01">
+            </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="receiptUpload">Upload Receipt <span class="required-indicator">*</span></label>
+          <label for="receiptUpload" class="file-uploader">
+              <svg class="file-uploader-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M3 17.25V6.75A2.25 2.25 0 015.25 4.5h13.5A2.25 2.25 0 0121 6.75v10.5A2.25 2.25 0 0118.75 21H5.25A2.25 2.25 0 013 17.25z" />
+              </svg>
+              <div class="file-uploader-text">Click to upload <span>or drag and drop</span></div>
+              <div class="file-uploader-hint">JPG, PNG, or PDF (MAX. 5MB)</div>
+          </label>
+          <input type="file" id="receiptUpload" accept=".jpg,.jpeg,.png,.pdf" required>
+          <div class="file-preview" id="file-preview"></div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="action-button">Submit Expense</button>
+        </div>
+
+        <div class="submitting-overlay">
+            <div class="spinner"></div>
+        </div>
+      </form>
+    </main>
+  </div>
+  
+  <div class="screen-variations">
+    <h2>Screen Variations</h2>
+    
+    <div class="variation-group">
+      <h3>Variant: "Default State"</h3>
+      <p class="description">The initial, clean state of the form before any user interaction.</p>
+      <!-- The main interactive form above serves as the default state demo -->
+    </div>
+
+    <div class="variation-group">
+        <h3>Variant: "Conditional Fields Visible"</h3>
+        <p class="description">How the form appears after a user selects 'Diesel' as the expense type.</p>
+        <form class="expense-form">
+            <div class="form-group">
+              <label for="expenseType2">Expense Type <span class="required-indicator">*</span></label>
+              <div class="form-select-wrapper">
+                <select id="expenseType2" class="form-select" required>
+                  <option value="Toll">Toll</option>
+                  <option value="Food">Food</option>
+                  <option value="Diesel" selected>Diesel</option>
+                  <option value="Maintenance">Maintenance</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="amount2">Amount (₹) <span class="required-indicator">*</span></label>
+              <input type="number" id="amount2" class="form-input" placeholder="e.g., 250.50" required step="0.01">
+            </div>
+            <div class="conditional-fields is-visible">
+                <div class="form-group">
+                  <label for="odometer2">Odometer (km) <span class="required-indicator">*</span></label>
+                  <input type="number" id="odometer2" class="form-input" placeholder="e.g., 150250">
+                </div>
+                <div class="form-group">
+                  <label for="quantity2">Fuel Quantity (Liters) <span class="required-indicator">*</span></label>
+                  <input type="number" id="quantity2" class="form-input" placeholder="e.g., 75.5" step="0.01">
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <div class="variation-group">
+      <h3>Variant: "Validation Failed"</h3>
+      <p class="description">The form after a submission attempt with invalid or missing data. Error messages are displayed.</p>
+      <form class="expense-form">
+        <div class="form-group has-error">
+          <label for="expenseType3">Expense Type <span class="required-indicator">*</span></label>
+          <div class="form-select-wrapper">
+            <select id="expenseType3" class="form-select" required>
+              <option value="">Select an expense type...</option>
+            </select>
+          </div>
+          <div class="validation-message">This field is required.</div>
+        </div>
+        <div class="form-group has-error">
+            <label for="amount3">Amount (₹) <span class="required-indicator">*</span></label>
+            <input type="number" id="amount3" class="form-input" placeholder="e.g., 250.50" required step="0.01" value="-50">
+            <div class="validation-message">Amount must be a positive number.</div>
+        </div>
+         <div class="form-group has-error">
+            <label for="receiptUpload3">Upload Receipt <span class="required-indicator">*</span></label>
+            <label for="receiptUpload3" class="file-uploader">
+              <svg class="file-uploader-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3.75 3.75M12 9.75l3.75 3.75M3 17.25V6.75A2.25 2.25 0 015.25 4.5h13.5A2.25 2.25 0 0121 6.75v10.5A2.25 2.25 0 0118.75 21H5.25A2.25 2.25 0 013 17.25z" /></svg>
+              <div class="file-uploader-text">Click to upload <span>or drag and drop</span></div>
+              <div class="file-uploader-hint">JPG, PNG, or PDF (MAX. 5MB)</div>
+            </label>
+            <input type="file" id="receiptUpload3" accept=".jpg,.jpeg,.png,.pdf" required>
+            <div class="validation-message">A receipt file is required.</div>
+        </div>
+      </form>
+    </div>
+    
+    <div class="variation-group">
+      <h3>Variant: "Submitting"</h3>
+      <p class="description">The form is disabled and an overlay with a spinner is shown while the data is being sent to the server.</p>
+        <form class="expense-form is-submitting">
+            <div class="form-group">
+              <label for="expenseType4">Expense Type <span class="required-indicator">*</span></label>
+              <div class="form-select-wrapper"><select id="expenseType4" class="form-select" disabled><option>Toll</option></select></div>
+            </div>
+            <div class="form-group">
+              <label for="amount4">Amount (₹) <span class="required-indicator">*</span></label>
+              <input type="number" id="amount4" class="form-input" value="250.00" disabled>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="action-button" disabled>Submit Expense</button>
+            </div>
+            <div class="submitting-overlay">
+                <div class="spinner"></div>
+            </div>
+        </form>
+    </div>
+
+    <div class="variation-group">
+      <h3>Variant: "General Error"</h3>
+      <p class="description">A feedback alert/toast appears to inform the user of a server-side or network error.</p>
+       <div class="feedback-alert" style="display: block;">
+            Could not submit expense. Please check your connection and try again.
+        </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const expenseTypeSelect = document.getElementById('expenseType');
+      const dieselFields = document.getElementById('diesel-fields');
+      const odometerInput = document.getElementById('odometer');
+      const quantityInput = document.getElementById('quantity');
+      const receiptUpload = document.getElementById('receiptUpload');
+      const filePreview = document.getElementById('file-preview');
+
+      expenseTypeSelect.addEventListener('change', function() {
+        if (this.value === 'Diesel') {
+          dieselFields.classList.add('is-visible');
+          odometerInput.required = true;
+          quantityInput.required = true;
+        } else {
+          dieselFields.classList.remove('is-visible');
+          odometerInput.required = false;
+          quantityInput.required = false;
+          odometerInput.value = '';
+          quantityInput.value = '';
+        }
+      });
+
+      receiptUpload.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+            filePreview.textContent = 'Selected file: ' + this.files[0].name;
+            filePreview.style.display = 'block';
+        } else {
+            filePreview.style.display = 'none';
+        }
+      });
+
+      const mainForm = document.getElementById('main-expense-form');
+      mainForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          // Simulate submission
+          mainForm.classList.add('is-submitting');
+          setTimeout(() => {
+              mainForm.classList.remove('is-submitting');
+              alert('Form submitted successfully (simulation).');
+              mainForm.reset();
+              dieselFields.classList.remove('is-visible');
+              filePreview.style.display = 'none';
+          }, 2000);
+      });
+    });
+  </script>
+</body>
+</html>

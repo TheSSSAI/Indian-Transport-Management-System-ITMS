@@ -1,0 +1,412 @@
+-- TMS Database Schema for PostgreSQL
+-- Version: 1.0
+-- Description: A comprehensive schema for a Transportation Management System.
+
+-- ========= PRELIMINARIES =========
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+-- ========= TABLE DEFINITIONS =========
+
+-- Table: Role
+-- Description: Represents user roles (e.g., Admin, Dispatch Manager).
+CREATE TABLE Role (
+    roleId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    CONSTRAINT UC_Role_Name UNIQUE (name),
+    CONSTRAINT CHK_Role_Name CHECK (name IN ('Admin', 'Dispatch Manager', 'Finance Officer', 'Driver'))
+);
+
+-- Table: User
+-- Description: Represents system users, leveraging Odoo's 'res.users' model.
+CREATE TABLE "User" (
+    userId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    passwordHash VARCHAR(255) NOT NULL,
+    roleId UUID NOT NULL,
+    isActive BOOLEAN NOT NULL DEFAULT true,
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT UC_User_Email UNIQUE (email)
+);
+
+-- Table: Customer
+-- Description: Represents a customer, extending Odoo's 'res.partner' model.
+CREATE TABLE Customer (
+    customerId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    billingAddress TEXT NOT NULL,
+    gstin VARCHAR(15),
+    contactPerson VARCHAR(255),
+    isActive BOOLEAN NOT NULL DEFAULT true,
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT UC_Customer_Gstin UNIQUE (gstin)
+);
+
+-- Table: Driver
+-- Description: Represents a driver, extending Odoo's 'hr.employee' model.
+CREATE TABLE Driver (
+    driverId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    contactNumber VARCHAR(20),
+    licenseNumber VARCHAR(50) NOT NULL,
+    licenseExpiryDate DATE NOT NULL,
+    isActive BOOLEAN NOT NULL DEFAULT true,
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT UC_Driver_LicenseNumber UNIQUE (licenseNumber)
+);
+
+-- Table: Vehicle
+-- Description: Represents a vehicle (truck) used for transport.
+CREATE TABLE Vehicle (
+    vehicleId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    truckNumber VARCHAR(20) NOT NULL,
+    model VARCHAR(100),
+    capacityTons DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    ownerDetails TEXT,
+    ownershipType VARCHAR(20) NOT NULL DEFAULT 'Company-Owned',
+    fuelType VARCHAR(20),
+    lastServiceDate DATE,
+    nextServiceDueDate DATE,
+    status VARCHAR(20) NOT NULL DEFAULT 'Active',
+    lastOdometerReading INTEGER DEFAULT 0,
+    lastLatitude DECIMAL(9, 6),
+    lastLongitude DECIMAL(9, 6),
+    lastLocationTimestamp TIMESTAMPTZ,
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT UC_Vehicle_TruckNumber UNIQUE (truckNumber),
+    CONSTRAINT CHK_Vehicle_Capacity CHECK (capacityTons >= 0),
+    CONSTRAINT CHK_Vehicle_OwnershipType CHECK (ownershipType IN ('Company-Owned', 'Outsourced')),
+    CONSTRAINT CHK_Vehicle_Status CHECK (status IN ('Active', 'Inactive', 'In-Maintenance')),
+    CONSTRAINT CHK_Vehicle_Odometer CHECK (lastOdometerReading >= 0)
+);
+
+-- Table: VehicleDocument
+-- Description: Stores documents associated with a vehicle.
+CREATE TABLE VehicleDocument (
+    vehicleDocumentId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    vehicleId UUID NOT NULL,
+    documentType VARCHAR(50) NOT NULL,
+    expiryDate DATE NOT NULL,
+    attachmentUrl VARCHAR(512) NOT NULL,
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT UC_VehicleDocument_Vehicle_Type UNIQUE (vehicleId, documentType)
+);
+
+-- Table: Material
+-- Description: Master data for types of materials being transported.
+CREATE TABLE Material (
+    materialId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    isActive BOOLEAN NOT NULL DEFAULT true,
+    CONSTRAINT UC_Material_Name UNIQUE (name)
+);
+
+-- Table: Route
+-- Description: Master data for predefined transport routes.
+CREATE TABLE Route (
+    routeId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    sourceLocation VARCHAR(255) NOT NULL,
+    destinationLocation VARCHAR(255) NOT NULL,
+    standardDistanceKm DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    estimatedTransitTimeHours DECIMAL(10, 2) DEFAULT 0,
+    isActive BOOLEAN NOT NULL DEFAULT true,
+    CONSTRAINT UC_Route_Name UNIQUE (name),
+    CONSTRAINT CHK_Route_Distance CHECK (standardDistanceKm >= 0),
+    CONSTRAINT CHK_Route_Time CHECK (estimatedTransitTimeHours >= 0)
+);
+
+-- Table: Trip
+-- Description: The central entity representing a single transport job.
+CREATE TABLE Trip (
+    tripId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    customerId UUID NOT NULL,
+    vehicleId UUID,
+    driverId UUID,
+    materialId UUID NOT NULL,
+    customerName VARCHAR(255),
+    vehicleTruckNumber VARCHAR(20),
+    driverName VARCHAR(255),
+    source VARCHAR(255) NOT NULL,
+    destination VARCHAR(255) NOT NULL,
+    weightTons DECIMAL(10, 3) NOT NULL DEFAULT 0,
+    rate DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    rateType VARCHAR(20) NOT NULL DEFAULT 'fixed',
+    expectedDeliveryDate TIMESTAMPTZ NOT NULL,
+    actualDeliveryDate TIMESTAMPTZ,
+    status VARCHAR(20) NOT NULL DEFAULT 'Planned',
+    cancellationReason TEXT,
+    onHoldResolutionComment TEXT,
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT CHK_Trip_Weight CHECK (weightTons >= 0),
+    CONSTRAINT CHK_Trip_Rate CHECK (rate >= 0),
+    CONSTRAINT CHK_Trip_RateType CHECK (rateType IN ('per_km', 'per_ton', 'fixed')),
+    CONSTRAINT CHK_Trip_Status CHECK (status IN ('Planned', 'Assigned', 'In-Transit', 'On Hold', 'Delivered', 'Completed', 'Invoiced', 'Paid', 'Canceled'))
+) PARTITION BY RANGE (createdAt);
+
+-- Table: TripExpense
+-- Description: Records expenses submitted by drivers for a specific trip.
+CREATE TABLE TripExpense (
+    tripExpenseId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tripId UUID NOT NULL,
+    driverId UUID NOT NULL,
+    expenseType VARCHAR(50) NOT NULL,
+    amount DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    receiptUrl VARCHAR(512) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'Submitted',
+    rejectionReason TEXT,
+    fuelQuantityLiters DECIMAL(10, 2) DEFAULT 0,
+    odometerReading INTEGER DEFAULT 0,
+    submittedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT CHK_TripExpense_ExpenseType CHECK (expenseType IN ('Diesel', 'Toll', 'Food', 'Repair', 'Other')),
+    CONSTRAINT CHK_TripExpense_Amount CHECK (amount >= 0),
+    CONSTRAINT CHK_TripExpense_Status CHECK (status IN ('Submitted', 'Approved', 'Rejected')),
+    CONSTRAINT CHK_TripExpense_FuelQty CHECK (fuelQuantityLiters >= 0),
+    CONSTRAINT CHK_TripExpense_Odometer CHECK (odometerReading >= 0)
+);
+
+-- Table: Invoice
+-- Description: Represents a GST-compliant invoice generated for a trip.
+CREATE TABLE Invoice (
+    invoiceId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tripId UUID NOT NULL,
+    customerId UUID NOT NULL,
+    invoiceNumber VARCHAR(50) NOT NULL,
+    invoiceDate DATE NOT NULL,
+    dueDate DATE NOT NULL,
+    totalAmount DECIMAL(14, 2) NOT NULL DEFAULT 0,
+    gstAmount DECIMAL(14, 2) NOT NULL DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'Draft',
+    irn VARCHAR(64),
+    qrCodeData TEXT,
+    customerNameSnapshot VARCHAR(255) NOT NULL,
+    billingAddressSnapshot TEXT NOT NULL,
+    gstinSnapshot VARCHAR(15),
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT UC_Invoice_TripId UNIQUE (tripId),
+    CONSTRAINT UC_Invoice_InvoiceNumber UNIQUE (invoiceNumber),
+    CONSTRAINT UC_Invoice_Irn UNIQUE (irn),
+    CONSTRAINT CHK_Invoice_Status CHECK (status IN ('Draft', 'Sent', 'Paid', 'Partially Paid', 'Canceled'))
+);
+
+-- Table: Payment
+-- Description: Records payments received from customers against invoices.
+CREATE TABLE Payment (
+    paymentId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    invoiceId UUID NOT NULL,
+    customerId UUID NOT NULL,
+    paymentDate DATE NOT NULL,
+    amount DECIMAL(14, 2) NOT NULL,
+    paymentMethod VARCHAR(50),
+    transactionReference VARCHAR(100),
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT CHK_Payment_Amount CHECK (amount > 0)
+);
+
+-- Table: VehicleLocation
+-- Description: Stores time-series GPS location data for each vehicle.
+CREATE TABLE VehicleLocation (
+    vehicleLocationId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    vehicleId UUID NOT NULL,
+    latitude DECIMAL(9, 6) NOT NULL,
+    longitude DECIMAL(9, 6) NOT NULL,
+    "timestamp" TIMESTAMPTZ NOT NULL,
+    locationGeom GEOMETRY(Point, 4326)
+) PARTITION BY RANGE ("timestamp");
+
+-- Table: Alert
+-- Description: Stores system-generated alerts for critical events.
+CREATE TABLE Alert (
+    alertId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    alertType VARCHAR(50) NOT NULL,
+    message TEXT NOT NULL,
+    relatedModel VARCHAR(100),
+    relatedRecordId UUID,
+    status VARCHAR(20) NOT NULL DEFAULT 'New',
+    severity VARCHAR(20) NOT NULL DEFAULT 'Medium',
+    createdAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT CHK_Alert_Type CHECK (alertType IN ('DocumentExpiry', 'LowBalance', 'CriticalTripEvent', 'Geofence')),
+    CONSTRAINT CHK_Alert_Status CHECK (status IN ('New', 'Acknowledged', 'Resolved')),
+    CONSTRAINT CHK_Alert_Severity CHECK (severity IN ('Low', 'Medium', 'High', 'Critical'))
+);
+
+-- Table: Geofence
+-- Description: Defines geographical boundaries for monitoring vehicle entry and exit.
+CREATE TABLE Geofence (
+    geofenceId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) NOT NULL,
+    coordinates JSONB NOT NULL,
+    isActive BOOLEAN NOT NULL DEFAULT true,
+    CONSTRAINT UC_Geofence_Name UNIQUE (name)
+);
+
+-- Table: GeofenceEvent
+-- Description: Logs when a vehicle enters or exits a defined geofence.
+CREATE TABLE GeofenceEvent (
+    geofenceEventId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    geofenceId UUID NOT NULL,
+    vehicleId UUID NOT NULL,
+    eventType VARCHAR(10) NOT NULL,
+    "timestamp" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT CHK_GeofenceEvent_Type CHECK (eventType IN ('Entry', 'Exit'))
+);
+
+-- Table: Card
+-- Description: Manages FASTag and diesel cards, including manual balance tracking.
+CREATE TABLE Card (
+    cardId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    cardType VARCHAR(20) NOT NULL,
+    cardNumber VARCHAR(50) NOT NULL,
+    provider VARCHAR(100),
+    assignedVehicleId UUID,
+    balance DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    lowBalanceThreshold DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    isActive BOOLEAN NOT NULL DEFAULT true,
+    CONSTRAINT UC_Card_CardNumber UNIQUE (cardNumber),
+    CONSTRAINT CHK_Card_Type CHECK (cardType IN ('FASTag', 'Diesel'))
+);
+
+-- Table: ProofOfDelivery
+-- Description: Stores Proof of Delivery (POD) data for a trip.
+CREATE TABLE ProofOfDelivery (
+    podId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tripId UUID NOT NULL,
+    podType VARCHAR(20) NOT NULL,
+    podDataUrl VARCHAR(512) NOT NULL,
+    recipientName VARCHAR(255) NOT NULL,
+    submittedAt TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT UC_ProofOfDelivery_TripId UNIQUE (tripId),
+    CONSTRAINT CHK_POD_Type CHECK (podType IN ('Photo', 'eSignature'))
+);
+
+-- Table: TripEventLog
+-- Description: Logs events that occur during a trip, as reported by the driver.
+CREATE TABLE TripEventLog (
+    tripEventLogId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    tripId UUID NOT NULL,
+    driverId UUID NOT NULL,
+    eventType VARCHAR(50) NOT NULL,
+    eventTimestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    photoUrl VARCHAR(512),
+    notes TEXT,
+    CONSTRAINT CHK_TripEventLog_Type CHECK (eventType IN ('Accident', 'Repair', 'Government Stoppage', 'Fueling', 'Trip Start'))
+);
+
+-- Table: AuditLog
+-- Description: Provides an immutable audit trail for all significant data changes.
+CREATE TABLE AuditLog (
+    auditLogId UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    userId UUID NOT NULL,
+    "timestamp" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    actionType VARCHAR(20) NOT NULL,
+    modelName VARCHAR(100) NOT NULL,
+    recordId UUID NOT NULL,
+    changes JSONB,
+    CONSTRAINT CHK_AuditLog_ActionType CHECK (actionType IN ('Create', 'Update', 'Delete'))
+) PARTITION BY RANGE ("timestamp");
+
+
+-- ========= INDEXES =========
+
+-- User Indexes
+CREATE INDEX IX_User_RoleId ON "User" USING btree (roleId);
+CREATE INDEX IX_User_IsActive ON "User" USING btree (isActive);
+
+-- Customer Indexes
+CREATE INDEX IX_Customer_Name ON Customer USING btree (name);
+CREATE INDEX IX_Customer_IsActive ON Customer USING btree (isActive);
+
+-- Driver Indexes
+CREATE INDEX IX_Driver_IsActive ON Driver USING btree (isActive);
+CREATE INDEX IX_Driver_LicenseExpiryDate ON Driver USING btree (licenseExpiryDate);
+
+-- Vehicle Indexes
+CREATE INDEX IX_Vehicle_Status ON Vehicle USING btree (status);
+CREATE INDEX IX_Vehicle_OwnershipType ON Vehicle USING btree (ownershipType);
+CREATE INDEX IX_Vehicle_NextServiceDueDate ON Vehicle USING btree (nextServiceDueDate);
+
+-- VehicleDocument Indexes
+CREATE INDEX IX_VehicleDocument_ExpiryDate ON VehicleDocument USING btree (expiryDate);
+
+-- Material Indexes
+CREATE INDEX IX_Material_IsActive ON Material USING btree (isActive);
+
+-- Route Indexes
+CREATE INDEX IX_Route_IsActive ON Route USING btree (isActive);
+
+-- Trip Indexes
+CREATE INDEX IX_Trip_Status_ExpectedDeliveryDate ON Trip USING btree (status, expectedDeliveryDate);
+CREATE INDEX IX_Trip_CustomerId_Status ON Trip USING btree (customerId, status);
+CREATE INDEX IX_Trip_Driver_Status ON Trip USING btree (driverId, status);
+
+-- TripExpense Indexes
+CREATE INDEX IX_TripExpense_TripId_Status ON TripExpense USING btree (tripId, status);
+CREATE INDEX IX_TripExpense_Status_SubmittedAt ON TripExpense USING btree (status, submittedAt);
+
+-- Invoice Indexes
+CREATE INDEX IX_Invoice_CustomerId_Status ON Invoice USING btree (customerId, status);
+CREATE INDEX IX_Invoice_Status_DueDate ON Invoice USING btree (status, dueDate);
+CREATE INDEX IX_Invoice_PaidStatus_DueDate ON Invoice (status, dueDate) WHERE status IN ('Paid', 'Partially Paid');
+
+-- Payment Indexes
+CREATE INDEX IX_Payment_InvoiceId ON Payment USING btree (invoiceId);
+CREATE INDEX IX_Payment_CustomerId_PaymentDate ON Payment USING btree (customerId, paymentDate);
+
+-- VehicleLocation Indexes
+CREATE INDEX IX_VehicleLocation_Vehicle_Timestamp ON VehicleLocation USING btree (vehicleId, "timestamp");
+CREATE INDEX IX_VehicleLocation_Geom ON VehicleLocation USING GIST (locationGeom);
+
+-- Alert Indexes
+CREATE INDEX IX_Alert_Status_CreatedAt ON Alert USING btree (status, createdAt);
+CREATE INDEX IX_Alert_RelatedRecord ON Alert USING btree (relatedModel, relatedRecordId);
+CREATE INDEX IX_Alert_Dashboard ON Alert USING btree (status, severity, createdAt DESC);
+
+-- Geofence Indexes
+CREATE INDEX IX_Geofence_IsActive ON Geofence USING btree (isActive);
+
+-- GeofenceEvent Indexes
+CREATE INDEX IX_GeofenceEvent_Vehicle_Timestamp ON GeofenceEvent USING btree (vehicleId, "timestamp");
+CREATE INDEX IX_GeofenceEvent_Geofence_Timestamp ON GeofenceEvent USING btree (geofenceId, "timestamp");
+
+-- Card Indexes
+CREATE INDEX IX_Card_AssignedVehicleId ON Card USING btree (assignedVehicleId);
+CREATE INDEX IX_Card_IsActive ON Card USING btree (isActive);
+
+-- TripEventLog Indexes
+CREATE INDEX IX_TripEventLog_Trip_Timestamp ON TripEventLog USING btree (tripId, eventTimestamp);
+
+-- AuditLog Indexes
+CREATE INDEX IX_AuditLog_Record_Timestamp ON AuditLog USING btree (modelName, recordId, "timestamp");
+CREATE INDEX IX_AuditLog_UserId_Timestamp ON AuditLog USING btree (userId, "timestamp");
+
+
+-- ========= FOREIGN KEY CONSTRAINTS =========
+
+ALTER TABLE "User" ADD CONSTRAINT FK_User_Role FOREIGN KEY (roleId) REFERENCES Role(roleId) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE VehicleDocument ADD CONSTRAINT FK_VehicleDocument_Vehicle FOREIGN KEY (vehicleId) REFERENCES Vehicle(vehicleId) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE Trip ADD CONSTRAINT FK_Trip_Customer FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE Trip ADD CONSTRAINT FK_Trip_Vehicle FOREIGN KEY (vehicleId) REFERENCES Vehicle(vehicleId) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE Trip ADD CONSTRAINT FK_Trip_Driver FOREIGN KEY (driverId) REFERENCES Driver(driverId) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE Trip ADD CONSTRAINT FK_Trip_Material FOREIGN KEY (materialId) REFERENCES Material(materialId) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE TripExpense ADD CONSTRAINT FK_TripExpense_Trip FOREIGN KEY (tripId) REFERENCES Trip(tripId) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE TripExpense ADD CONSTRAINT FK_TripExpense_Driver FOREIGN KEY (driverId) REFERENCES Driver(driverId) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE Invoice ADD CONSTRAINT FK_Invoice_Trip FOREIGN KEY (tripId) REFERENCES Trip(tripId) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE Invoice ADD CONSTRAINT FK_Invoice_Customer FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE Payment ADD CONSTRAINT FK_Payment_Invoice FOREIGN KEY (invoiceId) REFERENCES Invoice(invoiceId) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE Payment ADD CONSTRAINT FK_Payment_Customer FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE VehicleLocation ADD CONSTRAINT FK_VehicleLocation_Vehicle FOREIGN KEY (vehicleId) REFERENCES Vehicle(vehicleId) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE GeofenceEvent ADD CONSTRAINT FK_GeofenceEvent_Geofence FOREIGN KEY (geofenceId) REFERENCES Geofence(geofenceId) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE GeofenceEvent ADD CONSTRAINT FK_GeofenceEvent_Vehicle FOREIGN KEY (vehicleId) REFERENCES Vehicle(vehicleId) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE Card ADD CONSTRAINT FK_Card_Vehicle FOREIGN KEY (assignedVehicleId) REFERENCES Vehicle(vehicleId) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE ProofOfDelivery ADD CONSTRAINT FK_ProofOfDelivery_Trip FOREIGN KEY (tripId) REFERENCES Trip(tripId) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE TripEventLog ADD CONSTRAINT FK_TripEventLog_Trip FOREIGN KEY (tripId) REFERENCES Trip(tripId) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE TripEventLog ADD CONSTRAINT FK_TripEventLog_Driver FOREIGN KEY (driverId) REFERENCES Driver(driverId) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE AuditLog ADD CONSTRAINT FK_AuditLog_User FOREIGN KEY (userId) REFERENCES "User"(userId) ON DELETE SET NULL ON UPDATE NO ACTION;

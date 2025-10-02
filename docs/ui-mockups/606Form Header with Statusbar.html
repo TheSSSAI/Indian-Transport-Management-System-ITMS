@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Header with Statusbar Component</title>
+    <style>
+        /* CSS Reset & Base */
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; background-color: #F9FAFB; color: #111827; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; }
+        img, svg { display: block; max-width: 100%; }
+
+        /* Design System Tokens */
+        :root {
+            /* Colors */
+            --color-primary-100: #DBEAFE; --color-primary-500: #3B82F6; --color-primary-600: #2563EB; --color-primary-700: #1D4ED8;
+            --color-gray-100: #F3F4F6; --color-gray-300: #D1D5DB; --color-gray-500: #6B7280; --color-gray-700: #374151; --color-gray-900: #111827;
+            --color-white: #FFFFFF;
+            --color-success: #16A34A; --color-success-dark: #15803d;
+            --color-warning: #F59E0B; --color-error: #DC2626; --color-info: #0284C7;
+            --color-success-bg: #ECFDF5; --color-warning-bg: #FFFBEB; --color-error-bg: #FEF2F2; --color-info-bg: #EFF6FF;
+
+            /* Spacing */
+            --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px;
+
+            /* Typography */
+            --font-size-sm: 12px; --font-size-base: 14px;
+            --font-weight-medium: 500; --font-weight-semibold: 600;
+
+            /* Borders */
+            --border-radius-md: 6px; --border-radius-lg: 8px;
+        }
+
+        /* Showcase Layout */
+        .showcase { max-width: 1200px; margin: 0 auto; padding: var(--space-6); }
+        .showcase__header { padding-bottom: var(--space-5); border-bottom: 1px solid var(--color-gray-300); margin-bottom: var(--space-6); }
+        .showcase__header h1 { font-size: 36px; margin: 0 0 var(--space-2) 0; color: var(--color-primary-700); }
+        .component-section { background-color: var(--color-white); border-radius: var(--border-radius-lg); box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: var(--space-6); }
+        .component-section > h2 { font-size: 28px; padding: var(--space-5) var(--space-5) 0; margin: 0; }
+        .component-group { padding: var(--space-5); }
+        .component-group > h3 { font-size: 20px; margin: 0 0 var(--space-2) 0; font-weight: var(--font-weight-semibold); }
+        .component-group > p { font-size: var(--font-size-base); color: var(--color-gray-500); margin: 0 0 var(--space-4) 0; }
+
+        /* == ATOMIC COMPONENT DEPENDENCIES == */
+        
+        /* 1. Action Button */
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: var(--space-2) var(--space-4); font-size: var(--font-size-base); font-weight: var(--font-weight-medium); border-radius: var(--border-radius-md); text-decoration: none; cursor: pointer; border: 1px solid transparent; transition: all 0.2s ease-in-out; min-height: 38px; }
+        .btn svg { width: 16px; height: 16px; }
+        .btn--primary { background-color: var(--color-primary-600); color: var(--color-white); border-color: var(--color-primary-600); }
+        .btn--primary:hover { background-color: var(--color-primary-700); border-color: var(--color-primary-700); }
+        .btn--secondary { background-color: var(--color-white); color: var(--color-gray-700); border-color: var(--color-gray-300); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn--secondary:hover { background-color: var(--color-gray-100); }
+        .btn--state-transition { background-color: var(--color-success); color: var(--color-white); border-color: var(--color-success); }
+        .btn--state-transition:hover { background-color: var(--color-success-dark); border-color: var(--color-success-dark); }
+        .btn:active { transform: scale(0.98); }
+        .btn:focus-visible { outline: 2px solid var(--color-primary-500); outline-offset: 2px; }
+        .btn:disabled { background-color: var(--color-gray-100); color: var(--color-gray-300); border-color: var(--color-gray-300); cursor: not-allowed; transform: none; }
+        
+        /* 2. Status Badge */
+        .badge { display: inline-block; padding: 2px var(--space-2); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); border-radius: var(--border-radius-lg); }
+        .badge--info { background-color: var(--color-info-bg); color: var(--color-info); }
+        .badge--warning { background-color: var(--color-warning-bg); color: var(--color-warning); }
+
+        /* == MOLECULAR COMPONENT: FORM HEADER == */
+
+        .form-header {
+            background-color: var(--color-gray-100);
+            padding: var(--space-3) var(--space-4);
+            border-bottom: 1px solid var(--color-gray-300);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .form-header__actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .form-header__statusbar {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            /* For better scrollbar on some systems */
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .form-header__statusbar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+
+        .statusbar__item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: var(--space-2) var(--space-3) var(--space-2) 20px;
+            margin-right: -10px;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            text-transform: uppercase;
+            white-space: nowrap;
+            border: none;
+            background-color: transparent;
+            color: var(--color-gray-500);
+            cursor: default;
+        }
+
+        .statusbar__item::before,
+        .statusbar__item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 15px;
+            background-color: inherit;
+            transform: skewX(-20deg);
+            border-top: 1px solid var(--color-gray-300);
+            border-bottom: 1px solid var(--color-gray-300);
+            transition: all 0.2s ease;
+        }
+
+        .statusbar__item::before {
+            left: 0;
+            border-left: 1px solid var(--color-gray-300);
+        }
+
+        .statusbar__item::after {
+            right: -8px;
+            border-right: 1px solid var(--color-gray-300);
+            z-index: 1;
+        }
+
+        /* Standard (Read-only) State */
+        .statusbar__item--readonly {
+            background-color: var(--color-gray-100);
+        }
+
+        .statusbar__item--readonly.is-current {
+            background-color: var(--color-gray-300);
+            color: var(--color-gray-900);
+        }
+        
+        .statusbar__item--readonly.is-current::before,
+        .statusbar__item--readonly.is-current::after {
+            border-color: var(--color-gray-500);
+        }
+
+        /* Clickable State */
+        .statusbar__item--clickable {
+            background-color: var(--color-white);
+            cursor: pointer;
+            border-top: 1px solid var(--color-gray-300);
+            border-bottom: 1px solid var(--color-gray-300);
+        }
+
+        .statusbar__item--clickable:hover {
+            background-color: var(--color-gray-100);
+        }
+
+        .statusbar__item--clickable.is-current,
+        .statusbar__item--clickable.is-current:hover {
+            background-color: var(--color-primary-600);
+            color: var(--color-white);
+            z-index: 2;
+        }
+
+        .statusbar__item--clickable.is-current::before,
+        .statusbar__item--clickable.is-current::after {
+            border-color: var(--color-primary-700);
+        }
+        
+        /* Future states */
+         .statusbar__item--future {
+            color: var(--color-gray-300);
+         }
+         .statusbar__item--future.is-current { /* Should not happen, but for safety */
+            color: var(--color-white);
+         }
+
+        /* First item adjustments */
+        .statusbar__item:first-child {
+            padding-left: var(--space-4);
+        }
+        .statusbar__item:first-child::before {
+            display: none;
+        }
+        .statusbar__item:first-child,
+        .statusbar__item--clickable:first-child {
+             border-left: 1px solid var(--color-gray-300);
+             border-top-left-radius: var(--border-radius-md);
+             border-bottom-left-radius: var(--border-radius-md);
+        }
+        .statusbar__item--clickable.is-current:first-child {
+             border-left-color: var(--color-primary-700);
+        }
+
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .form-header__statusbar {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="showcase">
+        <header class="showcase__header">
+            <h1>Form Header with Statusbar</h1>
+            <p>A molecular component combining action buttons and a status workflow indicator, typically used at the top of Odoo form views.</p>
+        </header>
+
+        <section class="component-section">
+            <h2>Demonstration</h2>
+
+            <div class="component-group">
+                <h3>Standard Variant (Read-Only Mode)</h3>
+                <p>Used for displaying the current state of a record when the user is not in edit mode. Statuses are not interactive.</p>
+                <div class="form-header">
+                    <div class="form-header__actions">
+                        <button class="btn btn--primary">Edit</button>
+                        <button class="btn btn--secondary">Create</button>
+                    </div>
+                    <nav class="form-header__statusbar" aria-label="Status workflow">
+                        <div class="statusbar__item statusbar__item--readonly">Draft</div>
+                        <div class="statusbar__item statusbar__item--readonly is-current" aria-current="step">Assigned</div>
+                        <div class="statusbar__item statusbar__item--readonly statusbar__item--future">In-Transit</div>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="component-group">
+                <h3>With Actions Variant (Edit Mode with Clickable Statusbar)</h3>
+                <p>Used when a form is in edit mode. Displays primary save/discard actions and state-changing actions. The statusbar is interactive, showing completed, current, and future states.</p>
+                <div class="form-header">
+                    <div class="form-header__actions">
+                        <button class="btn btn--primary">Save</button>
+                        <button class="btn btn--secondary">Discard</button>
+                        <button class="btn btn--state-transition">Mark as Delivered</button>
+                        <button class="btn btn--secondary">Cancel Trip</button>
+                    </div>
+                    <nav class="form-header__statusbar" aria-label="Status workflow">
+                        <button class="statusbar__item statusbar__item--clickable">Planned</button>
+                        <button class="statusbar__item statusbar__item--clickable">Assigned</button>
+                        <button class="statusbar__item statusbar__item--clickable is-current" aria-current="step">In-Transit</button>
+                        <button class="statusbar__item statusbar__item--clickable statusbar__item--future" disabled>Delivered</button>
+                        <button class="statusbar__item statusbar__item--clickable statusbar__item--future" disabled>Completed</button>
+                    </nav>
+                </div>
+            </div>
+            
+            <div class="component-group">
+                <h3>Example with Badges inside Actions</h3>
+                <p>Demonstrates how atomic components like badges can be nested within action buttons for more complex states.</p>
+                <div class="form-header">
+                    <div class="form-header__actions">
+                        <button class="btn btn--secondary" style="display: flex; align-items: center; gap: 8px;">
+                            <span>Expenses</span>
+                            <span class="badge badge--warning">2 Pending</span>
+                        </button>
+                        <button class="btn btn--secondary" style="display: flex; align-items: center; gap: 8px;">
+                            <span>Documents</span>
+                             <span class="badge badge--info">5</span>
+                        </button>
+                    </div>
+                    <nav class="form-header__statusbar" aria-label="Status workflow">
+                        <button class="statusbar__item statusbar__item--clickable">Planned</button>
+                        <button class="statusbar__item statusbar__item--clickable is-current" aria-current="step">Assigned</button>
+                        <button class="statusbar__item statusbar__item--clickable statusbar__item--future" disabled>In-Transit</button>
+                    </nav>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <div>
+      <h2>Component Variations</h2>
+      <div>
+        <h3>Variant Name: "standard"</h3>
+        <p>A standard form header, typically seen in read-only mode. It features the primary edit/create buttons and a non-interactive statusbar that simply indicates the current state of the record.</p>
+        <!-- Variant HTML -->
+        <div class="form-header">
+            <div class="form-header__actions">
+                <button class="btn btn--primary">Edit</button>
+            </div>
+            <nav class="form-header__statusbar" aria-label="Status workflow">
+                <div class="statusbar__item statusbar__item--readonly is-current" aria-current="step">Active</div>
+                <div class="statusbar__item statusbar__item--readonly statusbar__item--future">Inactive</div>
+            </nav>
+        </div>
+      </div>
+      <div>
+        <h3>Variant Name: "with_actions"</h3>
+        <p>A form header for a record in an active workflow, often in edit mode. It includes multiple contextual action buttons (e.g., Save, Discard, state transitions) and an interactive, clickable statusbar that visualizes the entire process lifecycle.</p>
+        <!-- Variant HTML -->
+        <div class="form-header">
+            <div class="form-header__actions">
+                <button class="btn btn--primary">Save</button>
+                <button class="btn btn--secondary">Discard</button>
+                <button class="btn btn--state-transition">Approve</button>
+            </div>
+            <nav class="form-header__statusbar" aria-label="Status workflow">
+                <button class="statusbar__item statusbar__item--clickable">Submitted</button>
+                <button class="statusbar__item statusbar__item--clickable is-current" aria-current="step">Pending</button>
+                <button class="statusbar__item statusbar__item--clickable statusbar__item--future" disabled>Approved</button>
+            </nav>
+        </div>
+      </div>
+    </div>
+</body>
+</html>

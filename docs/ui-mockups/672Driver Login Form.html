@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organism: Driver Login Form</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Design System Tokens */
+    :root {
+      /* Colors */
+      --color-primary-100: #DBEAFE;
+      --color-primary-500: #3B82F6;
+      --color-primary-600: #2563EB;
+      --color-primary-700: #1D4ED8;
+      --color-white: #FFFFFF;
+      --color-gray-50: #F9FAFB;
+      --color-gray-100: #F3F4F6;
+      --color-gray-300: #D1D5DB;
+      --color-gray-500: #6B7280;
+      --color-gray-700: #374151;
+      --color-gray-900: #111827;
+      --color-error-base: #DC2626;
+      --color-error-light: #FEF2F2;
+      --color-error-dark: #7F1D1D;
+      /* Fonts */
+      --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-size-sm: 14px;
+      --font-size-base: 16px;
+      --font-size-lg: 18px;
+      --font-weight-medium: 500;
+      --font-weight-bold: 700;
+      /* Spacing */
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      /* Borders */
+      --border-radius-md: 6px;
+      --border-radius-lg: 8px;
+      /* Transitions */
+      --transition-fast: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Base & Showcase Styles */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: var(--font-family-primary);
+      background-color: var(--color-gray-100);
+      color: var(--color-gray-900);
+      margin: 0;
+    }
+    .showcase-title { font-size: 24px; text-align: center; margin-bottom: var(--spacing-xl); }
+    .demo-controls {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      background: white;
+      padding: 0.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 0.5rem;
+      z-index: 100;
+    }
+    .demo-btn {
+      font-size: 12px;
+      padding: 4px 8px;
+      border: 1px solid var(--color-gray-300);
+      background: var(--color-white);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+
+    /* DEPENDENCY: Large Action Button (Mobile) */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+      min-height: 48px;
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-bold);
+      text-decoration: none;
+      border: 1px solid transparent;
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      transition: var(--transition-fast);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--color-primary-500);
+      outline-offset: 2px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn[disabled] { cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn--primary {
+      background-color: var(--color-primary-600);
+      color: var(--color-white);
+    }
+    .btn--primary:hover { background-color: var(--color-primary-700); }
+    .btn--primary[disabled] {
+      background-color: var(--color-primary-100);
+      color: var(--color-white);
+    }
+    .btn--loading .btn-text { visibility: hidden; }
+    .btn--loading::after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border: 3px solid;
+      border-color: currentColor currentColor currentColor transparent;
+      border-radius: 50%;
+      animation: btn-spinner 0.6s linear infinite;
+    }
+    @keyframes btn-spinner { to { transform: rotate(360deg); } }
+
+    /* DEPENDENCY: Form Inputs (Mobile) */
+    .form-group { margin-bottom: var(--spacing-md); }
+    .form-label { display: block; font-weight: var(--font-weight-medium); margin-bottom: var(--spacing-sm); }
+    .form-input {
+      width: 100%;
+      padding: 12px var(--spacing-md);
+      font-size: var(--font-size-base);
+      font-family: var(--font-family-primary);
+      border: 1px solid var(--color-gray-300);
+      border-radius: var(--border-radius-md);
+      transition: var(--transition-fast);
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--color-primary-500);
+      box-shadow: 0 0 0 2px var(--color-primary-100);
+    }
+    .form-input::placeholder { color: var(--color-gray-500); }
+    .form-input.error {
+      border-color: var(--color-error-base);
+    }
+    .form-input.error:focus {
+      box-shadow: 0 0 0 2px var(--color-error-light);
+    }
+    .form-input[disabled] { background-color: var(--color-gray-50); cursor: not-allowed; }
+
+
+    /* ORGANISM: Driver Login Form */
+    .login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: var(--spacing-lg);
+      background-color: var(--color-gray-50);
+    }
+
+    .login-form-container {
+      width: 100%;
+      max-width: 400px;
+      background-color: var(--color-white);
+      padding: var(--spacing-xl) var(--spacing-lg);
+      border-radius: var(--border-radius-lg);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    }
+
+    .login-form__header {
+      text-align: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .login-form__logo {
+      display: inline-block;
+      background-color: var(--color-primary-600);
+      color: var(--color-white);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      font-weight: var(--font-weight-bold);
+      font-size: 20px;
+      line-height: 48px;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .login-form__title {
+      font-size: 24px;
+      font-weight: var(--font-weight-bold);
+      color: var(--color-gray-900);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .login-form__subtitle {
+      color: var(--color-gray-500);
+    }
+
+    .login-form__error-summary {
+      display: none; /* Hidden by default */
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      background-color: var(--color-error-light);
+      color: var(--color-error-dark);
+      border: 1px solid var(--color-error-base);
+      border-radius: var(--border-radius-md);
+      font-weight: var(--font-weight-medium);
+      text-align: center;
+    }
+
+    .login-form__footer {
+      margin-top: var(--spacing-lg);
+      text-align: center;
+    }
+
+    .login-form__link {
+      font-size: var(--font-size-sm);
+      color: var(--color-primary-600);
+      font-weight: var(--font-weight-medium);
+      text-decoration: none;
+    }
+    .login-form__link:hover { text-decoration: underline; }
+
+    /* State Management */
+    .login-form-container[data-state="error"] .login-form__error-summary {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="login-screen">
+    <div id="login-form" class="login-form-container" data-state="default">
+      <header class="login-form__header">
+        <div class="login-form__logo" aria-hidden="true">T</div>
+        <h1 class="login-form__title">Driver Portal</h1>
+        <p class="login-form__subtitle">Sign in to your account</p>
+      </header>
+      
+      <div class="login-form__error-summary" role="alert">
+        Invalid username or password.
+      </div>
+      
+      <form onsubmit="event.preventDefault(); setState('submitting');">
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" id="email" class="form-input" placeholder="you@example.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+        </div>
+        
+        <div class="form-group" style="margin-top: var(--spacing-lg);">
+          <button type="submit" id="login-button" class="btn btn--primary">
+            <span class="btn-text">Log In</span>
+          </button>
+        </div>
+      </form>
+      
+      <footer class="login-form__footer">
+        <a href="#" class="login-form__link">Forgot Password?</a>
+      </footer>
+    </div>
+  </main>
+  
+  <div class="demo-controls">
+      <button class="demo-btn" onclick="setState('default')">Default</button>
+      <button class="demo-btn" onclick="setState('submitting')">Submitting</button>
+      <button class="demo-btn" onclick="setState('error')">Error</button>
+  </div>
+
+  <script>
+    function setState(state) {
+      const formContainer = document.getElementById('login-form');
+      const loginButton = document.getElementById('login-button');
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+
+      // Reset all states first
+      formContainer.dataset.state = 'default';
+      loginButton.classList.remove('btn--loading');
+      loginButton.disabled = false;
+      emailInput.disabled = false;
+      passwordInput.disabled = false;
+      emailInput.classList.remove('error');
+
+      // Apply the new state
+      if (state === 'submitting') {
+        loginButton.classList.add('btn--loading');
+        loginButton.disabled = true;
+        emailInput.disabled = true;
+        passwordInput.disabled = true;
+      } else if (state === 'error') {
+        formContainer.dataset.state = 'error';
+        emailInput.classList.add('error');
+      }
+    }
+  </script>
+	
+	<div style="max-width: 400px; margin: 2rem auto; padding: 1rem; background-color: #fff; border-radius: 8px;"> <h2> Component Variations</h2>
+      <div>
+        <h3>Variant Name : default</h3>
+		<!--description--><normal> The standard, interactive state of the form before any user action. Fields are enabled and no error messages are shown.</normal>
+		<!-- vrient 1 html -->
+        
+		
+      </div>
+	 </div>
+	
+	</body>
+</html>

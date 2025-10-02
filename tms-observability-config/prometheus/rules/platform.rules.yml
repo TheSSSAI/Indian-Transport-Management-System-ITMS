@@ -1,0 +1,72 @@
+# prometheus/rules/platform.rules.yml
+# Alerting rules for the underlying Kubernetes platform and infrastructure components.
+
+groups:
+  - name: tms-kubernetes-platform
+    rules:
+      - alert: KubePodCrashLooping
+        expr: >
+          rate(kube_pod_container_status_restarts_total{namespace=~"tms-prod|tms-staging"}[15m]) * 60 * 5 > 0
+        for: 10m
+        labels:
+          severity: critical
+          tier: platform
+        annotations:
+          summary: "Pod is crash-looping: {{ $labels.pod }} in namespace {{ $labels.namespace }}"
+          description: "The container {{ $labels.container }} in pod {{ $labels.pod }} has been restarting frequently over the last 15 minutes."
+          runbook_url: "https://your-runbook-wiki.com/kube-pod-crashlooping"
+
+      - alert: HighCpuUsage
+        expr: >
+          sum(rate(container_cpu_usage_seconds_total{namespace=~"tms-prod|tms-staging", container!=""}[5m])) by (pod, namespace)
+          /
+          sum(kube_pod_container_resource_limits{resource="cpu", unit="core", namespace=~"tms-prod|tms-staging"}) by (pod, namespace)
+          * 100 > 90
+        for: 10m
+        labels:
+          severity: warning
+          tier: platform
+        annotations:
+          summary: "High CPU usage on pod {{ $labels.pod }}"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has been using over 90% of its CPU limit for the last 10 minutes."
+          runbook_url: "https://your-runbook-wiki.com/kube-high-cpu"
+
+      - alert: HighMemoryUsage
+        expr: >
+          sum(container_memory_working_set_bytes{namespace=~"tms-prod|tms-staging", container!=""}) by (pod, namespace)
+          /
+          sum(kube_pod_container_resource_limits{resource="memory", unit="byte", namespace=~"tms-prod|tms-staging"}) by (pod, namespace)
+          * 100 > 90
+        for: 10m
+        labels:
+          severity: warning
+          tier: platform
+        annotations:
+          summary: "High Memory usage on pod {{ $labels.pod }}"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has been using over 90% of its memory limit for the last 10 minutes."
+          runbook_url: "https://your-runbook-wiki.com/kube-high-memory"
+
+      - alert: KubeDeploymentReplicasMismatch
+        expr: >
+          kube_deployment_spec_replicas{namespace=~"tms-prod|tms-staging"} != kube_deployment_status_replicas_available{namespace=~"tms-prod|tms-staging"}
+        for: 10m
+        labels:
+          severity: critical
+          tier: platform
+        annotations:
+          summary: "Deployment replicas mismatch for {{ $labels.deployment }}"
+          description: "Deployment {{ $labels.deployment }} in namespace {{ $labels.namespace }} has {{ $value }} desired replicas, but fewer are available. This could indicate a scaling or pod scheduling issue."
+          runbook_url: "https://your-runbook-wiki.com/kube-replicas-mismatch"
+
+      - alert: RabbitMqQueueFull
+        # Assumes a RabbitMQ exporter is scraped, providing queue-level metrics.
+        expr: >
+          rabbitmq_queue_messages_ready{queue=~"q.tms.*"} > 1000
+        for: 5m
+        labels:
+          severity: warning
+          tier: platform
+        annotations:
+          summary: "RabbitMQ queue {{ $labels.queue }} is filling up."
+          description: "The queue {{ $labels.queue }} has over 1000 ready messages. Consumers may be slow or down."
+          runbook_url: "https://your-runbook-wiki.com/rabbitmq-queue-full"

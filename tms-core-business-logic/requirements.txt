@@ -1,0 +1,17 @@
+.txt
+# This file lists the Python dependencies required for the production application.
+# It should be kept in sync with the dependencies declared in the __manifest__.py
+# and any libraries used for external integrations.
+
+# Core Odoo Framework
+odoo==18.0
+
+# PostgreSQL driver
+psycopg2-binary
+
+# AWS SDK for Python (for S3 and Secrets Manager integration)
+boto3
+
+# Other Odoo dependencies
+# These are often included with Odoo, but pinning them can ensure stability.
+# Add libraries like 'num2words', 'phonenumbers', etc., if your custom logic requires them.

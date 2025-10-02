@@ -1,0 +1,93 @@
+# prometheus/rules/application.rules.yml
+# Alerting rules for application-specific SLOs and critical events.
+# These rules monitor the health and performance of the Odoo monolith and the GPS microservice.
+# REQ-1-602
+
+groups:
+  - name: tms-api-availability
+    rules:
+      - alert: HighApiErrorRate
+        expr: >
+          (
+            sum(rate(http_requests_total{status_code=~"5..", app=~"tms-odoo|tms-gps-microservice"}[5m]))
+            /
+            sum(rate(http_requests_total{app=~"tms-odoo|tms-gps-microservice"}[5m]))
+          ) * 100 > 5
+        for: 5m
+        labels:
+          severity: critical
+          tier: application
+        annotations:
+          summary: "High API error rate detected for {{ $labels.app }}"
+          description: "The error rate for {{ $labels.app }} is {{ $value | printf \"%.2f\" }}% over the last 5 minutes, which exceeds the 5% threshold."
+          runbook_url: "https://your-runbook-wiki.com/tms-high-error-rate"
+
+      - alert: NoApiResponse
+        expr: >
+          absent(up{app=~"tms-odoo|tms-gps-microservice"}) == 1
+        for: 2m
+        labels:
+          severity: critical
+          tier: application
+        annotations:
+          summary: "Application instance is down"
+          description: "No target could be scraped for app {{ $labels.app }}. The application may be down or has been removed from service discovery."
+          runbook_url: "https://your-runbook-wiki.com/tms-app-down"
+
+  - name: tms-api-latency
+    rules:
+      - alert: HighApiLatency
+        # REQ-1-500: 95% of API GET requests must be < 200ms
+        expr: >
+          histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{app=~"tms-odoo|tms-gps-microservice", method="GET"}[5m])) by (le, app)) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+          tier: application
+        annotations:
+          summary: "High P95 API latency detected for {{ $labels.app }}"
+          description: "The 95th percentile latency for GET requests on {{ $labels.app }} is {{ $value | printf \"%.2f\" }}s over the last 5 minutes, exceeding the 200ms threshold."
+          runbook_url: "https://your-runbook-wiki.com/tms-high-latency"
+          
+  - name: tms-business-logic
+    rules:
+      - alert: GpsDataIngestionStalled
+        # This rule assumes the GPS microservice exposes a metric tracking the timestamp of the last successful data ingestion.
+        expr: >
+          time() - tms_gps_last_ingestion_timestamp_seconds > 300
+        for: 5m
+        labels:
+          severity: critical
+          tier: application
+        annotations:
+          summary: "GPS data ingestion is stalled"
+          description: "The GPS ingestion microservice has not successfully processed any data from the third-party provider in over 5 minutes. Real-time vehicle tracking is impacted."
+          runbook_url: "https://your-runbook-wiki.com/tms-gps-ingestion-stalled"
+          
+      - alert: EInvoiceGenerationFailures
+        # This rule assumes the Odoo app exposes a counter for failed e-invoice generation attempts.
+        # REQ-1-302, REQ-1-006
+        expr: >
+          increase(tms_einvoice_generation_failures_total[15m]) > 5
+        for: 0m # Fire immediately
+        labels:
+          severity: warning
+          tier: application
+        annotations:
+          summary: "Multiple e-invoice generation failures detected"
+          description: "There have been more than 5 failed attempts to generate e-invoices in the last 15 minutes. This could impact billing and compliance."
+          runbook_url: "https://your-runbook-wiki.com/tms-einvoice-failures"
+
+      - alert: GpsDlqNotEmpty
+        # REQ-1-301: Alert on messages in the Dead-Letter Queue for GPS data.
+        # This assumes a RabbitMQ exporter is scraped, providing queue-level metrics.
+        expr: >
+          rabbitmq_queue_messages{queue="q.tms.location_updates.dlq"} > 0
+        for: 1m
+        labels:
+            severity: critical
+            tier: application
+        annotations:
+            summary: "Poison-pill message detected in GPS Dead-Letter Queue"
+            description: "There is at least one message in the GPS data DLQ. This indicates a malformed or un-processable message that is blocking data ingestion for a vehicle. Manual intervention is required."
+            runbook_url: "https://your-runbook-wiki.com/tms-gps-dlq"

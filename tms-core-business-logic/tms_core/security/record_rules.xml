@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!--
+        =====================================================
+        Record Rules for TMS
+        =====================================================
+        These rules enforce row-level security, ensuring users only see
+        the data they are authorized to access.
+        -->
+
+        <!--
+        Rule: Driver can only see their own assigned trips.
+        This is a critical security rule to enforce data segregation for drivers.
+        Fulfills REQ-1-100 and Critical Finding #3.
+        -->
+        <record id="rule_tms_trip_driver_self_only" model="ir.rule">
+            <field name="name">TMS Trip: Driver can only see own trips</field>
+            <field name="model_id" ref="model_tms_trip"/>
+            <field name="groups" eval="[(4, ref('tms_core.group_tms_driver'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">[('driver_id.user_id', '=', user.id)]</field>
+        </record>
+
+        <!--
+        Rule: Driver can only manage their own expenses.
+        Ensures a driver cannot see or modify expenses submitted by another driver.
+        -->
+        <record id="rule_tms_expense_driver_self_only" model="ir.rule">
+            <field name="name">TMS Expense: Driver can only see own expenses</field>
+            <field name="model_id" ref="model_tms_expense"/>
+            <field name="groups" eval="[(4, ref('tms_core.group_tms_driver'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="False"/>
+            <field name="domain_force">[('driver_id.user_id', '=', user.id)]</field>
+        </record>
+
+        <!--
+        Rule: Driver can only see their own trip events.
+        -->
+        <record id="rule_tms_trip_event_driver_self_only" model="ir.rule">
+            <field name="name">TMS Trip Event: Driver can only see own trip events</field>
+            <field name="model_id" ref="model_tms_trip_event"/>
+            <field name="groups" eval="[(4, ref('tms_core.group_tms_driver'))]"/>
+            <field name="domain_force">[('driver_id.user_id', '=', user.id)]</field>
+        </record>
+        
+        <!--
+        Rule: Driver can only see their own PODs.
+        -->
+        <record id="rule_tms_pod_driver_self_only" model="ir.rule">
+            <field name="name">TMS POD: Driver can only see own PODs</field>
+            <field name="model_id" ref="model_tms_pod"/>
+            <field name="groups" eval="[(4, ref('tms_core.group_tms_driver'))]"/>
+            <field name="domain_force">[('trip_id.driver_id.user_id', '=', user.id)]</field>
+        </record>
+
+        <!--
+        Rule: Driver can only see their own employee record.
+        This rule leverages the fact that `hr.employee` has a user_id field.
+        -->
+        <record id="rule_hr_employee_driver_self_only" model="ir.rule">
+            <field name="name">HR Employee: Driver can only see own record</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="groups" eval="[(4, ref('tms_core.group_tms_driver'))]"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+        </record>
+        
+        <!--
+        Multi-Company Rules for Managerial Roles
+        Ensures that managers and finance officers can only see records
+        belonging to their allowed companies. This is a best practice for
+        enterprise-grade Odoo modules.
+        -->
+        <record id="rule_tms_trip_multi_company" model="ir.rule">
+            <field name="name">TMS Trip Multi-Company</field>
+            <field name="model_id" ref="model_tms_trip"/>
+            <field name="groups" eval="[(6, 0, [ref('tms_core.group_tms_dispatch_manager'), ref('tms_core.group_tms_finance_officer')])]"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_tms_vehicle_multi_company" model="ir.rule">
+            <field name="name">TMS Vehicle Multi-Company</field>
+            <field name="model_id" ref="model_tms_vehicle"/>
+            <field name="groups" eval="[(6, 0, [ref('tms_core.group_tms_dispatch_manager'), ref('tms_core.group_tms_finance_officer')])]"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+        <record id="rule_tms_expense_multi_company" model="ir.rule">
+            <field name="name">TMS Expense Multi-Company</field>
+            <field name="model_id" ref="model_tms_expense"/>
+            <field name="groups" eval="[(6, 0, [ref('tms_core.group_tms_dispatch_manager'), ref('tms_core.group_tms_finance_officer')])]"/>
+            <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        </record>
+
+    </data>
+</odoo>

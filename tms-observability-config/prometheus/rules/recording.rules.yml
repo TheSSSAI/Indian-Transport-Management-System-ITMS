@@ -1,0 +1,46 @@
+# prometheus/rules/recording.rules.yml
+# Recording rules to pre-calculate expensive or complex PromQL queries.
+# This improves the performance of dashboards and alerting rules that use these metrics.
+
+groups:
+  - name: tms-http-recording-rules
+    interval: 1m
+    rules:
+      - record: app:http_requests:rate5m
+        expr: >
+          sum by (app, namespace, method, status_code) (
+            rate(http_requests_total[5m])
+          )
+        labels:
+          team: tms
+
+      - record: app:http_requests_errors:rate5m
+        expr: >
+          sum by (app, namespace) (
+            rate(http_requests_total{status_code=~"5.."}[5m])
+          )
+        labels:
+          team: tms
+
+      - record: app:http_requests_latency_p95:5m
+        expr: >
+          histogram_quantile(0.95, sum by (app, namespace, le) (
+            rate(http_request_duration_seconds_bucket[5m])
+          ))
+        labels:
+          team: tms
+
+  - name: tms-platform-recording-rules
+    interval: 1m
+    rules:
+      - record: namespace:pod_cpu_usage:rate5m
+        expr: >
+          sum by (namespace, pod) (
+            rate(container_cpu_usage_seconds_total{container!=""}[5m])
+          )
+
+      - record: namespace:pod_memory_usage_bytes
+        expr: >
+          sum by (namespace, pod) (
+            container_memory_working_set_bytes{container!=""}
+          )

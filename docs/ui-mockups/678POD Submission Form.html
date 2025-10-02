@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Organism: POD Submission Form</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Design System Tokens */
+    :root {
+      --color-primary-100: #DBEAFE;
+      --color-primary-500: #3B82F6;
+      --color-primary-600: #2563EB;
+      --color-primary-700: #1D4ED8;
+      --color-white: #FFFFFF;
+      --color-gray-50: #F9FAFB;
+      --color-gray-100: #F3F4F6;
+      --color-gray-300: #D1D5DB;
+      --color-gray-500: #6B7280;
+      --color-gray-700: #374151;
+      --color-gray-900: #111827;
+      --color-error-base: #DC2626;
+      --color-error-light: #FEF2F2;
+      --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-size-sm: 14px;
+      --font-size-base: 16px;
+      --font-size-lg: 18px;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      --font-weight-bold: 700;
+      --spacing-xs: 4px;
+      --spacing-sm: 8px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      --spacing-2xl: 48px;
+      --border-radius-md: 6px;
+      --border-radius-lg: 8px;
+      --transition-fast: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+
+    /* Base & Showcase Styles */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: var(--font-family-primary);
+      background-color: var(--color-gray-100);
+      color: var(--color-gray-900);
+      margin: 0;
+      padding: var(--spacing-lg);
+    }
+    .mobile-showcase {
+      max-width: 420px;
+      min-width: 360px;
+      margin: 0 auto;
+      background-color: var(--color-white);
+      border-radius: var(--border-radius-lg);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+
+    /* DEPENDENCY: Mobile Header Bar */
+    .mobile-header {
+      display: flex;
+      align-items: center;
+      height: 60px;
+      padding: 0 var(--spacing-md);
+      background-color: var(--color-white);
+      border-bottom: 1px solid var(--color-gray-300);
+    }
+    .mobile-header__left, .mobile-header__right { flex: 0 0 44px; display: flex; align-items: center; }
+    .mobile-header__left { justify-content: flex-start; }
+    .mobile-header__right { justify-content: flex-end; }
+    .mobile-header__title {
+      flex: 1 1 auto;
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin: 0 var(--spacing-sm);
+    }
+
+    /* DEPENDENCY: Large Action Button */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; position: relative;
+      width: 100%; min-height: 48px; padding: var(--spacing-sm) var(--spacing-md);
+      font-size: var(--font-size-base); font-weight: var(--font-weight-bold);
+      text-decoration: none; border: 1px solid transparent; border-radius: var(--border-radius-md);
+      cursor: pointer; transition: var(--transition-fast);
+    }
+    .btn:focus-visible { outline: 2px solid var(--color-primary-500); outline-offset: 2px; }
+    .btn:active { transform: scale(0.98); }
+    .btn[disabled] { cursor: not-allowed; transform: none; }
+    .btn--primary { background-color: var(--color-primary-600); color: var(--color-white); }
+    .btn--primary:hover { background-color: var(--color-primary-700); }
+    .btn--primary[disabled] { background-color: var(--color-primary-100); color: var(--color-white); }
+    .btn--secondary { background-color: var(--color-white); color: var(--color-gray-700); border-color: var(--color-gray-300); }
+    .btn--secondary:hover { background-color: var(--color-gray-50); }
+    .btn--loading .btn-text { visibility: hidden; }
+    .btn--loading::after { content: ''; position: absolute; width: 24px; height: 24px; border: 3px solid; border-color: currentColor currentColor currentColor transparent; border-radius: 50%; animation: btn-spinner 0.6s linear infinite; }
+    @keyframes btn-spinner { to { transform: rotate(360deg); } }
+
+    /* DEPENDENCY: Form Input */
+    .form-group { margin-bottom: var(--spacing-lg); }
+    .form-label { display: block; font-weight: var(--font-weight-medium); margin-bottom: var(--spacing-sm); }
+    .form-input {
+      width: 100%; padding: 12px var(--spacing-md); font-size: var(--font-size-base);
+      border: 1px solid var(--color-gray-300); border-radius: var(--border-radius-md); transition: var(--transition-fast);
+    }
+    .form-input:focus { outline: none; border-color: var(--color-primary-500); box-shadow: 0 0 0 2px var(--color-primary-100); }
+    .form-input.error { border-color: var(--color-error-base); }
+    .form-input.error:focus { box-shadow: 0 0 0 2px var(--color-error-light); }
+    .form-error-message { color: var(--color-error-base); font-size: var(--font-size-sm); margin-top: var(--spacing-xs); display: none; }
+    .form-input.error + .form-error-message { display: block; }
+
+    /* DEPENDENCY: File Uploader */
+    .file-uploader { position: relative; width: 100%; border-radius: var(--border-radius-lg); }
+    .file-uploader__input { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border-width: 0; }
+    .file-uploader__dropzone { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--spacing-xl) var(--spacing-lg); border: 2px dashed var(--color-gray-300); border-radius: var(--border-radius-lg); cursor: pointer; }
+    .file-uploader__icon { width: 48px; height: 48px; color: var(--color-primary-600); margin-bottom: var(--spacing-md); }
+    .file-uploader__text { font-weight: var(--font-weight-semibold); color: var(--color-primary-600); }
+    .file-uploader__hint { font-size: var(--font-size-sm); color: var(--color-gray-500); margin-top: var(--spacing-xs); }
+    .file-uploader__dropzone:hover {  border-color: var(--color-primary-500);  background-color: var(--color-primary-100); }
+    .file-uploader__input:focus-visible + .file-uploader__dropzone {  outline: 2px solid var(--color-primary-500);  outline-offset: 2px;  border-color: var(--color-primary-500); }
+
+
+    /* DEPENDENCY: Signature Pad */
+    .signature-pad-wrapper { position: relative; display: flex; flex-direction: column; }
+    .signature-pad { position: relative; border: 1px solid var(--color-gray-300); border-radius: var(--border-radius-lg); background-color: var(--color-gray-50); touch-action: none; aspect-ratio: 2 / 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .signature-pad:focus-within { border-color: var(--color-primary-500); box-shadow: 0 0 0 2px var(--color-primary-100); }
+    .signature-pad__canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; }
+    .signature-pad__placeholder { color: var(--color-gray-500); font-size: var(--font-size-base); pointer-events: none; user-select: none; transition: opacity 150ms ease-in-out; }
+    .signature-pad__actions { position: absolute; top: var(--spacing-sm); right: var(--spacing-sm); display: flex; gap: var(--spacing-sm); opacity: 0; visibility: hidden; transition: opacity 150ms ease-in-out; }
+    .signature-pad--signed .signature-pad__actions { opacity: 1; visibility: visible; }
+    .signature-pad--signed .signature-pad__placeholder, .signature-pad--drawing .signature-pad__placeholder { opacity: 0; }
+    .signature-pad__actions .btn {  width: auto; min-height: 36px; padding: var(--spacing-xs) var(--spacing-sm); font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); }
+
+
+    /* ORGANISM: POD Submission Form */
+    .pod-form { padding: var(--spacing-lg); }
+    .pod-form[data-submitting=\"true\"] fieldset {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+    .pod-form__group { margin-bottom: var(--spacing-lg); }
+    .pod-form__choice-group { margin-bottom: var(--spacing-lg); }
+    .pod-form__choice-legend { font-weight: var(--font-weight-medium); margin-bottom: var(--spacing-sm); padding: 0; border: 0; }
+    .pod-form__choice-control { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--color-gray-300); border-radius: var(--border-radius-md); overflow: hidden; }
+    .pod-form__choice-control input[type=\"radio\"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .pod-form__choice-label {
+      text-align: center; padding: 12px; font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold); color: var(--color-gray-700);
+      background-color: var(--color-white); cursor: pointer; transition: var(--transition-fast);
+    }
+    .pod-form__choice-label:not(:last-child) { border-right: 1px solid var(--color-gray-300); }
+    .pod-form__choice-control input[type=\"radio\"]:checked + label {
+      background-color: var(--color-primary-600); color: var(--color-white);
+    }
+    .pod-form__choice-control input[type=\"radio\"]:focus-visible + label {
+      outline: 2px solid var(--color-primary-500); outline-offset: -2px;
+    }
+    .pod-form__method-container .pod-form__method { display: none; }
+    .pod-form[data-method=\"photo\"] .pod-form__method--photo { display: block; }
+    .pod-form[data-method=\"signature\"] .pod-form__method--signature { display: block; }
+    .pod-form__footer { margin-top: var(--spacing-xl); }
+  </style>
+</head>
+<body>
+
+<div class="mobile-showcase">
+  <header class="mobile-header">
+    <div class="mobile-header__left">
+      <!-- Back button would typically be here -->
+    </div>
+    <h1 class="mobile-header__title">Submit Proof of Delivery</h1>
+    <div class="mobile-header__right"></div>
+  </header>
+
+  <form id="main-pod-form" class="pod-form" data-method="photo" data-submitting="false" onsubmit="return false;">
+    <fieldset>
+        <div class="pod-form__group">
+            <label for="recipient-name" class="form-label">Recipient's Name *</label>
+            <input type="text" id="recipient-name" class="form-input" placeholder="Enter full name" required>
+            <p class="form-error-message">Recipient name is required.</p>
+        </div>
+
+        <div class="pod-form__choice-group">
+            <legend class="pod-form__choice-legend">Proof of Delivery Method *</legend>
+            <div class="pod-form__choice-control">
+                <input type="radio" id="method-photo" name="pod-method" value="photo" checked>
+                <label for="method-photo" class="pod-form__choice-label">Photo</label>
+
+                <input type="radio" id="method-signature" name="pod-method" value="signature">
+                <label for="method-signature" class="pod-form__choice-label">E-Signature</label>
+            </div>
+        </div>
+        
+        <div class="pod-form__method-container">
+            <div class="pod-form__method pod-form__method--photo">
+                <div id="photo-uploader" class="file-uploader" data-state="empty" role="group" aria-label="Upload a receipt photo">
+                    <input type="file" id="photo-input" class="file-uploader__input" accept="image/*" capture="environment">
+                    <label for="photo-input" class="file-uploader__dropzone" tabindex="0">
+                        <svg class="file-uploader__icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.776 48.776 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"></path>
+                        </svg>
+                        <span class="file-uploader__text">Take or Upload Photo</span>
+                        <span class="file-uploader__hint">JPG, PNG up to 5MB</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="pod-form__method pod-form__method--signature">
+                <div class="signature-pad-wrapper">
+                    <div class="signature-pad" data-state="empty">
+                        <span class="signature-pad__placeholder">Sign Here</span>
+                        <canvas id="signature-canvas" class="signature-pad__canvas"></canvas>
+                        <div class="signature-pad__actions">
+                            <button type="button" class="btn btn--secondary" id="clear-signature">Clear</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="pod-form__footer">
+        <button type="submit" id="submit-btn" class="btn btn--primary">
+            <span class="btn-text">Mark as Delivered</span>
+        </button>
+    </div>
+  </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const podForm = document.getElementById('main-pod-form');
+        const radioButtons = podForm.querySelectorAll('input[name="pod-method"]');
+        
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                podForm.dataset.method = event.target.value;
+            });
+        });
+
+        // Demo of submitting state
+        const submitBtn = document.getElementById('submit-btn');
+        const recipientInput = document.getElementById('recipient-name');
+        
+        submitBtn.addEventListener('click', () => {
+            // Basic validation demo
+            if (!recipientInput.value) {
+                recipientInput.classList.add('error');
+                return;
+            }
+            recipientInput.classList.remove('error');
+
+            podForm.dataset.submitting = 'true';
+            submitBtn.classList.add('btn--loading');
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                podForm.dataset.submitting = 'false';
+                submitBtn.classList.remove('btn--loading');
+                submitBtn.disabled = false;
+                alert('POD Submitted Successfully (Demo)');
+            }, 2000);
+        });
+
+        // Signature Pad Logic (simplified for demo)
+        const signaturePadElement = document.querySelector('.signature-pad-wrapper');
+        const canvas = signaturePadElement.querySelector('#signature-canvas');
+        const signaturePadContainer = signaturePadElement.querySelector('.signature-pad');
+        const clearButton = signaturePadElement.querySelector('#clear-signature');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let hasSigned = false;
+
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * ratio;
+            canvas.height = rect.height * ratio;
+            ctx.scale(ratio, ratio);
+            ctx.strokeStyle = '#111827';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function getEventPosition(event) {
+            const rect = canvas.getBoundingClientRect();
+            const touch = event.touches ? event.touches[0] : event;
+            return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+        }
+
+        function startDrawing(e) { e.preventDefault(); isDrawing = true; signaturePadContainer.classList.add('signature-pad--drawing'); [ctx.lastX, ctx.lastY] = [getEventPosition(e).x, getEventPosition(e).y]; }
+        function draw(e) { if (!isDrawing) return; e.preventDefault(); const { x, y } = getEventPosition(e); ctx.beginPath(); ctx.moveTo(ctx.lastX, ctx.lastY); ctx.lineTo(x, y); ctx.stroke(); [ctx.lastX, ctx.lastY] = [x, y]; hasSigned = true; }
+        function stopDrawing() { if (!isDrawing) return; isDrawing = false; signaturePadContainer.classList.remove('signature-pad--drawing'); if (hasSigned) { signaturePadContainer.classList.add('signature-pad--signed'); } }
+        function clearSignature() { ctx.clearRect(0, 0, canvas.width, canvas.height); hasSigned = false; signaturePadContainer.classList.remove('signature-pad--signed'); }
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseleave', stopDrawing);
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
+        clearButton.addEventListener('click', clearSignature);
+    });
+</script>
+	
+	<div> <h2> Component Variations</h2>
+      <div>
+        <h3>Variant Name : photo_upload</h3>
+		<!--description-->
+<normal> The default variant where the user is prompted to take or upload a photo of the proof of delivery. This uses the 'File Uploader (Mobile)' component.</normal>
+		<!-- vrient 1 html -->
+        <!-- This is shown by default in the mockup above when the 'Photo' option is selected. -->     
+		
+      </div>
+	 </div>
+      <div>
+        <h3>Variant Name : e_signature</h3>
+		<!--description-->
+<normal> The variant where the user can capture an electronic signature from the recipient directly on the device screen. This uses the 'Signature Pad' component.</normal>
+		<!-- vrient 1 html -->
+        <!-- This is shown in the mockup above when the 'E-Signature' option is selected. -->     
+		
+      </div>
+	 </div>    
+	
+	</body>
+</html>

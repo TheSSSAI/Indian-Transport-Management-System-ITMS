@@ -1,0 +1,30 @@
+[flake8]
+# Odoo's default is 79, but modern practice allows for longer lines.
+# 119 is compatible with Black's default line length.
+max-line-length = 119
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    env,
+    build,
+    dist,
+    *.egg-info,
+    # Exclude Odoo's third-party libraries if they are vendored
+    # Example: */lib/*
+ignore =
+    # E501: Line too long (handled by black)
+    E501,
+    # W503: Line break before binary operator (black conflicts with this)
+    W503,
+    # F401: Module imported but unused (Odoo's __init__.py files often do this)
+    F401,
+    # F811: Redefinition of unused name (can happen with Odoo's monkey patching)
+    F811,
+    # E712: a is True -> a (Odoo ORM search domains use 'field = True')
+    E712,
+    # E701: multiple statements on one line (colon)
+    E701
+# You can add more specific ignores here if needed, for example for Odoo API decorators
+# that flake8 might not understand.

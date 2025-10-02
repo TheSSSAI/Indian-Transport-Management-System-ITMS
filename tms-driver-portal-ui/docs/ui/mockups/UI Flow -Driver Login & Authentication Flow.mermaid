@@ -1,0 +1,49 @@
+sequenceDiagram
+    actor Driver
+    participant Driver Portal UI
+    participant TMS Core (Odoo Backend)
+
+    Driver->>Driver Portal UI: 1. Enters credentials and taps 'Log In'
+    activate Driver Portal UI
+
+    alt Empty Credentials
+        Driver Portal UI->>Driver Portal UI: 2a. Client-side validation fails
+        Driver Portal UI-->>Driver: 3a. Display 'This field is required'
+    else Valid Credentials
+        Driver Portal UI->>TMS Core (Odoo Backend): 2b. POST /web/session/authenticate (credentials)
+        activate TMS Core (Odoo Backend)
+
+        TMS Core (Odoo Backend)->>TMS Core (Odoo Backend): 3b. Find user by login (email)
+        
+        alt User Not Found OR Invalid Password
+            TMS Core (Odoo Backend)-->>Driver Portal UI: 4a. Authentication Failed Response
+            deactivate TMS Core (Odoo Backend)
+            Driver Portal UI-->>Driver: 5a. Display generic error: 'Invalid username or password'
+        
+        else User Found
+            TMS Core (Odoo Backend)->>TMS Core (Odoo Backend): 4b. Check if user is active and has 'Driver' role
+            
+            alt User Inactive
+                TMS Core (Odoo Backend)-->>Driver Portal UI: 5b. Inactive User Response
+                deactivate TMS Core (Odoo Backend)
+                Driver Portal UI-->>Driver: 6b. Display specific error: 'Your account is inactive.'
+            
+            else User Active & Is Driver
+                TMS Core (Odoo Backend)->>TMS Core (Odoo Backend): 5c. Validate password
+                
+                alt Password Valid (Success)
+                    TMS Core (Odoo Backend)->>TMS Core (Odoo Backend): 6c. Create new session
+                    TMS Core (Odoo Backend)-->>Driver Portal UI: 7c. 200 OK with session data and 'Set-Cookie' header
+                    deactivate TMS Core (Odoo Backend)
+                    Driver Portal UI->>Driver Portal UI: 8c. Store session info, redirect to Driver Dashboard
+                    Driver Portal UI-->>Driver: 9c. Show Driver Dashboard
+                
+                else Password Invalid
+                    TMS Core (Odoo Backend)-->>Driver Portal UI: 6d. Authentication Failed Response
+                    deactivate TMS Core (Odoo Backend)
+                    Driver Portal UI-->>Driver: 7d. Display generic error: 'Invalid username or password'
+                end
+            end
+        end
+    end
+    deactivate Driver Portal UI

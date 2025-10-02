@@ -1,0 +1,37 @@
+flowchart TD
+    subgraph User Action
+        A[User enters credentials & taps 'Log In' on Driver Portal]
+    end
+
+    subgraph Frontend Check
+        B{Network Connection?}
+    end
+
+    subgraph Backend Process
+        D[API Call: POST /web/session/authenticate]
+        E{Backend Validation}
+        F{Credentials Match?}
+        G{Account Active?}
+    end
+
+    subgraph User Feedback
+        direction LR
+        C["Show 'Network error. Please check connection.'"]
+        H["Show 'Invalid username or password.'"]
+        I["Show 'Your account is inactive. Please contact your manager.'"]
+        J([Success: Redirect to Dashboard])
+    end
+
+    A --> B
+    B -- No --> C
+    B -- Yes --> D
+    D --> E
+    E --> F
+    F -- No --> H
+    F -- Yes --> G
+    G -- No --> I
+    G -- Yes --> J
+
+    %% Styling
+    classDef errorNode fill:#fef2f2,stroke:#dc2626,color:#b91c1c
+    class C,H,I errorNode

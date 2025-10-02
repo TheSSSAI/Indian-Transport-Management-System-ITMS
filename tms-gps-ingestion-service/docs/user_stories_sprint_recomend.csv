@@ -1,0 +1,4 @@
+"sprint_number","story_ids","total_points","sprint_goal","dependencies_resolved"
+"1","[""US-070"",""US-001"",""US-004"",""US-015"",""US-011"",""US-006""]","18","Establish the core system foundation, including all master data models (Customer, Driver, Vehicle) and the complete Role-Based Access Control (RBAC) framework.","true"
+"2","[""US-026"",""US-027"",""US-046"",""US-047"",""US-049"",""US-052"",""US-053""]","25","Implement the complete end-to-end trip lifecycle and build the Driver Portal MVP, enabling trip creation, assignment, and execution from start to delivery.","true"
+"3","[""US-032"",""US-033"",""US-037"",""US-029"",""US-064"",""US-089""]","53","Focus on high-complexity features: deliver the core financial workflow with GST E-Invoicing, implement the live GPS map view, build the manager's dashboard, and complete the data migration scripts. This sprint is oversized and should be split.",""

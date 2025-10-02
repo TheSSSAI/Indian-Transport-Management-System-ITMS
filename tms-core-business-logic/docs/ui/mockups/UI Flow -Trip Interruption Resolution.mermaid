@@ -1,0 +1,34 @@
+sequenceDiagram
+    participant DM as "Dispatch Manager"
+    participant UI as "Odoo UI (Trip Form)"
+    participant Server as "Odoo Server (TMS Logic)"
+    participant DB as "PostgreSQL Database"
+
+    note over DM, UI: Precondition: Trip is in 'On Hold' state.
+
+    DM->>UI: 1. Clicks 'Resume Trip' button.
+    UI->>UI: 2. Renders wizard for 'Resolution Comment'.
+    DM->>UI: 3. Enters comment & clicks 'Confirm'.
+
+    activate Server
+    UI->>Server: 4. RPC call: action_resume_trip(trip_id, comment)
+
+    Server->>Server: 5. [Security] Verify user has 'Dispatch Manager' role.
+    Server->>Server: 6. [Validation] Verify 'comment' is not empty.
+
+    alt Validation Failure
+        Server-->>UI: Raise ValidationError('A reason is mandatory.')
+        UI->>DM: Display validation error on wizard.
+    else Happy Path
+        activate DB
+        Server->>DB: 7. BEGIN TRANSACTION
+        Server->>DB: 8. UPDATE tms_trip SET state = 'in_transit' WHERE id = ...
+        Server->>DB: 9. INSERT into mail_message (to log comment in chatter)
+        Server->>DB: 10. COMMIT TRANSACTION
+        deactivate DB
+        note right of Server: The state change and audit log<br/>are an atomic operation.
+        Server-->>UI: 11. Return success action (refresh view).
+        UI->>UI: 12. Close wizard and reload form data.
+        UI->>DM: 13. Displays updated 'In-Transit' status & new log entry.
+    end
+    deactivate Server

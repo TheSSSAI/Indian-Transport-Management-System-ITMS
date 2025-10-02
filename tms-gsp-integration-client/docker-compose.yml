@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tms_gsp_db
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+  mq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: tms_gsp_mq
+    environment:
+      - RABBITMQ_DEFAULT_USER=odoo
+      - RABBITMQ_DEFAULT_PASS=odoo
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI port
+    volumes:
+      - odoo-mq-data:/var/lib/rabbitmq
+    restart: always
+
+  odoo:
+    build:
+      context: .
+      dockerfile: Dockerfile # Assumes a standard Odoo Dockerfile exists
+    container_name: tms_gsp_odoo
+    depends_on:
+      - db
+      - mq
+    ports:
+      - "8069:8069" # Odoo web port
+      - "8072:8072" # Odoo longpolling port
+    volumes:
+      - ./dev/odoo.conf:/etc/odoo/odoo.conf
+      - ./tms_gsp_integration:/mnt/extra-addons/tms_gsp_integration
+      - odoo-web-data:/var/lib/odoo
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo
+      - QUEUE_JOB__RABBITMQ__HOST=mq
+    restart: always
+
+volumes:
+  odoo-db-data:
+  odoo-web-data:
+  odoo-mq-data:

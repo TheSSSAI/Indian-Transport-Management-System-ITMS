@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="tms_driver_portal.TrainingScreen" owl="1">
+        <div class="d-flex flex-column h-100 bg-light">
+            <HeaderNav title="'Help &amp; Training'"/>
+
+            <div class="flex-grow-1 overflow-auto p-3">
+                <!-- Skeleton Loader -->
+                <div t-if="state.isLoading">
+                    <div class="list-group placeholder-glow">
+                        <div class="list-group-item list-group-item-action d-flex gap-3 py-3">
+                            <span class="placeholder col-1"/>
+                            <div class="d-flex gap-2 w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-0 placeholder col-8"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="list-group-item list-group-item-action d-flex gap-3 py-3">
+                            <span class="placeholder col-1"/>
+                            <div class="d-flex gap-2 w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-0 placeholder col-7"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div t-if="state.hasError and !state.isLoading" class="alert alert-danger" role="alert">
+                    <i class="fa fa-exclamation-triangle me-2"/>
+                    <t t-esc="state.errorMessage"/>
+                </div>
+                
+                <!-- Empty State -->
+                <div t-if="!state.isLoading and !state.materials.length" class="text-center text-muted p-5">
+                    <i class="fa fa-info-circle fa-3x mb-3"/>
+                    <h4>No training materials are available at this time.</h4>
+                    <p>Please check back later.</p>
+                </div>
+
+                <!-- Materials List -->
+                <div t-if="!state.isLoading and state.materials.length" class="list-group">
+                    <t t-foreach="state.materials" t-as="material" t-key="material.id">
+                        <div class="list-group-item p-0 mb-3 border-0">
+                            <div class="card shadow-sm">
+                                <div t-if="material.type === 'video'" class="card-body p-0">
+                                    <h5 class="card-header bg-white">
+                                        <i t-att-class="'fa ' + this._getIconForType(material.type) + ' me-2 text-primary'"/>
+                                        <t t-esc="material.title"/>
+                                    </h5>
+                                    <div class="ratio ratio-16x9">
+                                        <video controls="controls" preload="metadata" class="w-100">
+                                            <source t-att-src="material.url" type="video/mp4"/>
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                </div>
+                                <a t-if="material.type === 'document'" t-att-href="material.url" target="_blank" class="list-group-item list-group-item-action d-flex align-items-center p-3">
+                                    <i t-att-class="'fa fa-2x ' + this._getIconForType(material.type) + ' me-3 text-danger'"/>
+                                    <div class="flex-grow-1">
+                                        <h5 class="mb-0" t-esc="material.title"/>
+                                        <small class="text-muted">Tap to open document</small>
+                                    </div>
+                                    <i class="fa fa-external-link-alt text-muted"/>
+                                </a>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

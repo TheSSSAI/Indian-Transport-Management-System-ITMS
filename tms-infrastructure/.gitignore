@@ -1,0 +1,24 @@
+# Terraform-specific
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+*.tfplan
+*.bak
+
+# Terragrunt-specific (for potential future use)
+.terragrunt-cache/
+terragrunt-debug.tfvars
+*.hcl.rendered
+
+# Infracost
+.infracost/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDE-specific
+.idea/
+.vscode/

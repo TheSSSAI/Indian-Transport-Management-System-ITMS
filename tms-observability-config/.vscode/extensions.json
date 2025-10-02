@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "redhat.vscode-yaml",
+    "ms-azuretools.vscode-docker",
+    "esbenp.prettier-vscode",
+    "timonwong.shellcheck",
+    "prometheus.prometheus",
+    "grafana.grafana"
+  ]
+}

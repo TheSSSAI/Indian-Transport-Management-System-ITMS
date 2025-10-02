@@ -1,0 +1,36 @@
+.vscode/launch.json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Odoo: Launch Server",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/odoo",
+            "args": [
+                "--config=${workspaceFolder}/odoo.conf"
+            ],
+            "console": "integratedTerminal",
+            "jinja": true,
+            "justMyCode": true,
+            "env": {
+                "PYTHONUNBUFFERED": "1"
+            }
+        },
+        {
+            "name": "Odoo: Run Tests",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/bin/odoo",
+            "args": [
+                "--config=${workspaceFolder}/odoo.conf",
+                "--test-enable",
+                "--stop-after-init",
+                "-i", "tms_core"
+            ],
+            "console": "integratedTerminal",
+            "jinja": true,
+            "justMyCode": true
+        }
+    ]
+}

@@ -1,0 +1,32 @@
+stateDiagram-v2
+    direction LR
+
+    [*] --> Planned: Dispatch Manager creates trip\n(REQ-1-102)
+
+    Planned --> Assigned: Dispatch Manager: Assign Vehicle & Driver\n(REQ-1-004)
+    Assigned --> In_Transit: Driver: Start Trip\n(REQ-1-113)
+
+    In_Transit --> Delivered: Driver: Submit POD\n(REQ-1-114)
+    Delivered --> Completed: Dispatch Manager: Verify & Complete\n(REQ-1-004)
+    Completed --> Invoiced: Finance Officer: Generate Invoice\n(REQ-1-004)
+    Invoiced --> Paid: Finance Officer: Record Payment\n(REQ-1-004)
+    Paid --> [*]
+
+    %% Exception Flows
+    In_Transit --> On_Hold: Driver: Log Critical Event\n(Accident, Repair, Gov. Stoppage)\n(REQ-1-905, BR-005)
+    On_Hold --> In_Transit: Dispatch Manager: Resume Trip\n(with mandatory comment)\n(REQ-1-103)
+
+    state " " as Canceled_Note
+    note right of Canceled_Note
+        A trip can be canceled by a
+        Dispatch Manager with a
+        mandatory reason from any
+        state before 'Delivered'.
+        (REQ-1-104)
+    end note
+
+    Planned --> Canceled : Cancel Trip
+    Assigned --> Canceled : Cancel Trip
+    In_Transit --> Canceled : Cancel Trip
+    On_Hold --> Canceled : Cancel Trip
+    Canceled --> [*]

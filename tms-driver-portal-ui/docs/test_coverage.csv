@@ -1,0 +1,5 @@
+"component_name","business_criticality","technical_complexity","change_frequency","test_types_required","unit_test_coverage","integration_test_coverage","e2e_test_coverage","automation_percentage","manual_test_effort","automated_test_effort","total_test_cases","risk_mitigation_score","quality_confidence","maintenance_overhead","tool_compatibility","team_skill_alignment"
+"E-Invoicing Module (GSP Integration)","Critical","High","Medium","[""Unit"",""Integration"",""E2E"",""Security"",""Performance""]","90","95","70","90","16","80","50","0.98","High","Medium","Excellent","Good"
+"GPS Ingestion Pipeline","High","High","Low","[""Unit"",""Integration"",""Performance"",""Security""]","95","98","50","95","8","60","40","0.95","High","Low","Excellent","Excellent"
+"Role-Based Access Control (RBAC)","Critical","Medium","Low","[""Unit"",""Integration"",""Security""]","85","95","60","80","24","40","60","0.99","Very High","Low","Excellent","Good"
+"Driver Portal UI (Mobile)","High","Medium","High","[""E2E"",""Usability"",""Compatibility"",""Accessibility"",""Performance""]","60","70","85","70","40","80","75","0.9","High","High","Good","Good"

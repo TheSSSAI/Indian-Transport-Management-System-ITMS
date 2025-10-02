@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip List Card Component</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ---------------------------------- */
+        /*         DESIGN TOKENS (CSS)        */
+        /* ---------------------------------- */
+        :root {
+            /* Colors - Primary */
+            --color-primary-100: #DBEAFE;
+            --color-primary-500: #3B82F6;
+            --color-primary-600: #2563EB;
+            --color-primary-700: #1D4ED8;
+            /* Colors - Neutrals */
+            --color-white: #FFFFFF;
+            --color-gray-50: #F9FAFB;
+            --color-gray-100: #F3F4F6;
+            --color-gray-300: #D1D5DB;
+            --color-gray-500: #6B7280;
+            --color-gray-700: #374151;
+            --color-gray-900: #111827;
+            /* Colors - Semantic */
+            --color-success-light: #ECFDF5;
+            --color-success-dark: #14532D;
+            --color-warning-light: #FFFBEB;
+            --color-warning-dark: #78350F;
+            --color-error-light: #FEF2F2;
+            --color-error-dark: #7F1D1D;
+            --color-info-light: #F0F9FF;
+            --color-info-dark: #0C4A6E;
+            /* Fonts */
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-size-sm: 14px;
+            --font-size-base: 16px;
+            --font-size-lg: 18px;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            /* Borders */
+            --border-radius-md: 6px;
+            --border-radius-lg: 8px;
+            /* Transitions */
+            --transition-fast: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* ---------------------------------- */
+        /*       BASE & LAYOUT STYLES         */
+        /* ---------------------------------- */
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            font-family: var(--font-family-primary);
+            background-color: var(--color-gray-100);
+            color: var(--color-gray-900);
+            margin: 0;
+            padding: var(--spacing-lg);
+        }
+        .mobile-showcase {
+            max-width: 420px;
+            min-width: 360px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+        }
+        h2 { 
+            font-size: 20px; 
+            margin-bottom: var(--spacing-md); 
+            padding-bottom: var(--spacing-sm); 
+            border-bottom: 1px solid var(--color-gray-300); 
+        }
+        .component-section { margin-bottom: var(--spacing-xl); }
+        
+        /* ---------------------------------- */
+        /*       DEPENDENCY: STATUS TAGS      */
+        /* ---------------------------------- */
+        .status-tag {
+            display: inline-block;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            border-radius: 9999px;
+            white-space: nowrap;
+        }
+        .status-tag--info { background-color: var(--color-info-light); color: var(--color-info-dark); }
+        .status-tag--primary { background-color: var(--color-primary-100); color: var(--color-primary-700); }
+        .status-tag--success { background-color: var(--color-success-light); color: var(--color-success-dark); }
+        .status-tag--warning { background-color: var(--color-warning-light); color: var(--color-warning-dark); }
+        .status-tag--error { background-color: var(--color-error-light); color: var(--color-error-dark); }
+
+        /* ---------------------------------- */
+        /*      COMPONENT: TRIP LIST CARD     */
+        /* ---------------------------------- */
+        .trip-card {
+            display: block;
+            width: 100%;
+            padding: var(--spacing-md);
+            background-color: var(--color-white);
+            border: 1px solid var(--color-gray-300);
+            border-radius: var(--border-radius-lg);
+            text-decoration: none;
+            color: var(--color-gray-900);
+            transition: var(--transition-fast);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .trip-card:not(:last-child) {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .trip-card:focus-visible {
+            outline: 2px solid var(--color-primary-500);
+            outline-offset: 2px;
+            border-color: var(--color-primary-500);
+        }
+
+        .trip-card:active {
+            transform: scale(0.98);
+            background-color: var(--color-gray-50);
+        }
+
+        .trip-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .trip-card__id {
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+            color: var(--color-gray-700);
+        }
+
+        .trip-card__status {
+            flex-shrink: 0;
+        }
+
+        .trip-card__body {
+            margin-top: var(--spacing-md);
+        }
+
+        .trip-card__customer {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacing-md);
+            display: block;
+        }
+
+        .trip-card__route {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .trip-card__location {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: var(--font-size-base);
+        }
+
+        .trip-card__location-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            color: var(--color-gray-500);
+        }
+
+        .trip-card__location-text {
+            color: var(--color-gray-700);
+        }
+
+        .trip-card__separator {
+            padding-left: 10px; /* Aligns with icon width */
+            color: var(--color-gray-300);
+            font-size: 20px;
+            line-height: 0;
+            margin: 2px 0;
+        }
+
+        /* Variant: Past Trip */
+        .trip-card--past {
+            background-color: var(--color-gray-50);
+            border-color: var(--color-gray-100);
+        }
+
+        .trip-card--past .trip-card__customer,
+        .trip-card--past .trip-card__id {
+            color: var(--color-gray-500);
+        }
+        
+        .trip-card--past .trip-card__location-text {
+            color: var(--color-gray-500);
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="mobile-showcase">
+        <section class="component-section">
+            <h2>Current Trips</h2>
+            <div class="trip-list">
+                <a href="#" class="trip-card" aria-label="Trip T-00123 for Reliable Steel Corp from Mumbai Port to Delhi Warehouse. Status: In-Transit. Tap to view details.">
+                    <div class="trip-card__header">
+                        <span class="trip-card__id">T-00123</span>
+                        <span class="status-tag status-tag--primary trip-card__status">In-Transit</span>
+                    </div>
+                    <div class="trip-card__body">
+                        <strong class="trip-card__customer">Reliable Steel Corp</strong>
+                        <div class="trip-card__route">
+                            <div class="trip-card__location">
+                                <svg class="trip-card__location-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                                <span class="trip-card__location-text">Mumbai Port</span>
+                            </div>
+                            <div class="trip-card__separator">↓</div>
+                            <div class="trip-card__location">
+                                <svg class="trip-card__location-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503-8.25a4.5 4.5 0 01-8.997 0A4.5 4.5 0 0115.503 6.75z" />
+                                </svg>                                  
+                                <span class="trip-card__location-text">Delhi Warehouse</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="trip-card" aria-label="Trip T-00121 for Quick Logistics from Pune to Nagpur. Status: Assigned. Tap to view details.">
+                    <div class="trip-card__header">
+                        <span class="trip-card__id">T-00121</span>
+                        <span class="status-tag status-tag--info trip-card__status">Assigned</span>
+                    </div>
+                    <div class="trip-card__body">
+                        <strong class="trip-card__customer">Quick Logistics</strong>
+                        <div class="trip-card__route">
+                            <div class="trip-card__location">
+                                <svg class="trip-card__location-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                                <span class="trip-card__location-text">Pune</span>
+                            </div>
+                             <div class="trip-card__separator">↓</div>
+                            <div class="trip-card__location">
+                                <svg class="trip-card__location-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503-8.25a4.5 4.5 0 01-8.997 0A4.5 4.5 0 0115.503 6.75z" />
+                                </svg>
+                                <span class="trip-card__location-text">Nagpur</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="component-section">
+            <h2>Past Trips</h2>
+            <div class="trip-list">
+                <a href="#" class="trip-card trip-card--past" aria-label="Past Trip T-00119 for Cement Co. from Chennai to Bangalore. Status: Delivered. Tap to view details.">
+                    <div class="trip-card__header">
+                        <span class="trip-card__id">T-00119</span>
+                        <span class="status-tag status-tag--success trip-card__status">Delivered</span>
+                    </div>
+                    <div class="trip-card__body">
+                        <strong class="trip-card__customer">Cement Co.</strong>
+                        <div class="trip-card__route">
+                            <div class="trip-card__location">
+                                <svg class="trip-card__location-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                                <span class="trip-card__location-text">Chennai</span>
+                            </div>
+                             <div class="trip-card__separator">↓</div>
+                            <div class="trip-card__location">
+                                <svg class="trip-card__location-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503-8.25a4.5 4.5 0 01-8.997 0A4.5 4.5 0 0115.503 6.75z" />
+                                </svg>
+                                <span class="trip-card__location-text">Bangalore</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="#" class="trip-card trip-card--past" aria-label="Past Trip T-00115 for Agri Exports from Nashik to Mumbai Port. Status: Canceled. Tap to view details.">
+                    <div class="trip-card__header">
+                        <span class="trip-card__id">T-00115</span>
+                        <span class="status-tag status-tag--error trip-card__status">Canceled</span>
+                    </div>
+                    <div class="trip-card__body">
+                        <strong class="trip-card__customer">Agri Exports</strong>
+                        <div class="trip-card__route">
+                            <div class="trip-card__location">
+                                <svg class="trip-card__location-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                                <span class="trip-card__location-text">Nashik</span>
+                            </div>
+                             <div class="trip-card__separator">↓</div>
+                            <div class="trip-card__location">
+                                <svg class="trip-card__location-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503-8.25a4.5 4.5 0 01-8.997 0A4.5 4.5 0 0115.503 6.75z" />
+                                </svg>
+                                <span class="trip-card__location-text">Mumbai Port</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </section>
+    </div>
+	
+	<div> <h2> Component Variations</h2>
+      <div>
+        <h3>Variant Name : current_trip<h3>
+		<normal> A card representing an active trip (e.g., 'Assigned' or 'In-Transit'). It has a standard white background and high-contrast text. </normal>
+		                <a href="#" class="trip-card" aria-label="Trip T-00123 for Reliable Steel Corp from Mumbai Port to Delhi Warehouse. Status: In-Transit. Tap to view details.">
+                    <div class="trip-card__header">
+                        <span class="trip-card__id">T-00123</span>
+                        <span class="status-tag status-tag--primary trip-card__status">In-Transit</span>
+                    </div>
+                    <div class="trip-card__body">
+                        <strong class="trip-card__customer">Reliable Steel Corp</strong>
+                        <div class="trip-card__route">
+                            <div class="trip-card__location">
+                                <svg class="trip-card__location-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                                <span class="trip-card__location-text">Mumbai Port</span>
+                            </div>
+                            <div class="trip-card__separator">↓</div>
+                            <div class="trip-card__location">
+                                <svg class="trip-card__location-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503-8.25a4.5 4.5 0 01-8.997 0A4.5 4.5 0 0115.503 6.75z" />
+                                </svg>                                  
+                                <span class="trip-card__location-text">Delhi Warehouse</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>     
+		
+      <div>
+	 </div>
+      <div>
+        <h3>Variant Name : past_trip<h3>
+		<normal> A card representing a completed or historical trip. It has a slightly muted appearance (light gray background, grayed-out text) to visually de-emphasize it compared to current trips. </normal>
+		                <a href="#" class="trip-card trip-card--past" aria-label="Past Trip T-00119 for Cement Co. from Chennai to Bangalore. Status: Delivered. Tap to view details.">
+                    <div class="trip-card__header">
+                        <span class="trip-card__id">T-00119</span>
+                        <span class="status-tag status-tag--success trip-card__status">Delivered</span>
+                    </div>
+                    <div class="trip-card__body">
+                        <strong class="trip-card__customer">Cement Co.</strong>
+                        <div class="trip-card__route">
+                            <div class="trip-card__location">
+                                <svg class="trip-card__location-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                                </svg>
+                                <span class="trip-card__location-text">Chennai</span>
+                            </div>
+                             <div class="trip-card__separator">↓</div>
+                            <div class="trip-card__location">
+                                <svg class="trip-card__location-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503-8.25a4.5 4.5 0 01-8.997 0A4.5 4.5 0 0115.503 6.75z" />
+                                </svg>
+                                <span class="trip-card__location-text">Bangalore</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>     
+		
+      <div>
+	 </div>    
+	
+	</body>
+</html>

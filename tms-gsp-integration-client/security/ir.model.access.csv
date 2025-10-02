@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+# This file is intentionally left with only a header.
+# The tms_gsp_integration addon extends an existing Odoo model (account.move)
+# and does not create new models that require their own top-level access rights.
+# Permissions for viewing, creating, and editing invoices are inherited from
+# the core 'account' module's security groups (e.g., account.group_account_invoice).
+# Specific field-level or action-level security is handled via the view XML and Python code.

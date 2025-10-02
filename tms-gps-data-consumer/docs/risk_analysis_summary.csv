@@ -1,0 +1,2 @@
+"total_risks_identified","critical_risks","high_priority_risks","average_risk_score","key_risk_themes","immediate_actions_required"
+"8","0","4","12","[""Dependency on External APIs"",""Real-Time Data Processing Complexity"",""Deployment and Infrastructure Complexity""]","[""Prioritize implementation of resilient API client patterns for GSP and GPS integrations."",""Begin early prototyping and performance testing of the GPS data ingestion pipeline."",""Mandate peer reviews for all Terraform scripts and secure a staging environment that mirrors production.""]"

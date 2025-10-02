@@ -1,0 +1,42 @@
+.ini
+[options]
+; This is the password that allows database operations:
+admin_passwd = ${ODOO_MASTER_PASSWORD}
+db_host = ${HOST}
+db_port = ${PORT}
+db_user = ${USER}
+db_password = ${PASSWORD}
+db_name = ${DB_NAME}
+db_template = template0
+
+; Specify the addons path. The Dockerfile places the custom addon in /mnt/extra-addons.
+; Odoo's built-in addons are located within the library path.
+addons_path = /mnt/extra-addons
+
+; Server settings
+http_port = 8069
+longpolling_port = 8072
+workers = 2
+max_cron_threads = 1
+proxy_mode = True
+
+; Logging settings
+log_level = info
+log_handler = :INFO
+
+; Email settings
+email_from = ${EMAIL_FROM}
+smtp_server = ${SMTP_SERVER}
+smtp_port = ${SMTP_PORT}
+smtp_user = ${SMTP_USER}
+smtp_password = ${SMTP_PASSWORD}
+smtp_ssl = ${SMTP_SSL}
+
+; To auto-install the module upon database initialization
+; init = tms_core
+
+; To update the module on server start
+; update = tms_core
+
+; Unaccent extension for postgresql
+unaccent = True

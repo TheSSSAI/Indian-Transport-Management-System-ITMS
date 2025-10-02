@@ -1,0 +1,17 @@
+flowchart TD
+    A[User submits credentials on Driver Portal Login Page] --> B{Are credentials valid?}
+    B -->|No| C[Show 'Invalid credentials' error]
+    B -->|Yes| D{Is user account active?}
+    D -->|No| E[Show 'Account is inactive' error]
+    D -->|Yes| F{Is user role 'Driver'?}
+    F -->|No| G[Show 'Access Denied' error]
+    F -->|Yes| H[Establish session & Redirect to Driver Portal Dashboard]
+
+    %% Styling
+    classDef errorNode fill:#FEF2F2,stroke:#DC2626,color:#B91C1C
+    classDef successNode fill:#F0FDF4,stroke:#16A34A,color:#052e16
+    classDef processNode fill:#EFF6FF,stroke:#2563EB,color:#1e40af
+    
+    class A processNode
+    class C,E,G errorNode
+    class H successNode

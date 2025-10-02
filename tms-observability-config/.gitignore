@@ -1,0 +1,32 @@
+# IDE and editor files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*~
+*.swo
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Local development and testing artifacts
+/tmp/
+*.tmp
+*.local
+*.log
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Node.js dependencies
+node_modules/
+
+# Secrets and local environment files
+*.env
+.env.*
+!.env.example
+secrets.yml
+secrets.json

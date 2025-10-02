@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            This file defines default system-wide configuration parameters for the GSP integration.
+            Using ir.config_parameter allows administrators to change these values via the UI
+            without requiring code changes, which is crucial for different environments
+            (dev, staging, production).
+            noupdate="1" ensures these records are only created on module installation and are not
+            overwritten on subsequent updates.
+        -->
+        <record id="tms_gsp_api_url" model="ir.config_parameter">
+            <field name="key">tms_gsp.api_url</field>
+            <field name="value"></field>
+        </record>
+
+        <record id="tms_gsp_aws_secret_name" model="ir.config_parameter">
+            <field name="key">tms_gsp.aws_secret_name</field>
+            <field name="value"></field>
+        </record>
+
+        <record id="tms_gsp_timeout_seconds" model="ir.config_parameter">
+            <field name="key">tms_gsp.timeout_seconds</field>
+            <field name="value">15</field>
+        </record>
+
+        <record id="tms_gsp_aws_region" model="ir.config_parameter">
+            <field name="key">tms_gsp.aws_region</field>
+            <field name="value">ap-south-1</field>
+        </record>
+    </data>
+</odoo>

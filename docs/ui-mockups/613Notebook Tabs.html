@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Molecular Component: Notebook Tabs</title>
+  <style>
+    /* CSS Reset & Base */
+    *, *::before, *::after { box-sizing: border-box; }
+    body { 
+      margin: 0; 
+      background-color: #F9FAFB; 
+      color: #111827; 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      line-height: 1.6; 
+    }
+    img, svg { display: block; max-width: 100%; }
+
+    /* Design System Tokens */
+    :root {
+      /* Colors */
+      --color-primary-500: #3B82F6;
+      --color-primary-600: #2563EB;
+      --color-primary-700: #1D4ED8;
+      --color-gray-100: #F3F4F6;
+      --color-gray-300: #D1D5DB;
+      --color-gray-500: #6B7280;
+      --color-gray-700: #374151;
+      --color-gray-900: #111827;
+      --color-white: #FFFFFF;
+      
+      /* Spacing */
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+      
+      /* Typography */
+      --font-size-base: 14px;
+      --font-weight-medium: 500;
+      --font-weight-semibold: 600;
+      
+      /* Borders */
+      --border-radius-md: 6px;
+      --border-radius-lg: 8px;
+    }
+
+    /* Showcase Layout */
+    .showcase { max-width: 900px; margin: 0 auto; padding: var(--space-6); }
+    .showcase__header { padding-bottom: var(--space-5); border-bottom: 1px solid var(--color-gray-300); margin-bottom: var(--space-6); }
+    .showcase__header h1 { font-size: 36px; margin: 0 0 var(--space-2) 0; color: var(--color-primary-700); }
+    .showcase__header p { font-size: 16px; color: var(--color-gray-500); margin: 0; }
+    .component-section { background-color: var(--color-white); padding: var(--space-5); border-radius: var(--border-radius-lg); box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: var(--space-6); }
+    .component-section > h2 { font-size: 24px; margin: 0 0 var(--space-4) 0; color: var(--color-gray-900); }
+    .component-section > p { font-size: var(--font-size-base); color: var(--color-gray-500); margin: 0 0 var(--space-4) 0; }
+    code {
+      background-color: var(--color-gray-100);
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-family: 'Roboto Mono', monospace;
+    }
+
+    /* Component: Notebook Tabs */
+
+    /* Base styles for the tab container */
+    .notebook-tabs {
+      width: 100%;
+    }
+
+    /* The list of tab buttons */
+    .notebook-tabs__list {
+      display: flex;
+      flex-wrap: wrap; /* Allows tabs to wrap on smaller screens */
+      border-bottom: 1px solid var(--color-gray-300);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Individual tab button styling */
+    .notebook-tabs__tab {
+      font-family: inherit;
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-gray-500);
+      background-color: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: var(--space-3) var(--space-4);
+      margin-bottom: -1px; /* Overlaps the container's bottom border */
+      cursor: pointer;
+      transition: color 0.2s ease, border-color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    /* Hover state for inactive tabs */
+    .notebook-tabs__tab:hover:not(.is-active) {
+      color: var(--color-gray-700);
+      background-color: var(--color-gray-100);
+    }
+
+    /* Focus state for keyboard navigation */
+    .notebook-tabs__tab:focus-visible {
+      outline: 2px solid var(--color-primary-500);
+      outline-offset: -2px;
+      border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+    }
+
+    /* Active tab state */
+    .notebook-tabs__tab.is-active {
+      color: var(--color-primary-700);
+      font-weight: var(--font-weight-semibold);
+      border-bottom-color: var(--color-primary-600);
+    }
+
+    /* Container for the tab panel content */
+    .notebook-tabs__panel {
+      padding: var(--space-5) var(--space-2);
+    }
+
+    /* Utility to hide inactive panels */
+    .is-hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="showcase">
+    <header class="showcase__header">
+      <h1>Molecular Component: Notebook Tabs</h1>
+      <p>Used to organize content within a form into separate, selectable sections. This component is foundational for complex organism views like <code>Master Data Form View</code> and <code>Trip Form View</code>.</p>
+    </header>
+
+    <section class="component-section">
+      <h2>Default State (Tab 1 Active)</h2>
+      <p>This is the default appearance of the component when a form is loaded. The first tab is active by default.</p>
+      
+      <div class="notebook-tabs">
+        <div class="notebook-tabs__list" role="tablist" aria-label="Vehicle Information">
+          <button class="notebook-tabs__tab is-active" id="tab-details" role="tab" aria-selected="true" aria-controls="panel-details">
+            Vehicle Details
+          </button>
+          <button class="notebook-tabs__tab" id="tab-docs" role="tab" aria-selected="false" aria-controls="panel-docs" tabindex="-1">
+            Documents
+          </button>
+          <button class="notebook-tabs__tab" id="tab-service" role="tab" aria-selected="false" aria-controls="panel-service" tabindex="-1">
+            Service History
+          </button>
+          <button class="notebook-tabs__tab" id="tab-costs" role="tab" aria-selected="false" aria-controls="panel-costs" tabindex="-1">
+            Costs
+          </button>
+        </div>
+        <div class="notebook-tabs__panel" id="panel-details" role="tabpanel" aria-labelledby="tab-details">
+          Content for Vehicle Details goes here. This would typically contain form fields for model, capacity, etc.
+        </div>
+        <div class="notebook-tabs__panel is-hidden" id="panel-docs" role="tabpanel" aria-labelledby="tab-docs">
+          Content for Documents goes here. This panel would list uploaded compliance documents.
+        </div>
+        <div class="notebook-tabs__panel is-hidden" id="panel-service" role="tabpanel" aria-labelledby="tab-service">
+          Content for Service History goes here. This panel would show a log of maintenance activities.
+        </div>
+         <div class="notebook-tabs__panel is-hidden" id="panel-costs" role="tabpanel" aria-labelledby="tab-costs">
+          Content for Costs goes here. This panel would show profitability calculations and other financial data.
+        </div>
+      </div>
+    </section>
+
+    <section class="component-section">
+      <h2>Alternate State (Tab 2 Active)</h2>
+      <p>This demonstrates the visual state when a user selects a different tab. The <code>is-active</code> class moves to the selected tab, and the corresponding panel is shown.</p>
+      
+      <div class="notebook-tabs">
+        <div class="notebook-tabs__list" role="tablist" aria-label="Vehicle Information 2">
+          <button class="notebook-tabs__tab" id="tab2-details" role="tab" aria-selected="false" aria-controls="panel2-details" tabindex="-1">
+            Vehicle Details
+          </button>
+          <button class="notebook-tabs__tab is-active" id="tab2-docs" role="tab" aria-selected="true" aria-controls="panel2-docs">
+            Documents
+          </button>
+          <button class="notebook-tabs__tab" id="tab2-service" role="tab" aria-selected="false" aria-controls="panel2-service" tabindex="-1">
+            Service History
+          </button>
+          <button class="notebook-tabs__tab" id="tab2-costs" role="tab" aria-selected="false" aria-controls="panel2-costs" tabindex="-1">
+            Costs
+          </button>
+        </div>
+        <div class="notebook-tabs__panel is-hidden" id="panel2-details" role="tabpanel" aria-labelledby="tab2-details">
+          Content for Vehicle Details goes here.
+        </div>
+        <div class="notebook-tabs__panel" id="panel2-docs" role="tabpanel" aria-labelledby="tab2-docs">
+          Content for Documents goes here. Note that this panel is now visible.
+        </div>
+        <div class="notebook-tabs__panel is-hidden" id="panel2-service" role="tabpanel" aria-labelledby="tab2-service">
+          Content for Service History goes here.
+        </div>
+        <div class="notebook-tabs__panel is-hidden" id="panel2-costs" role="tabpanel" aria-labelledby="tab2-costs">
+          Content for Costs goes here.
+        </div>
+      </div>
+    </section>
+    
+    <section class="component-section">
+      <h2>Responsive Behavior (Wrapping)</h2>
+      <p>On smaller screens, if the tabs exceed the available width, they will wrap onto the next line. This ensures all tabs remain accessible.</p>
+       <div class="notebook-tabs">
+        <div class="notebook-tabs__list" role="tablist" aria-label="Trip Information">
+          <button class="notebook-tabs__tab is-active" role="tab" aria-selected="true">Trip Details</button>
+          <button class="notebook-tabs__tab" role="tab" aria-selected="false" tabindex="-1">Expenses</button>
+          <button class="notebook-tabs__tab" role="tab" aria-selected="false" tabindex="-1">Event Log</button>
+          <button class="notebook-tabs__tab" role="tab" aria-selected="false" tabindex="-1">Proof of Delivery</button>
+          <button class="notebook-tabs__tab" role="tab" aria-selected="false" tabindex="-1">Invoicing</button>
+          <button class="notebook-tabs__tab" role="tab" aria-selected="false" tabindex="-1">Profitability</button>
+          <button class="notebook-tabs__tab" role="tab" aria-selected="false" tabindex="-1">Notes</button>
+        </div>
+        <div class="notebook-tabs__panel">
+          Content for the active tab ('Trip Details') would be displayed here.
+        </div>
+      </div>
+    </section>
+
+  </main>
+  
+  <div class="showcase">
+      <div class="component-section">
+          <h2>Component Variations</h2>
+          <div>
+              <h3>Variant Name : horizontal_tabs</h3>
+              <normal>The standard and only variant for this component. It arranges tabs in a single horizontal row that wraps onto new lines if space is insufficient. This is the conventional layout for notebook-style navigation within a form.</normal>
+              <!-- Variant HTML shown in examples above -->
+          </div>
+      </div>
+  </div>
+
+</body>
+</html>

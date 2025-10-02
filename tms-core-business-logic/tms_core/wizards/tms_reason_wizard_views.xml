@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- TMS Reason Wizard Form View -->
+        <record id="tms_reason_wizard_view_form" model="ir.ui.view">
+            <field name="name">tms.reason.wizard.view.form</field>
+            <field name="model">tms.reason.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Provide Reason">
+                    <group>
+                        <field name="reason" nolabel="1" placeholder="Please provide a reason..." required="1"/>
+                    </group>
+                    <footer>
+                        <button name="action_confirm" string="Confirm" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- TMS Reason Wizard Action -->
+        <record id="action_tms_reason_wizard" model="ir.actions.act_window">
+            <field name="name">Provide Reason</field>
+            <field name="res_model">tms.reason.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

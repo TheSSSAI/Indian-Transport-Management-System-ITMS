@@ -1,0 +1,55 @@
+# .github/workflows/ci.yaml
+#
+# This GitHub Actions workflow defines the Continuous Integration (CI) pipeline
+# for the TMS Kubernetes Manifests repository. It acts as a quality gate to ensure
+# that all changes pushed in a pull request are syntactically correct, adhere to
+# best practices, and can be successfully rendered into valid Kubernetes manifests.
+
+name: "TMS K8s Manifests CI"
+
+on:
+  pull_request:
+    branches:
+      - "main"
+  push:
+    branches:
+      - "main"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: "Lint and Validate Manifests"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
+
+      - name: "Set up Helm"
+        uses: azure/setup-helm@v4
+        with:
+          version: 'v3.14.0' # Pin to a specific version for reproducibility
+
+      - name: "Set up Kustomize"
+        uses: imranismail/setup-kustomize@v2
+        with:
+          kustomize-version: 'v5.3.0' # Pin to a specific version
+
+      - name: "Set up Python and yamllint"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install yamllint
+
+      - name: "Lint YAML files and Helm charts"
+        run: |
+          chmod +x ./scripts/lint.sh
+          ./scripts/lint.sh
+
+      - name: "Validate Kustomize overlays"
+        run: |
+          chmod +x ./scripts/validate.sh
+          ./scripts/validate.sh

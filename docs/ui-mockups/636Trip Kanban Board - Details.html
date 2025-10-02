@@ -1,0 +1,600 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Kanban Board - Component Specifications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .component-type-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .section h2 {
+            color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4f46e5;
+            display: inline-block;
+        }
+        
+        .section h3 {
+            color: #4f46e5;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .info-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .variations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .variation-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .variation-name {
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 8px;
+        }
+        
+        .variation-code {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #1e293b;
+            overflow-x: auto;
+            margin: 8px 0;
+            border-left: 4px solid #4f46e5;
+        }
+        
+        .variation-description {
+            font-size: 13px;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .feature-category {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .feature-category h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .feature-category ul {
+            list-style: none;
+        }
+        
+        .feature-category li {
+            padding: 6px 0;
+            color: #4b5563;
+            font-size: 14px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .feature-category li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .tokens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        
+        .token {
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            border: 1px solid #bae6fd;
+            text-align: center;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 16px 0;
+            line-height: 1.4;
+        }
+        
+        .stats-bar {
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .stat {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Trip Kanban Board</h1>
+            <div class="component-type-badge">organism Component</div>
+        </div>
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Variations</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">25</span>
+                <span class="stat-label">Design Tokens</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">3</span>
+                <span class="stat-label">Breakpoints</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">5</span>
+                <span class="stat-label">A11y Features</span>
+            </div>
+        </div><div class="content">
+        <div class="section">
+            <h2>Component Information</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Component Id</h4>
+                    <p>MU-ORGN-003</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Name</h4>
+                    <p>Trip Kanban Board</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Type</h4>
+                    <p>organism</p>
+                </div>
+                <div class="info-card">
+                    <h4>Description</h4>
+                    <p>An organism component that visually organizes 'Trip' records into columns based on their status (e.g., Planned, Assigned, In-Transit). It serves as the primary dashboard for managing the trip lifecycle, allowing for drag-and-drop interactions to change a trip's state.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Design System Alignment</h4>
+                    <p>This organism is a composition of molecular 'Kanban Card (Trip)' components. It uses the design system's spacing tokens for layout, neutral colors for the background and structure, and typography tokens for column headers.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Design Tokens Used</h2>
+            <div class="tokens-grid"><div class="token">--color-primary-500</div><div class="token">--color-gray-50</div><div class="token">--color-gray-100</div><div class="token">--color-gray-200</div><div class="token">--color-gray-300</div><div class="token">--color-gray-400</div><div class="token">--color-gray-500</div><div class="token">--color-gray-800</div><div class="token">--color-gray-900</div><div class="token">--color-white</div><div class="token">--color-warning</div><div class="token">--color-warning-bg</div><div class="token">--color-info</div><div class="token">--color-info-bg</div><div class="token">--space-1</div><div class="token">--space-2</div><div class="token">--space-3</div><div class="token">--space-4</div><div class="token">--space-6</div><div class="token">--font-size-sm</div><div class="token">--font-size-base</div><div class="token">--font-size-lg</div><div class="token">--font-weight-medium</div><div class="token">--font-weight-semibold</div><div class="token">--border-radius-lg</div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Responsive Specifications</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Mobile Adaptations</h4>
+                    <ul><li>The main board container becomes horizontally scrollable on viewports narrower than the total width of the columns.</li><li>Column widths remain fixed to maintain card readability, preventing them from becoming too narrow.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Tablet Adaptations</h4>
+                    <ul><li>The horizontal scrolling behavior applies to tablet viewports as well, ensuring the layout is consistent and usable across devices.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Desktop Enhancements</h4>
+                    <ul><li>The board displays as a multi-column layout. If the number of columns exceeds the viewport width, horizontal scrolling is enabled.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Accessibility Features</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Keyboard Support</h4><p>The board container can be scrolled horizontally using keyboard arrows when focused. Each column and card within it is focusable via the Tab key.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Screen Reader Support</h4><p>The board is structured with semantic HTML. Columns have `aria-labelledby` attributes pointing to their headers. Card counts in headers provide context.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Focus Management</h4><p>A visible focus ring is applied to all interactive elements, including the cards themselves, ensuring keyboard navigators can track their position.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Aria Attributes</h4><ul><li>aria-labelledby</li><li>aria-roledescription="kanban board"</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Color Contrast</h4><p>All text and UI elements meet a minimum contrast ratio of 4.5:1 (WCAG AA). The 'On Hold' card variant uses a border and background tint, not just color, to convey its state.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>CSS Implementation</h2>
+            <div class="code-block">/* Component: Trip Kanban Board */
+
+/* Design System Tokens */
+:root {
+  /* Colors */
+  --color-primary-100: #DBEAFE; --color-primary-500: #3B82F6; --color-primary-600: #2563EB; --color-primary-700: #1D4ED8;
+  --color-gray-50: #F9FAFB; --color-gray-100: #F3F4F6; --color-gray-200: #E5E7EB; --color-gray-300: #D1D5DB; --color-gray-400: #9CA3AF; --color-gray-500: #6B7280; --color-gray-700: #374151; --color-gray-800: #1F2937; --color-gray-900: #111827;
+  --color-white: #FFFFFF;
+  --color-success: #16A34A; --color-warning: #F59E0B; --color-error: #DC2626; --color-info: #0284C7;
+  --color-success-bg: #ECFDF5; --color-warning-bg: #FFFBEB; --color-error-bg: #FEF2F2; --color-info-bg: #EFF6FF;
+
+  /* Spacing */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px;
+
+  /* Typography */
+  --font-size-sm: 12px; --font-size-base: 14px; --font-size-lg: 16px;
+  --font-weight-medium: 500; --font-weight-semibold: 600;
+
+  /* Borders */
+  --border-radius-lg: 8px;
+}
+
+/* Base Styles &amp; Showcase Layout */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background-color: var(--color-gray-50); font-family: &#039;Inter&#039;, sans-serif; }
+.showcase { padding: var(--space-6); }
+.showcase__header { margin-bottom: var(--space-6); }
+.showcase__header h1 { font-size: 32px; color: var(--color-gray-900); margin: 0 0 var(--space-2) 0; }
+.showcase__header p { font-size: 16px; color: var(--color-gray-500); margin: 0; }
+.component-group { margin-bottom: var(--space-6); }
+.component-group h2 { font-size: 24px; margin: 0 0 var(--space-4) 0; }
+
+/* ORGANISM: Kanban Board */
+.kanban-board {
+  display: flex;
+  gap: var(--space-4);
+  overflow-x: auto;
+  padding-bottom: var(--space-4); /* Space for scrollbar */
+  min-height: 500px;
+}
+
+.kanban-column {
+  width: 320px;
+  flex-shrink: 0;
+  background-color: var(--color-gray-100);
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+
+.kanban-column__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.kanban-column__title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-800);
+}
+
+.kanban-column__count {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-500);
+  background-color: var(--color-gray-200);
+  padding: 2px 6px;
+  border-radius: 99px;
+}
+
+.kanban-column__body {
+  flex-grow: 1;
+  padding: var(--space-2) var(--space-2) var(--space-4) var(--space-2);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Empty State */
+.kanban-column__body--empty {
+  justify-content: center;
+  align-items: center;
+  color: var(--color-gray-400);
+  font-size: var(--font-size-base);
+}
+
+/* MOLECULE: Kanban Card (Trip) - Copied from dependency */
+.kanban-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: var(--space-4);
+  cursor: grab;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.kanban-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+.kanban-card:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
+.kanban-card.is-dragging {
+  cursor: grabbing;
+  background-color: var(--color-info-bg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: rotate(2deg) scale(1.02);
+}
+.kanban-card--on-hold {
+  border-left: 4px solid var(--color-warning);
+  background-color: var(--color-warning-bg);
+}
+.kanban-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.kanban-card__trip-id { font-size: var(--font-size-base); font-weight: var(--font-weight-semibold); color: var(--color-gray-900); }
+.kanban-card__menu-btn { padding: 0; border: none; background: none; cursor: pointer; color: var(--color-gray-500); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+.kanban-card__body { display: flex; flex-direction: column; gap: var(--space-2); }
+.kanban-card__customer { font-size: var(--font-size-lg); font-weight: var(--font-weight-medium); color: var(--color-gray-700); }
+.kanban-card__route { font-size: var(--font-size-base); color: var(--color-gray-500); display: flex; align-items: center; gap: var(--space-2); }
+.kanban-card__route svg { width: 16px; height: 16px; flex-shrink: 0; }
+.kanban-card__footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-gray-100); padding-top: var(--space-3); margin-top: var(--space-2); }
+.kanban-card__details { font-size: var(--font-size-sm); color: var(--color-gray-500); display: flex; align-items: center; gap: var(--space-1); }
+.kanban-card__details svg { width: 14px; height: 14px; color: var(--color-gray-500); }
+
+/* ATOMIC: Status Badge */
+.badge { display: inline-block; padding: 2px var(--space-2); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); border-radius: 9999px; }
+.badge--default { background-color: var(--color-gray-100); color: var(--color-gray-700); }
+.badge--info { background-color: var(--color-info-bg); color: var(--color-info); }
+.badge--success { background-color: var(--color-success-bg); color: var(--color-success); }
+.badge--warning { background-color: var(--color-warning-bg); color: #92400E; }
+
+/* SKELETON STATE */
+.kanban-card--skeleton {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+}
+.skeleton-line {
+  background-color: var(--color-gray-200);
+  border-radius: 4px;
+  animation: shimmer 1.5s infinite linear;
+  background-image: linear-gradient(90deg, #E5E7EB 0px, #F3F4F6 40px, #E5E7EB 80px);
+  background-size: 200px;
+}
+.skeleton-line--sm { height: 12px; width: 60%; }
+.skeleton-line--md { height: 16px; width: 80%; }
+.skeleton-line--lg { height: 20px; width: 90%; }
+
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+</div>
+        </div>
+        <div class="section">
+            <h2>Implementation Notes</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Embedded Css Architecture</h4>
+                    <p>All styles are embedded in a single <style> tag. Design tokens are defined as CSS custom properties for consistency. BEM is used for the Kanban Board, Column, and Card components.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Organization</h4>
+                    <p>The HTML is structured to showcase the three main states of the board: Loaded, Loading (with skeleton placeholders), and Empty. The dependent `Kanban Card (Trip)` component is fully integrated.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Responsive Design</h4>
+                    <p>The responsive strategy relies on `overflow-x: auto` for the main board container and fixed-width columns (`flex-shrink: 0`), which is a robust pattern for Kanban-style interfaces.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Accessibility Compliance</h4>
+                    <p>WCAG 2.1 AA is targeted through semantic markup, ARIA attributes for context, high-contrast colors, and visible focus states.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Browser Support</h4>
+                    <p>Uses modern CSS (flexbox, custom properties) compatible with all target evergreen browsers.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Usage Guidelines</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>When To Use</h4><p>As the primary interface for managing the lifecycle of trips, providing an at-a-glance overview of all operational tasks.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Content Guidelines</h4><p>Column headers should be concise and correspond to a specific trip status. Card content is derived from the 'Kanban Card (Trip)' molecular component.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Placement Rules</h4><p>This organism is a top-level view and typically occupies the main content area of a screen.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Customization Options</h4><ul><li style="list-style: disc; margin-left: 16px; padding-left: 0;">The number of columns is flexible and can be dynamically generated based on the available trip statuses.</li><li style="list-style: disc; margin-left: 16px; padding-left: 0;">JavaScript is required to handle drag-and-drop functionality between columns.</li></ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Testing Recommendations</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Browser Testing</h4><p>Test in Chrome, Firefox, Safari, and Edge.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Device Testing</h4><p>Verify the horizontal scrolling behavior on both tablet and mobile viewports. Check for smooth scrolling and ensure no content is clipped.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Accessibility Testing</h4><ul><li>Test keyboard navigation for scrolling and focusing on cards.</li><li>Use a screen reader to verify that column titles and card contents are announced logically.</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Performance Testing</h4><p>Test rendering performance with a large number of cards in a single column to ensure vertical scrolling remains smooth.</p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+</html>

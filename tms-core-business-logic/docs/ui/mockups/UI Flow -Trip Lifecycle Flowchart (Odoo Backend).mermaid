@@ -1,0 +1,35 @@
+graph TD
+    subgraph Dispatch Manager
+        A[Create Trip] --> B(Planned)
+        B -->|Assign Vehicle & Driver| C(Assigned)
+        H(On Hold) -->|Provide Resolution & Resume| G(In Transit)
+        Cancel_Planned(Planned) -->|Cancel with Reason| K(Canceled)
+        Cancel_Assigned(Assigned) -->|Cancel with Reason| K
+        Cancel_InTransit(In Transit) -->|Cancel with Reason| K
+        I(Delivered) -->|Verify POD & Complete| J(Completed)
+    end
+
+    subgraph "Driver (Portal)"
+        C -->|Start Trip| G
+        G -->|Log Critical Event <br> (Accident, Repair, etc.)| H
+        G -->|Submit Proof of Delivery (POD)| I
+    end
+
+    subgraph Finance Officer
+        J -->|Generate Invoice| L(Invoiced)
+        L -->|Record Payment| M(Paid)
+    end
+
+    %% Node Styling
+    classDef state fill:#e3f2fd,stroke:#333,stroke-width:2px
+    classDef terminalSuccess fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    classDef terminalFail fill:#ffebee,stroke:#d32f2f,stroke-width:2px
+
+    class B,C,G,I,J,L state
+    class M terminalSuccess
+    class H,K terminalFail
+
+    %% Hiding duplicate nodes used for cancellation flow clarity
+    style Cancel_Planned fill:none,stroke:none,color:none
+    style Cancel_Assigned fill:none,stroke:none,color:none
+    style Cancel_InTransit fill:none,stroke:none,color:none

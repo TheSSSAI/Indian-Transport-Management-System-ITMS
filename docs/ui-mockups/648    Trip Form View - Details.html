@@ -1,0 +1,402 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Individual Component - Component Specifications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .component-type-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .section h2 {
+            color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4f46e5;
+            display: inline-block;
+        }
+        
+        .section h3 {
+            color: #4f46e5;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .info-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .variations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .variation-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .variation-name {
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 8px;
+        }
+        
+        .variation-code {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #1e293b;
+            overflow-x: auto;
+            margin: 8px 0;
+            border-left: 4px solid #4f46e5;
+        }
+        
+        .variation-description {
+            font-size: 13px;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .feature-category {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .feature-category h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .feature-category ul {
+            list-style: none;
+        }
+        
+        .feature-category li {
+            padding: 6px 0;
+            color: #4b5563;
+            font-size: 14px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .feature-category li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .tokens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        
+        .token {
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            border: 1px solid #bae6fd;
+            text-align: center;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 16px 0;
+            line-height: 1.4;
+        }
+        
+        .stats-bar {
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .stat {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Individual Component</h1>
+            <div class="component-type-badge">Unknown Component</div>
+        </div>
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Variations</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Design Tokens</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">3</span>
+                <span class="stat-label">Breakpoints</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">5</span>
+                <span class="stat-label">A11y Features</span>
+            </div>
+        </div><div class="content">
+        <div class="section">
+            <h2>Responsive Specifications</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Desktop Layout</h4>
+                    <ul><li>Spacious two-column grid for the main form content.</li><li>Header displays action buttons and statusbar side-by-side.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Tablet Adaptations</h4>
+                    <ul><li>The form grid may collapse to a single column depending on viewport width and orientation.</li><li>Maintains desktop-like spacing and touch targets.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Mobile Adaptations</h4>
+                    <ul><li>The two-column form grid collapses into a single vertical column.</li><li>The form header stacks action buttons and the statusbar.</li><li>Padding is reduced to maximize content visibility on narrow screens.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Accessibility Features</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Keyboard Navigation</h4><p>Logical tab order is maintained through all interactive elements: header buttons, statusbar, smart buttons, form fields, and notebook tabs.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Screen Reader Support</h4><p>Semantic HTML structure with landmarks (`<header>`, `<main>`, `<footer>`, `<nav>`). All form fields have associated `<label>`s. Complex components like the statusbar and tabs use appropriate ARIA attributes (`aria-current`, `role='tablist'`).</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Focus Management</h4><p>Visible focus rings are applied to all interactive elements, consistent with the design system's `:focus-visible` state.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Aria Attributes</h4><ul><li>aria-label</li><li>aria-current='step'</li><li>role='tablist'</li><li>role='tab'</li><li>aria-selected</li><li>aria-controls</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Color Contrast</h4><p>All text and UI elements meet WCAG 2.1 AA contrast requirements. State information is not conveyed by color alone (e.g., text labels, icons).</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Implementation Notes</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Embedded Css Architecture</h4>
+                    <p>All styles, including design system tokens, atomic component styles, and organism layout rules, are embedded in a single `<style>` tag. A BEM-like naming convention, aligned with Odoo's framework, is used for clarity.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Screen Organization</h4>
+                    <p>The HTML is structured to demonstrate two primary states of the form: a read-only view (for an 'In-Transit' trip) and an edit view (for a 'Planned' trip). This provides a comprehensive reference for implementation.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Responsive Design</h4>
+                    <p>A desktop-first approach is used, with media queries to handle the layout collapse on screens narrower than 1024px and 768px, ensuring graceful degradation.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Accessibility Compliance</h4>
+                    <p>WCAG 2.1 AA is targeted through the use of semantic markup, extensive ARIA attributes for complex components, and keyboard-accessible design.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Browser Support</h4>
+                    <p>The screen uses modern, widely-supported CSS features (Flexbox, Grid, Custom Properties) for compatibility with all target evergreen browsers.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Usage Guidelines</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>When Accessed</h4><p>This screen is the primary destination for viewing or editing a trip record. It is accessed by clicking a trip from a list or Kanban view.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Primary Actions</h4><p>Users can view trip details, edit trip data (if in the correct state and with permission), and advance the trip through its lifecycle using the header action buttons.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Navigation Patterns</h4><p>Users can navigate to related records (Expenses, Invoices) via the smart buttons. They can return to the list/Kanban view using the application's breadcrumbs.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Success Criteria</h4><p>A user successfully views, edits, or advances a trip's status, with all changes accurately reflected and persisted.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Testing Recommendations</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Screen Testing</h4><p>Test both the read-only and edit states of the form. Verify that all data fields are correctly displayed and that state-specific action buttons are visible/hidden as expected.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Responsive Testing</h4><p>Verify the layout collapse on tablet (1024px) and mobile (768px and 360px) viewports. Ensure no content is clipped and all interactive elements are usable.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Accessibility Testing</h4><ul><li>Perform a full keyboard navigation test to ensure all interactive elements are reachable in a logical order.</li><li>Use a screen reader to test the announcement of form labels, status changes, and tab navigation.</li><li>Validate color contrast for all text and UI elements.</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>User Flow Testing</h4><p>Test the end-to-end user flow: creating a new trip, editing it in 'Planned' state, assigning resources, and viewing it in 'In-Transit' state.</p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+</html>

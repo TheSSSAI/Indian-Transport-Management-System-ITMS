@@ -1,0 +1,69 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+# ==============================================================================
+# Full Access for TMS Admin Group
+# The Admin has full CRUD permissions on all TMS models for system management.
+# ==============================================================================
+access_tms_trip_admin,tms.trip admin access,model_tms_trip,tms_core.group_tms_admin,1,1,1,1
+access_tms_vehicle_admin,tms.vehicle admin access,model_tms_vehicle,tms_core.group_tms_admin,1,1,1,1
+access_tms_route_admin,tms.route admin access,model_tms_route,tms_core.group_tms_admin,1,1,1,1
+access_tms_material_admin,tms.material admin access,model_tms_material,tms_core.group_tms_admin,1,1,1,1
+access_tms_expense_admin,tms.expense admin access,model_tms_expense,tms_core.group_tms_admin,1,1,1,1
+access_tms_pod_admin,tms.pod admin access,model_tms_pod,tms_core.group_tms_admin,1,1,1,1
+access_tms_trip_event_admin,tms.trip.event admin access,model_tms_trip_event,tms_core.group_tms_admin,1,1,1,1
+access_tms_vehicle_document_admin,tms.vehicle.document admin access,model_tms_vehicle_document,tms_core.group_tms_admin,1,1,1,1
+access_tms_card_admin,tms.card admin access,model_tms_card,tms_core.group_tms_admin,1,1,1,1
+access_tms_alert_admin,tms.alert admin access,model_tms_alert,tms_core.group_tms_admin,1,1,1,1
+access_hr_employee_driver_admin,hr.employee driver admin access,model_hr_employee,tms_core.group_tms_admin,1,1,1,1
+access_res_partner_customer_admin,res.partner customer admin access,model_res_partner,tms_core.group_tms_admin,1,1,1,1
+
+# ==============================================================================
+# Access for Dispatch Manager Group
+# Full control over operational models (Trip, Expense). Read-only on master data.
+# Fulfills REQ-1-101: Dispatch Manager has permissions for operational tasks.
+# ==============================================================================
+access_tms_trip_manager,tms.trip manager access,model_tms_trip,tms_core.group_tms_dispatch_manager,1,1,1,1
+access_tms_expense_manager,tms.expense manager access,model_tms_expense,tms_core.group_tms_dispatch_manager,1,1,1,1
+access_tms_vehicle_manager_read,tms.vehicle manager read access,model_tms_vehicle,tms_core.group_tms_dispatch_manager,1,0,0,0
+access_tms_route_manager_read,tms.route manager read access,model_tms_route,tms_core.group_tms_dispatch_manager,1,0,0,0
+access_tms_material_manager_read,tms.material manager read access,model_tms_material,tms_core.group_tms_dispatch_manager,1,0,0,0
+access_tms_pod_manager_read,tms.pod manager read access,model_tms_pod,tms_core.group_tms_dispatch_manager,1,0,0,0
+access_tms_trip_event_manager_read,tms.trip.event manager read access,model_tms_trip_event,tms_core.group_tms_dispatch_manager,1,0,0,0
+access_tms_vehicle_document_manager_read,tms.vehicle.document manager read access,model_tms_vehicle_document,tms_core.group_tms_dispatch_manager,1,0,0,0
+access_tms_card_manager_read,tms.card manager read access,model_tms_card,tms_core.group_tms_dispatch_manager,1,0,0,0
+access_tms_alert_manager_read,tms.alert manager read access,model_tms_alert,tms_core.group_tms_dispatch_manager,1,0,0,0
+access_hr_employee_manager_read,hr.employee manager read access,model_hr_employee,tms_core.group_tms_dispatch_manager,1,0,0,0
+access_res_partner_manager_read,res.partner manager read access,model_res_partner,tms_core.group_tms_dispatch_manager,1,0,0,0
+
+# ==============================================================================
+# Access for Finance Officer Group
+# Full control on financial data (Cards). Read/Write on expenses for approval.
+# Read-only on operational data. Denied trip creation.
+# Fulfills REQ-1-101: Finance Officer has permissions to manage financial lifecycle but denied permissions to create or dispatch trips.
+# ==============================================================================
+access_tms_trip_finance_read,tms.trip finance read access,model_tms_trip,tms_core.group_tms_finance_officer,1,0,0,0
+access_tms_expense_finance,tms.expense finance access,model_tms_expense,tms_core.group_tms_finance_officer,1,1,1,1
+access_tms_card_finance,tms.card finance access,model_tms_card,tms_core.group_tms_finance_officer,1,1,1,1
+access_tms_vehicle_finance_read,tms.vehicle finance read access,model_tms_vehicle,tms_core.group_tms_finance_officer,1,0,0,0
+access_tms_route_finance_read,tms.route finance read access,model_tms_route,tms_core.group_tms_finance_officer,1,0,0,0
+access_tms_material_finance_read,tms.material finance read access,model_tms_material,tms_core.group_tms_finance_officer,1,0,0,0
+access_tms_pod_finance_read,tms.pod finance read access,model_tms_pod,tms_core.group_tms_finance_officer,1,0,0,0
+access_tms_trip_event_finance_read,tms.trip.event finance read access,model_tms_trip_event,tms_core.group_tms_finance_officer,1,0,0,0
+access_tms_vehicle_document_finance_read,tms.vehicle.document finance read access,model_tms_vehicle_document,tms_core.group_tms_finance_officer,1,0,0,0
+access_tms_alert_finance_read,tms.alert finance read access,model_tms_alert,tms_core.group_tms_finance_officer,1,0,0,0
+access_hr_employee_finance_read,hr.employee finance read access,model_hr_employee,tms_core.group_tms_finance_officer,1,0,0,0
+access_res_partner_finance,res.partner finance access,model_res_partner,tms_core.group_tms_finance_officer,1,1,1,0
+
+# ==============================================================================
+# Access for Driver Group
+# Highly restricted access. Read on their own trips. Create/Read/Update on own expenses.
+# Create/Read on events and PODs. Read on assigned vehicle documents.
+# Fulfills REQ-1-100: Strict data segregation for the 'Driver' role.
+# ==============================================================================
+access_tms_trip_driver,tms.trip driver access,model_tms_trip,tms_core.group_tms_driver,1,0,0,0
+access_tms_expense_driver,tms.expense driver access,model_tms_expense,tms_core.group_tms_driver,1,1,1,0
+access_tms_trip_event_driver,tms.trip.event driver access,model_tms_trip_event,tms_core.group_tms_driver,1,0,1,0
+access_tms_pod_driver,tms.pod driver access,model_tms_pod,tms_core.group_tms_driver,1,0,1,0
+access_tms_vehicle_driver_read,tms.vehicle driver read access,model_tms_vehicle,tms_core.group_tms_driver,1,0,0,0
+access_tms_vehicle_document_driver_read,tms.vehicle.document driver read access,model_tms_vehicle_document,tms_core.group_tms_driver,1,0,0,0
+# Drivers can see their own employee record
+access_hr_employee_driver_read,hr.employee driver read self,model_hr_employee,base.group_user,1,0,0,0

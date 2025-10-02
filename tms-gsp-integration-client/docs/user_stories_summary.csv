@@ -1,0 +1,2 @@
+"total_stories","total_story_points","must_have_stories","should_have_stories","could_have_stories","epics_identified","estimated_sprints","key_dependencies"
+"12","58","11","1","0","[""User and Access Management"",""Master Data Management"",""Security and Compliance"",""Trip Lifecycle Management"",""Real-Time Operations Monitoring"",""Financial Management & Invoicing""]","3","[""Odoo 18 Environment Setup"",""Master Data Models before Transactional Models"",""Core RBAC before feature implementation""]"

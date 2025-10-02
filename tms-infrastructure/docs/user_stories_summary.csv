@@ -1,0 +1,2 @@
+"total_stories","total_story_points","must_have_stories","should_have_stories","could_have_stories","epics_identified","estimated_sprints","key_dependencies"
+"15","84","15","0","0","[""User and Access Management"",""Master Data Management"",""Trip Lifecycle Management"",""Driver Portal & Mobile UX"",""Data Migration & Go-Live"",""Infrastructure, CI/CD & Operations""]","7","[""Odoo 18 Framework"",""AWS Infrastructure"",""Third-Party APIs (GSP, GPS)""]"

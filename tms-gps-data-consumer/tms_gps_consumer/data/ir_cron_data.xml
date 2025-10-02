@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            Scheduled Action (Cron Job) to trigger the GPS data consumer.
+
+            This cron job is the heart of the GPS consumer addon, periodically executing
+            the method that polls the RabbitMQ queue for new vehicle location messages.
+
+            - model_id: Points to the 'tms.gps.consumer.cron' model which acts as the
+                        Odoo-aware entry point for our service-layer logic.
+            - state: Specifies the Python code to be executed. 'model._run_consumer()'
+                     calls the designated method on the model.
+            - user_id: Runs as the 'base.user_root' (superuser) to ensure it has all
+                       necessary permissions to read system parameters (for credentials)
+                       and write to any 'tms.vehicle' record.
+            - interval_number/interval_type: Set to run every 15 seconds. This high
+                                             frequency is critical to meet the low-latency
+                                             NFR (REQ-1-501) for real-time tracking. This
+                                             value can be adjusted by an Admin in the UI.
+            - numbercall: Set to -1 to run indefinitely.
+            - doall: Set to False. This is important for a high-frequency job. It means
+                     that if the server is down and restarts, the scheduler will not try
+                     to run all the missed jobs from the downtime period. It will just
+                     resume the schedule from the current time, which is the correct
+                     behavior for a queue polling mechanism.
+            - noupdate="1": A critical attribute for production deployments. It ensures
+                            that once the record is created, any changes made by a system
+                            administrator in the Odoo UI (e.g., changing the interval) will
+                            NOT be overwritten during subsequent module updates.
+        -->
+        <record id="cron_process_gps_queue" model="ir.cron">
+            <field name="name">TMS: Process GPS Location Queue</field>
+            <field name="model_id" ref="model_tms_gps_consumer_cron"/>
+            <field name="state">code</field>
+            <field name="code">model._run_consumer()</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">15</field>
+            <field name="interval_type">seconds</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

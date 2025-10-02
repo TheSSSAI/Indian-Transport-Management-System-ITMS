@@ -1,0 +1,96 @@
+#
+# Production-specific Helm chart values for the TMS application suite.
+#
+# This file overrides the default values found in `charts/*/values.yaml`
+# when deploying to the production environment. It is applied via the
+# Kustomize overlay in `overlays/production/kustomization.yaml`.
+#
+# CI/CD pipelines are responsible for replacing the `__IMAGE_TAG__` placeholders
+# with the specific, versioned Docker image tag for a production release.
+#
+
+# -- Overrides for the Odoo monolith application (tms-odoo chart)
+tmsOdoo:
+  # Production image tag - to be replaced by CI/CD pipeline
+  image:
+    tag: "__IMAGE_TAG__"
+
+  # Replica count is managed declaratively via a Kustomize patch for production HA.
+  # See: overlays/production/patches/deployment-replicas.yaml
+  # replicaCount: 3
+
+  # Production resource allocation for Odoo pods.
+  # These values should be tuned based on performance testing and monitoring.
+  resources:
+    requests:
+      cpu: "1000m"
+      memory: "2Gi"
+    limits:
+      cpu: "2000m"
+      memory: "4Gi"
+
+  # Ingress configuration for the production environment
+  ingress:
+    enabled: true
+    hostname: "tms.example.com" # Production public hostname
+    annotations:
+      # AWS Load Balancer Controller specific annotations
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+      # Placeholder for the production ACM certificate ARN
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-south-1:123456789012:certificate/your-prod-cert-uuid"
+
+  # Secrets configuration for production
+  secrets:
+    db:
+      # Name of the SecretProviderClass for fetching production DB credentials
+      secretProviderClassName: "tms-odoo-prod-db-secrets"
+    gspApi:
+      # Name of the SecretProviderClass for fetching production GSP API credentials
+      secretProviderClassName: "tms-odoo-prod-gsp-secrets"
+
+  # Autoscaling is disabled for Odoo as it is a stateful application.
+  # Scaling is handled by increasing pod resources (vertical scaling) or
+  # by the static replica count defined in the HA patch.
+  autoscaling:
+    enabled: false
+
+# -- Overrides for the GPS ingestion microservice (tms-gps-service chart)
+tmsGpsService:
+  # Production image tag - to be replaced by CI/CD pipeline
+  image:
+    tag: "__IMAGE_TAG__"
+
+  # Replica count is managed declaratively via a Kustomize patch for production HA.
+  # The HPA will take over, but this provides a resilient starting point.
+  # replicaCount: 3
+
+  # Production resource allocation for GPS service pods.
+  # This is a lightweight service, but needs headroom for spiky traffic.
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  # Secrets configuration for production
+  secrets:
+    mq:
+      # Name of the SecretProviderClass for fetching production RabbitMQ credentials
+      secretProviderClassName: "tms-gps-prod-mq-secrets"
+    gpsApi:
+      # Name of the SecretProviderClass for fetching production GPS Provider API credentials
+      secretProviderClassName: "tms-gps-prod-gps-api-secrets"
+
+  # Autoscaling configuration for the stateless GPS microservice
+  autoscaling:
+    enabled: true
+    minReplicas: 3 # Minimum replicas for high availability (REQ-1-502)
+    maxReplicas: 10 # Maximum replicas to handle peak load
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80

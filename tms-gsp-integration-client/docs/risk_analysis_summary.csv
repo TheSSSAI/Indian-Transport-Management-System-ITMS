@@ -1,0 +1,2 @@
+"total_risks_identified","critical_risks","high_priority_risks","average_risk_score","key_risk_themes","immediate_actions_required"
+"8","0","2","12.63","[""External API Dependencies"",""Integration & Testing Complexity"",""Operational Readiness & Go-Live""]","[""Finalize GSP API resilience pattern and develop a detailed manual intervention runbook."",""Mandate and schedule multiple data migration dry-runs with automated validation."",""Prioritize foundational architecture and infrastructure tasks in early sprints to de-risk the timeline.""]"

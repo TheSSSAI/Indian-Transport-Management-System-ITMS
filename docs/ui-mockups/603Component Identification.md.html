@@ -1,0 +1,259 @@
+
+{
+  "component_inventory": {
+    "atomic_components": [
+      {
+        "component_name": "Action Button",
+        "category": "form_controls",
+        "variants": ["primary (oe_highlight)", "secondary", "state-transition", "icon-only"],
+        "states": ["default", "hover", "active", "disabled (invisible)"],
+        "responsive_needs": "Adheres to Odoo's standard responsive behavior.",
+        "dependencies": [],
+        "complexity_level": "low",
+        "implementation_priority": 1,
+        "estimated_effort": "1-2 hours (per button group)"
+      },
+      {
+        "component_name": "Field Widget (Many2one)",
+        "category": "form_controls",
+        "variants": ["standard_dropdown", "searchable", "with_create_edit"],
+        "states": ["default", "focused", "error", "read-only"],
+        "responsive_needs": "Standard Odoo mobile/tablet rendering for dropdowns.",
+        "dependencies": [],
+        "complexity_level": "low",
+        "implementation_priority": 1,
+        "estimated_effort": "0.5 hours (per field)"
+      },
+      {
+        "component_name": "Field Widget (Text/Char/Numeric)",
+        "category": "form_controls",
+        "variants": ["char", "integer", "float", "monetary", "text"],
+        "states": ["default", "focused", "error", "read-only", "required"],
+        "responsive_needs": "Standard Odoo field responsiveness.",
+        "dependencies": [],
+        "complexity_level": "low",
+        "implementation_priority": 1,
+        "estimated_effort": "0.5 hours (per field)"
+      },
+      {
+        "component_name": "Field Widget (Selection/Dropdown)",
+        "category": "form_controls",
+        "variants": ["standard", "radio_buttons"],
+        "states": ["default", "selected", "error", "read-only"],
+        "responsive_needs": "Standard Odoo widget behavior.",
+        "dependencies": [],
+        "complexity_level": "low",
+        "implementation_priority": 1,
+        "estimated_effort": "0.5 hours (per field)"
+      },
+      {
+        "component_name": "Status Badge",
+        "category": "feedback_elements",
+        "variants": ["default", "info", "success", "warning", "error"],
+        "states": ["default"],
+        "responsive_needs": "Standard Odoo widget behavior.",
+        "dependencies": [],
+        "complexity_level": "low",
+        "implementation_priority": 2,
+        "estimated_effort": "1 hour (for a set)"
+      }
+    ],
+    "molecular_components": [
+      {
+        "component_name": "Form Header with Statusbar",
+        "category": "layout",
+        "variants": ["standard", "with_actions"],
+        "states": ["default", "clickable_status"],
+        "responsive_needs": "Odoo's standard header adapts to screen width.",
+        "dependencies": ["Action Button", "Status Badge"],
+        "complexity_level": "medium",
+        "implementation_priority": 3,
+        "estimated_effort": "3-4 hours"
+      },
+      {
+        "component_name": "Smart Button Box",
+        "category": "navigation",
+        "variants": ["with_count", "simple_link"],
+        "states": ["default", "hover"],
+        "responsive_needs": "Standard Odoo component.",
+        "dependencies": [],
+        "complexity_level": "low",
+        "implementation_priority": 3,
+        "estimated_effort": "2-3 hours (per form)"
+      },
+      {
+        "component_name": "Notebook Tabs",
+        "category": "layout",
+        "variants": ["horizontal_tabs"],
+        "states": ["active_tab", "inactive_tab"],
+        "responsive_needs": "Standard Odoo component; tabs may wrap or become a dropdown on small screens.",
+        "dependencies": [],
+        "complexity_level": "low",
+        "implementation_priority": 2,
+        "estimated_effort": "1-2 hours (per form)"
+      },
+      {
+        "component_name": "Chatter/Log Area",
+        "category": "feedback_elements",
+        "variants": ["with_attachments", "with_activities"],
+        "states": ["default"],
+        "responsive_needs": "Standard Odoo mail.thread widget behavior.",
+        "dependencies": [],
+        "complexity_level": "low",
+        "implementation_priority": 3,
+        "estimated_effort": "1 hour (integration)"
+      },
+      {
+        "component_name": "Kanban Card (Trip)",
+        "category": "data_display",
+        "variants": ["default", "on_hold (highlighted)"],
+        "states": ["default", "hover", "dragged"],
+        "responsive_needs": "Cards stack vertically on smaller screens.",
+        "dependencies": ["Status Badge"],
+        "complexity_level": "medium",
+        "implementation_priority": 3,
+        "estimated_effort": "4-6 hours"
+      }
+    ],
+    "organism_components": [
+      {
+        "component_name": "Master Data Form View",
+        "category": "forms",
+        "variants": ["Vehicle", "Driver (inherited)", "Customer (inherited)", "Route", "Material"],
+        "states": ["new", "edit", "read-only"],
+        "responsive_needs": "Standard Odoo two-column layout collapses to single-column.",
+        "dependencies": ["Form Header with Statusbar", "Field Widget (Many2one)", "Field Widget (Text/Char/Numeric)", "Notebook Tabs", "Chatter/Log Area"],
+        "complexity_level": "medium",
+        "implementation_priority": 2,
+        "estimated_effort": "8-12 hours (for all master data forms)"
+      },
+      {
+        "component_name": "Trip Form View",
+        "category": "forms",
+        "variants": ["all_roles"],
+        "states": ["new", "edit", "read-only", "state_planned", "state_assigned", "state_in_transit", "state_on_hold", "state_delivered", "state_completed"],
+        "responsive_needs": "Standard Odoo two-column layout collapses to single-column.",
+        "dependencies": ["Form Header with Statusbar", "Smart Button Box", "Field Widget (Many2one)", "Notebook Tabs", "Chatter/Log Area"],
+        "complexity_level": "high",
+        "implementation_priority": 3,
+        "estimated_effort": "12-16 hours"
+      },
+      {
+        "component_name": "Trip Kanban Board",
+        "category": "data_display",
+        "variants": ["default"],
+        "states": ["loading", "loaded", "empty"],
+        "responsive_needs": "Columns become horizontally scrollable on smaller viewports.",
+        "dependencies": ["Kanban Card (Trip)"],
+        "complexity_level": "medium",
+        "implementation_priority": 3,
+        "estimated_effort": "6-8 hours"
+      },
+      {
+        "component_name": "Modal Wizard (Odoo)",
+        "category": "overlays",
+        "variants": ["Reason Input (Resume Trip)"],
+        "states": ["open", "error"],
+        "responsive_needs": "Standard Odoo modal behavior.",
+        "dependencies": ["Action Button", "Field Widget (Text/Char/Numeric)"],
+        "complexity_level": "low",
+        "implementation_priority": 4,
+        "estimated_effort": "3-5 hours"
+      }
+    ]
+  },
+  "screen_inventory": [
+    {
+      "screen_name": "Trip Management Dashboard",
+      "screen_type": "kanban_view",
+      "variants": ["desktop", "tablet"],
+      "states": ["loading", "loaded", "empty"],
+      "required_components": ["Trip Kanban Board", "Odoo Search View"],
+      "platform_optimizations": "Standard Odoo Kanban view optimized for desktop use.",
+      "implementation_priority": 2,
+      "estimated_effort": "6-8 hours",
+      "user_flow_criticality": "high"
+    },
+    {
+      "screen_name": "Trip List Screen",
+      "screen_type": "list_view",
+      "variants": ["desktop", "tablet"],
+      "states": ["loading", "loaded", "empty"],
+      "required_components": ["Odoo List View", "Odoo Search View", "Action Button"],
+      "platform_optimizations": "Standard Odoo List/Tree view with searchable/filterable columns.",
+      "implementation_priority": 2,
+      "estimated_effort": "4-6 hours",
+      "user_flow_criticality": "high"
+    },
+    {
+      "screen_name": "Trip Detail Screen",
+      "screen_type": "form_view",
+      "variants": ["desktop", "tablet"],
+      "states": ["loading", "loaded", "edit_mode", "read_only_mode", "error"],
+      "required_components": ["Trip Form View"],
+      "platform_optimizations": "Standard Odoo Form view with conditional logic for state transitions.",
+      "implementation_priority": 3,
+      "estimated_effort": "12-16 hours",
+      "user_flow_criticality": "high"
+    },
+    {
+      "screen_name": "Master Data Screens (Vehicles, Routes, etc.)",
+      "screen_type": "list_form_views",
+      "variants": ["Vehicle List/Form", "Route List/Form", "Material List/Form"],
+      "states": ["loading", "loaded", "empty", "edit_mode"],
+      "required_components": ["Master Data Form View", "Odoo List View", "Odoo Search View"],
+      "platform_optimizations": "Standard Odoo CRUD interface for master data management.",
+      "implementation_priority": 1,
+      "estimated_effort": "16-24 hours (for all)",
+      "user_flow_criticality": "high"
+    },
+    {
+      "screen_name": "Resume Trip Modal",
+      "screen_type": "modal_wizard",
+      "variants": ["desktop", "tablet"],
+      "states": ["open", "validation_error"],
+      "required_components": ["Modal Wizard (Odoo)"],
+      "platform_optimizations": "Standard Odoo modal for capturing mandatory user input.",
+      "implementation_priority": 4,
+      "estimated_effort": "3-5 hours",
+      "user_flow_criticality": "medium"
+    }
+  ],
+  "implementation_plan": {
+    "phase_1_foundation": {
+      "components": ["Odoo model definitions for all master data", "Base Odoo List/Form views for Vehicle, Route, Material", "Inherited views for Customer and Driver"],
+      "rationale": "Establishes the foundational master data required for all other operations. Fulfills REQ-1-003.",
+      "estimated_duration": "5-7 days"
+    },
+    "phase_2_building_blocks": {
+      "components": ["Odoo model definition for Trip", "Base Odoo List, Form, and Kanban views for Trip", "Kanban Card (Trip)"],
+      "rationale": "Builds the core transactional object and its primary visualizations. Fulfills REQ-1-004.",
+      "estimated_duration": "4-6 days"
+    },
+    "phase_3_complex_components": {
+      "components": ["Trip Form View header with statusbar and state-based buttons", "Modal Wizard (Resume Trip)"],
+      "rationale": "Implements the state machine and exception handling logic on the core transactional UI. Fulfills REQ-1-103 and REQ-1-904.",
+      "estimated_duration": "3-5 days"
+    },
+    "phase_4_screens": {
+      "screens": ["Refinement of all views", "Integration of Smart Buttons", "Chatter/Log Area integration"],
+      "rationale": "Refines the user experience and adds secondary features and navigation aids to the implemented views.",
+      "estimated_duration": "2-4 days"
+    }
+  },
+  "platform_implementation_strategy": {
+    "target_platform": "Odoo 18 Backend Web Client (Desktop/Tablet)",
+    "implementation_approach": "desktop_first",
+    "responsive_strategy": "Leverage Odoo 18's built-in responsive framework for graceful degradation on tablet and mobile viewports.",
+    "progressive_enhancement": "Core CRUD functionality first, followed by state-driven conditional UI and wizards, then UX enhancements like smart buttons.",
+    "browser_support": "Latest versions of Chrome, Firefox, Safari, Edge.",
+    "accessibility_integration": "WCAG 2.1 AA compliance will be achieved by using standard Odoo components and adhering to their accessibility guidelines."
+  },
+  "quality_assurance_plan": {
+    "component_testing": "Manual and automated testing of individual Odoo views (Form, List, Kanban) to ensure they render correctly and all fields are present.",
+    "integration_testing": "Testing the interaction between views, such as clicking a record in a List View to open its Form View, or selecting a master data record in a Trip Form.",
+    "responsive_testing": "Verifying Odoo's default responsive behavior on screen widths down to 768px (tablet). Full mobile (360px) is not a primary target for the backend.",
+    "accessibility_testing": "Manual checks for keyboard navigation and logical tab order within forms. Use of standard Odoo widgets ensures baseline accessibility.",
+    "performance_testing": "Verifying that List views with many records load within acceptable Odoo performance benchmarks."
+  }
+}

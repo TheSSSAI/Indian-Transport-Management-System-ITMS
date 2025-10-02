@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Molecular Component: Signature Pad</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      /* ---------------------------------- */
+      /*         DESIGN TOKENS (CSS)        */
+      /* ---------------------------------- */
+      :root {
+        /* Colors - Primary */
+        --color-primary-100: #DBEAFE;
+        --color-primary-500: #3B82F6;
+        --color-primary-600: #2563EB;
+        --color-primary-700: #1D4ED8;
+        /* Colors - Neutrals */
+        --color-white: #FFFFFF;
+        --color-gray-50: #F9FAFB;
+        --color-gray-100: #F3F4F6;
+        --color-gray-300: #D1D5DB;
+        --color-gray-500: #6B7280;
+        --color-gray-700: #374151;
+        --color-gray-900: #111827;
+        /* Colors - Semantic */
+        --color-success-base: #16A34A;
+        --color-error-base: #DC2626;
+        --color-info-base: #0284C7;
+
+        /* Fonts */
+        --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        --font-size-sm: 14px;
+        --font-size-base: 16px;
+        --font-size-lg: 18px;
+        --font-weight-normal: 400;
+        --font-weight-medium: 500;
+        --font-weight-semibold: 600;
+        --font-weight-bold: 700;
+        /* Spacing */
+        --spacing-xs: 4px;
+        --spacing-sm: 8px;
+        --spacing-md: 16px;
+        --spacing-lg: 24px;
+        --spacing-xl: 32px;
+        /* Borders */
+        --border-radius-md: 6px;
+        --border-radius-lg: 8px;
+        /* Transitions */
+        --transition-fast: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      /* ---------------------------------- */
+      /*       BASE & LAYOUT STYLES         */
+      /* ---------------------------------- */
+      *, *::before, *::after { box-sizing: border-box; }
+      body {
+        font-family: var(--font-family-primary);
+        background-color: var(--color-gray-100);
+        color: var(--color-gray-900);
+        margin: 0;
+        padding: var(--spacing-lg);
+      }
+      .mobile-showcase {
+        max-width: 420px;
+        min-width: 360px;
+        margin: 0 auto;
+        background-color: var(--color-white);
+        padding: var(--spacing-lg);
+        border-radius: var(--border-radius-lg);
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+      }
+      h2 { font-size: 20px; margin-bottom: var(--spacing-md); padding-bottom: var(--spacing-sm); border-bottom: 1px solid var(--color-gray-300); }
+      .component-section { margin-bottom: var(--spacing-xl); }
+      .form-label { display: block; font-weight: var(--font-weight-medium); margin-bottom: var(--spacing-sm); }
+
+      /* ---------------------------------- */
+      /*    LARGE ACTION BUTTON (MOBILE)    */
+      /* ---------------------------------- */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+        min-height: 48px;
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-bold);
+        text-decoration: none;
+        border: 1px solid transparent;
+        border-radius: var(--border-radius-md);
+        cursor: pointer;
+        transition: var(--transition-fast);
+        -webkit-tap-highlight-color: transparent;
+      }
+      .btn:focus-visible {
+          outline: 2px solid var(--color-primary-500);
+          outline-offset: 2px;
+      }
+      .btn:active { transform: scale(0.98); }
+      
+      /* Secondary Variant */
+      .btn--secondary {
+        background-color: var(--color-white);
+        color: var(--color-gray-700);
+        border-color: var(--color-gray-300);
+      }
+      .btn--secondary:hover { background-color: var(--color-gray-50); }
+
+      /* ---------------------------------- */
+      /*       Component: Signature Pad     */
+      /* ---------------------------------- */
+      .signature-pad-wrapper {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .signature-pad {
+        position: relative;
+        border: 1px solid var(--color-gray-300);
+        border-radius: var(--border-radius-lg);
+        background-color: var(--color-gray-50);
+        touch-action: none; /* Prevents scrolling while drawing on touch devices */
+        aspect-ratio: 2 / 1; /* Maintain a consistent shape */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden; /* Keep canvas inside rounded corners */
+        transition: var(--transition-fast);
+      }
+
+      .signature-pad:focus-within {
+          border-color: var(--color-primary-500);
+          box-shadow: 0 0 0 2px var(--color-primary-100);
+      }
+
+      .signature-pad__canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: crosshair;
+      }
+
+      .signature-pad__placeholder {
+        color: var(--color-gray-500);
+        font-size: var(--font-size-base);
+        pointer-events: none;
+        user-select: none;
+        transition: opacity 150ms ease-in-out;
+      }
+
+      .signature-pad--signed .signature-pad__placeholder,
+      .signature-pad--drawing .signature-pad__placeholder {
+        opacity: 0;
+      }
+
+      .signature-pad__actions {
+        position: absolute;
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
+        display: flex;
+        gap: var(--spacing-sm);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 150ms ease-in-out, visibility 150ms ease-in-out;
+      }
+
+      .signature-pad--signed .signature-pad__actions {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      /* Override button styles for this specific context */
+      .signature-pad__actions .btn {
+        width: auto; /* Allow buttons to be their natural width */
+        min-height: 36px;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+      }
+    </style>
+</head>
+<body>
+
+<div class="mobile-showcase">
+    <header>
+        <h1 style="font-size: 24px; margin-bottom: var(--spacing-lg);">Molecular Component: Signature Pad</h1>
+    </header>
+    <main>
+        <section class="component-section">
+            <h2>Interactive Example</h2>
+            <div id="pod-signature-pad" class="signature-pad-wrapper">
+                <label for="signature-canvas" class="form-label">Recipient Signature</label>
+                <div class="signature-pad" data-state="empty">
+                    <span class="signature-pad__placeholder">Sign Here</span>
+                    <canvas id="signature-canvas" class="signature-pad__canvas"></canvas>
+                    <div class="signature-pad__actions">
+                        <button type="button" class="btn btn--secondary" id="clear-signature">Clear</button>
+                    </div>
+                </div>
+                <p class="form-error-message" style="margin-top: var(--spacing-sm); color: var(--color-gray-500); font-size: var(--font-size-sm);">Please provide a signature to confirm delivery.</p>
+            </div>
+        </section>
+
+        <div>
+            <h2>Component Variations</h2>
+            <div>
+                <h3>Default</h3>
+                <p style="color: var(--color-gray-500); font-size: var(--font-size-base); line-height: 1.5; margin-top: -8px;">The standard implementation for capturing a signature. It includes states for empty, drawing, and signed. The drawing line is black with a width of 2px. The canvas is responsive and maintains a 2:1 aspect ratio.</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const signaturePadElement = document.getElementById('pod-signature-pad');
+        const canvas = signaturePadElement.querySelector('#signature-canvas');
+        const signaturePadContainer = signaturePadElement.querySelector('.signature-pad');
+        const clearButton = signaturePadElement.querySelector('#clear-signature');
+        const ctx = canvas.getContext('2d');
+
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let hasSigned = false;
+
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * ratio;
+            canvas.height = rect.height * ratio;
+            ctx.scale(ratio, ratio);
+            ctx.strokeStyle = '#111827'; // --color-gray-900
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function getEventPosition(event) {
+            const rect = canvas.getBoundingClientRect();
+            if (event.touches && event.touches.length > 0) {
+                return {
+                    x: event.touches[0].clientX - rect.left,
+                    y: event.touches[0].clientY - rect.top
+                };
+            }
+            return {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top
+            };
+        }
+
+        function startDrawing(e) {
+            e.preventDefault();
+            isDrawing = true;
+            const pos = getEventPosition(e);
+            [lastX, lastY] = [pos.x, pos.y];
+            signaturePadContainer.dataset.state = 'drawing';
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const pos = getEventPosition(e);
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            [lastX, lastY] = [pos.x, pos.y];
+            hasSigned = true;
+        }
+
+        function stopDrawing() {
+            if (!isDrawing) return;
+            isDrawing = false;
+            if (hasSigned) {
+                signaturePadContainer.dataset.state = 'signed';
+            } else {
+                signaturePadContainer.dataset.state = 'empty';
+            }
+        }
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hasSigned = false;
+            signaturePadContainer.dataset.state = 'empty';
+        }
+        
+        // Event Listeners for Mouse
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseleave', stopDrawing);
+
+        // Event Listeners for Touch
+        canvas.addEventListener('touchstart', startDrawing);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchcancel', stopDrawing);
+
+        clearButton.addEventListener('click', clearSignature);
+    });
+</script>
+
+</body>
+</html>

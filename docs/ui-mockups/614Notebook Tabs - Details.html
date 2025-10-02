@@ -1,0 +1,501 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notebook Tabs - Component Specifications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .component-type-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .section h2 {
+            color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4f46e5;
+            display: inline-block;
+        }
+        
+        .section h3 {
+            color: #4f46e5;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .info-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .variations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .variation-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .variation-name {
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 8px;
+        }
+        
+        .variation-code {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #1e293b;
+            overflow-x: auto;
+            margin: 8px 0;
+            border-left: 4px solid #4f46e5;
+        }
+        
+        .variation-description {
+            font-size: 13px;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .feature-category {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .feature-category h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .feature-category ul {
+            list-style: none;
+        }
+        
+        .feature-category li {
+            padding: 6px 0;
+            color: #4b5563;
+            font-size: 14px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .feature-category li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .tokens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        
+        .token {
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            border: 1px solid #bae6fd;
+            text-align: center;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 16px 0;
+            line-height: 1.4;
+        }
+        
+        .stats-bar {
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .stat {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Notebook Tabs</h1>
+            <div class="component-type-badge">molecular Component</div>
+        </div>
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Variations</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">15</span>
+                <span class="stat-label">Design Tokens</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">3</span>
+                <span class="stat-label">Breakpoints</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">5</span>
+                <span class="stat-label">A11y Features</span>
+            </div>
+        </div><div class="content">
+        <div class="section">
+            <h2>Component Information</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Component Id</h4>
+                    <p>MU-MOLC-003</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Name</h4>
+                    <p>Notebook Tabs</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Type</h4>
+                    <p>molecular</p>
+                </div>
+                <div class="info-card">
+                    <h4>Description</h4>
+                    <p>A layout component used to organize content within a form into separate, selectable sections. It allows users to switch between different views of related information without leaving the page, which is essential for complex forms like the Trip or Vehicle master data views.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Design System Alignment</h4>
+                    <p>Uses design system tokens for colors (primary for the active state indicator, neutrals for borders and text), spacing (padding in tabs and panels), and typography (font weights and sizes for active vs. inactive tabs).</p>
+                </div>
+                <div class="info-card">
+                    <h4>Organism Map</h4>
+                    <p>Master Data Form View,Trip Form View</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Design Tokens Used</h2>
+            <div class="tokens-grid"><div class="token">--color-primary-500</div><div class="token">--color-primary-600</div><div class="token">--color-primary-700</div><div class="token">--color-gray-100</div><div class="token">--color-gray-300</div><div class="token">--color-gray-500</div><div class="token">--color-gray-700</div><div class="token">--space-2</div><div class="token">--space-3</div><div class="token">--space-4</div><div class="token">--space-5</div><div class="token">--font-size-base</div><div class="token">--font-weight-medium</div><div class="token">--font-weight-semibold</div><div class="token">--border-radius-md</div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Responsive Specifications</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Mobile Adaptations</h4>
+                    <ul><li>On smaller screens where horizontal space is limited, the flex container for the tabs will wrap, placing overflow tabs onto a new line.</li><li>This behavior is consistent with Odoo's standard responsive patterns for notebooks.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Tablet Adaptations</h4>
+                    <ul><li>The component maintains its horizontal layout, providing more space is available.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Desktop Enhancements</h4>
+                    <ul><li>The standard horizontal tab layout is the primary design for desktop, offering clear and direct navigation between content sections.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Accessibility Features</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Keyboard Support</h4><p>Users can navigate between tabs using the Tab key. The Enter or Space key can be used to select a focused tab.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Screen Reader Support</h4><p>Semantic roles (`role="tablist"`, `role="tab"`, `role="tabpanel"`) and ARIA attributes (`aria-selected`, `aria-controls`) link tabs to their corresponding content panels, providing a coherent experience for screen reader users.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Focus Management</h4><p>A clear, visible focus indicator is applied to the active tab button using `:focus-visible`.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Aria Attributes</h4><ul><li>role="tablist"</li><li>role="tab"</li><li>role="tabpanel"</li><li>aria-selected="true/false"</li><li>aria-controls="[panel_id]"</li><li>id="[panel_id]"</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Color Contrast</h4><p>The active tab uses a combination of color, font weight, and a bottom border to indicate its state, ensuring it is not reliant on color alone. Text colors meet WCAG AA contrast ratios.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>CSS Implementation</h2>
+            <div class="code-block">/* Component: Notebook Tabs */
+
+/* Base styles for the tab container */
+.notebook-tabs {
+  width: 100%;
+}
+
+/* The list of tab buttons */
+.notebook-tabs__list {
+  display: flex;
+  flex-wrap: wrap; /* Allows tabs to wrap on smaller screens */
+  border-bottom: 1px solid var(--color-gray-300);
+  margin: 0;
+  padding: 0;
+}
+
+/* Individual tab button styling */
+.notebook-tabs__tab {
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray-500);
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: -1px; /* Overlaps the container&#039;s bottom border */
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+/* Hover state for inactive tabs */
+.notebook-tabs__tab:hover:not(.is-active) {
+  color: var(--color-gray-700);
+  background-color: var(--color-gray-100);
+}
+
+/* Focus state for keyboard navigation */
+.notebook-tabs__tab:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: -2px;
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+}
+
+/* Active tab state */
+.notebook-tabs__tab.is-active {
+  color: var(--color-primary-700);
+  font-weight: var(--font-weight-semibold);
+  border-bottom-color: var(--color-primary-600);
+}
+
+/* Container for the tab panel content */
+.notebook-tabs__panel {
+  padding: var(--space-5) var(--space-2);
+}
+
+/* Utility to hide inactive panels */
+.is-hidden {
+  display: none;
+}
+</div>
+        </div>
+        <div class="section">
+            <h2>Implementation Notes</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Embedded Css Architecture</h4>
+                    <p>All styles are embedded in a single `<style>` tag. Design system tokens are used as CSS custom properties. The component uses a BEM (Block, Element, Modifier) naming convention for clarity and maintainability (e.g., `.notebook-tabs`, `.notebook-tabs__tab`, `.notebook-tabs__tab.is-active`).</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Organization</h4>
+                    <p>The HTML is structured semantically with a tab list containing tab buttons, followed by a series of tab panels. This separation of controls and content is crucial for accessibility and logical structure.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Responsive Design</h4>
+                    <p>Responsiveness is achieved through `flex-wrap: wrap` on the tab list container, which is a simple and robust solution that degrades gracefully on smaller viewports, consistent with Odoo's standard behavior.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Accessibility Compliance</h4>
+                    <p>WCAG 2.1 AA compliance is achieved through semantic HTML, extensive use of ARIA roles and attributes to define the widget's behavior for assistive technologies, and high-contrast, visible focus states.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Browser Support</h4>
+                    <p>Uses modern, well-supported CSS properties like Flexbox and Custom Properties, ensuring compatibility with all target browsers.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Usage Guidelines</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>When To Use</h4><p>Use to segment a large form (like a vehicle or trip record) into logical sections to reduce cognitive load and improve organization. Ideal for separating primary details, financial information, historical logs, and related documents.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Content Guidelines</h4><p>Tab labels should be short and concise (1-2 words). The content within each tab panel should be thematically related.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Placement Rules</h4><p>Typically placed as the main content area within a form view, below the header and smart buttons.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Customization Options</h4><ul><li style="list-style: disc; margin-left: 16px; padding-left: 0;">The number of tabs and panels is flexible.</li><li style="list-style: disc; margin-left: 16px; padding-left: 0;">The active state is controlled by adding the `is-active` class to the tab button and removing the `is-hidden` class from the corresponding panel.</li></ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Testing Recommendations</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Browser Testing</h4><p>Test in Chrome, Firefox, and Safari.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Device Testing</h4><p>Verify the wrapping behavior on tablet and mobile viewports (e.g., screen widths of 768px and 480px).</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Accessibility Testing</h4><ul><li>Verify keyboard navigation by using the Tab key to move between tabs and Enter/Space to activate.</li><li>Use a screen reader (NVDA, VoiceOver) to ensure the roles, states, and relationships between tabs and panels are announced correctly.</li><li>Check color contrast of active vs. inactive tab text.</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Performance Testing</h4><p>Not applicable at the component level, as performance is tied to the content within the panels.</p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+</html>

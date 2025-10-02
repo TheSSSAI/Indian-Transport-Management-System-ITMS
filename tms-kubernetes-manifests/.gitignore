@@ -1,0 +1,49 @@
+# Helm and Kubernetes specific
+################################
+# Helm dependency charts
+charts/
+
+# Helm packaged charts
+*.tgz
+
+# Helm temporary files
+.DS_Store
+
+# Kustomize build output
+kustomize-build/
+
+# General
+#########
+# IDE settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local config files that may contain secrets
+values-local.yaml
+secrets.yaml
+
+# Build artifacts and temporary files
+tmp/
+*.tmp
+*.bak
+*.log
+
+# OS-specific
+###########
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Windows thumbnail cache
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+
+# Linux
+*~

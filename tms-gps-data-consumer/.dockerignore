@@ -1,0 +1,45 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.env
+.venv
+venv/
+env/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Odoo specific
+*.po
+*.pot
+sessions/
+filestore/
+
+# Test reports and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+junit.xml
+
+# Build artifacts
+dist/
+build/
+*.egg

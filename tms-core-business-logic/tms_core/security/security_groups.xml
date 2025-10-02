@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+        =====================================================
+        TMS Module Category
+        =====================================================
+        This category groups all TMS-specific roles for easier
+        management within the Odoo user settings interface.
+        It is the parent for all security groups defined below.
+        -->
+        <record id="module_category_tms" model="ir.module.category">
+            <field name="name">Transport Management</field>
+            <field name="description">User roles and access levels for the Transport Management System.</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!--
+        =====================================================
+        TMS User Roles (Security Groups)
+        =====================================================
+        These groups define the primary roles within the TMS,
+        as outlined in REQ-1-008. Each group corresponds to a
+        specific user persona with a defined set of permissions.
+        -->
+
+        <!--
+        Driver Role
+        - Most restricted role.
+        - Record rules will limit access to only their own trips.
+        - Views will hide financial information.
+        - Access controlled by: REQ-1-100, US-070
+        -->
+        <record id="group_tms_driver" model="res.groups">
+            <field name="name">Driver</field>
+            <field name="category_id" ref="module_category_tms"/>
+            <field name="comment">
+                The user can access the mobile-friendly Driver Portal to view their assigned trips, update trip status, submit expenses, and upload Proof of Delivery. Access is strictly limited to their own operational data.
+            </field>
+        </record>
+
+        <!--
+        Finance Officer Role
+        - Specialized role for financial management.
+        - Has full access to invoicing and payments but is restricted from operational tasks like trip creation.
+        - Access controlled by: REQ-1-101, US-070
+        - Implies access to base accounting user group for full functionality.
+        -->
+        <record id="group_tms_finance_officer" model="res.groups">
+            <field name="name">Finance Officer</field>
+            <field name="category_id" ref="module_category_tms"/>
+            <field name="implied_ids" eval="[(4, ref('account.group_account_invoice'))]"/>
+            <field name="comment">
+                The user can manage the full financial lifecycle of a trip, including creating GST-compliant invoices, recording payments, tracking receivables, and generating financial reports. They cannot create or dispatch trips.
+            </field>
+        </record>
+
+        <!--
+        Dispatch Manager Role
+        - Specialized role for operational management.
+        - Has full access to trip and expense management but is restricted from system administration and final financial settlement.
+        - Access controlled by: REQ-1-101, US-070
+        -->
+        <record id="group_tms_dispatch_manager" model="res.groups">
+            <field name="name">Dispatch Manager</field>
+            <field name="category_id" ref="module_category_tms"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">
+                The user can manage the full operational lifecycle of a trip, including creation, assignment of resources, expense approval, and monitoring. They cannot manage user accounts or perform final financial settlements.
+            </field>
+        </record>
+
+        <!--
+        Administrator Role
+        - Super-user role for the TMS module.
+        - Inherits all permissions from the other TMS roles.
+        - Has access to system configuration and user management.
+        - Access controlled by: REQ-1-008, US-070
+        - Implies access to Odoo's base administration/settings group.
+        -->
+        <record id="group_tms_admin" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="module_category_tms"/>
+            <field name="implied_ids" eval="[
+                (4, ref('group_tms_dispatch_manager')),
+                (4, ref('group_tms_finance_officer')),
+                (4, ref('group_tms_driver')),
+                (4, ref('base.group_system'))
+            ]"/>
+            <field name="comment">
+                The user has full access to all features of the Transport Management System, including master data management, system configuration, user management, and all operational and financial workflows.
+            </field>
+        </record>
+
+    </data>
+</odoo>

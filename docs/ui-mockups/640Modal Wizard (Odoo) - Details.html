@@ -1,0 +1,522 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Wizard (Odoo) - Component Specifications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .component-type-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .section h2 {
+            color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4f46e5;
+            display: inline-block;
+        }
+        
+        .section h3 {
+            color: #4f46e5;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .info-card h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        
+        .info-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .variations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        
+        .variation-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .variation-name {
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 8px;
+        }
+        
+        .variation-code {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            color: #1e293b;
+            overflow-x: auto;
+            margin: 8px 0;
+            border-left: 4px solid #4f46e5;
+        }
+        
+        .variation-description {
+            font-size: 13px;
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .feature-category {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .feature-category h4 {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .feature-category ul {
+            list-style: none;
+        }
+        
+        .feature-category li {
+            padding: 6px 0;
+            color: #4b5563;
+            font-size: 14px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .feature-category li:before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .tokens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        
+        .token {
+            background: #f0f9ff;
+            color: #0369a1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            border: 1px solid #bae6fd;
+            text-align: center;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 16px 0;
+            line-height: 1.4;
+        }
+        
+        .stats-bar {
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .stat {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Modal Wizard (Odoo)</h1>
+            <div class="component-type-badge">organism Component</div>
+        </div>
+        <div class="stats-bar">
+            <div class="stat">
+                <span class="stat-number">0</span>
+                <span class="stat-label">Variations</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">19</span>
+                <span class="stat-label">Design Tokens</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">3</span>
+                <span class="stat-label">Breakpoints</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">5</span>
+                <span class="stat-label">A11y Features</span>
+            </div>
+        </div><div class="content">
+        <div class="section">
+            <h2>Component Information</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Component Id</h4>
+                    <p>MU-ORGN-004</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Name</h4>
+                    <p>Modal Wizard (Odoo)</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Type</h4>
+                    <p>organism</p>
+                </div>
+                <div class="info-card">
+                    <h4>Description</h4>
+                    <p>A modal dialog used to capture user input for a specific action, such as providing a mandatory reason for a state change. It overlays the current view, requiring user interaction before they can return to the main application.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Design System Alignment</h4>
+                    <p>This component is an organism composed of atomic elements like Action Buttons and Form Inputs. It uses the design system's color palette for backgrounds, text, and states; spacing tokens for padding; and typography for titles and content.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Design Tokens Used</h2>
+            <div class="tokens-grid"><div class="token">--color-neutral-white</div><div class="token">--color-neutral-50</div><div class="token">--color-neutral-200</div><div class="token">--color-neutral-500</div><div class="token">--color-neutral-700</div><div class="token">--color-neutral-900</div><div class="token">--color-primary-700</div><div class="token">--color-semantic-error</div><div class="token">--space-2</div><div class="token">--space-3</div><div class="token">--space-4</div><div class="token">--space-6</div><div class="token">--font-size-sm</div><div class="token">--font-size-lg</div><div class="token">--font-weight-medium</div><div class="token">--font-weight-semibold</div><div class="token">--border-radius-md</div><div class="token">--border-radius-lg</div><div class="token">--shadow-focus-ring</div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Responsive Specifications</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Mobile Adaptations</h4>
+                    <ul><li>The modal dialog takes up a larger percentage of the screen width.</li><li>Internal padding is slightly reduced to maximize content space.</li><li>Footer buttons may stack if there are more than two.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Tablet Adaptations</h4>
+                    <ul><li>Maintains the desktop layout and sizing.</li>
+                    </ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Desktop Enhancements</h4>
+                    <ul><li>Optimized max-width for readability.</li><li>Subtle entrance animation.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Accessibility Features</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Keyboard Support</h4><p>The modal must trap focus, meaning the Tab key cycles only through the modal's interactive elements. The `Esc` key should close the modal.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Screen Reader Support</h4><p>The dialog uses `role="dialog"` and `aria-modal="true"`. An `aria-labelledby` attribute points to the modal title for context.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Focus Management</h4><p>When the modal opens, focus is programmatically moved to the first interactive element inside it (e.g., the textarea or close button).</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Aria Attributes</h4><ul><li>role="dialog"</li><li>aria-modal="true"</li><li>aria-labelledby</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Color Contrast</h4><p>All text, icons, and interactive elements meet WCAG 2.1 AA contrast requirements.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>CSS Implementation</h2>
+            <div class="code-block">/* Component: Modal Wizard */
+
+/* Backdrop: Covers the entire screen */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(17, 24, 39, 0.6);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+/* Dialog: The main modal container */
+.modal-dialog {
+  background-color: var(--color-neutral-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: modal-fade-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Header */
+.modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-neutral-200);
+  flex-shrink: 0;
+}
+
+.modal__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-neutral-900);
+  margin: 0;
+}
+
+/* Content */
+.modal__content {
+  padding: var(--space-6);
+  overflow-y: auto;
+}
+
+/* Footer */
+.modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background-color: var(--color-neutral-50);
+  border-top: 1px solid var(--color-neutral-200);
+  flex-shrink: 0;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .modal-dialog {
+    animation: none;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal__header, .modal__footer {
+        padding: var(--space-3);
+    }
+    .modal__content {
+        padding: var(--space-4);
+    }
+}
+</div>
+        </div>
+        <div class="section">
+            <h2>Implementation Notes</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Embedded Css Architecture</h4>
+                    <p>All styles, including design system tokens and atomic component styles (buttons, inputs), are embedded in a single `<style>` tag. BEM is used for component classes.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Component Organization</h4>
+                    <p>The HTML file showcases both the default ('open') state and the 'error' state of the wizard, providing a clear reference for both scenarios.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Responsive Design</h4>
+                    <p>The modal is designed to be responsive by default, using `max-width` and fluid properties. A media query is included for minor adjustments on smaller screens.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Accessibility Compliance</h4>
+                    <p>WCAG 2.1 AA compliance is ensured through ARIA attributes, focus management principles (to be implemented with JS), and semantic HTML.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Browser Support</h4>
+                    <p>Uses modern, widely-supported CSS features compatible with all target browsers.</p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Usage Guidelines</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>When To Use</h4><p>Use when a user action requires additional, mandatory input that must be provided before the action can be completed. Ideal for capturing reasons, confirmations, or simple configuration choices.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Content Guidelines</h4><p>The title should be a concise action verb (e.g., 'Resume Trip', 'Cancel Trip'). The content should contain only the essential form fields. Footer buttons should have clear primary and secondary actions.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Placement Rules</h4><p>This component is an overlay and should appear centered on top of the current view, with a backdrop to obscure the underlying page.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Customization Options</h4><ul><li style="list-style: disc; margin-left: 16px; padding-left: 0;">The content of the `.modal__title`, `.modal__content`, and `.modal__footer` are fully customizable.</li><li style="list-style: disc; margin-left: 16px; padding-left: 0;">The `.has-error` class can be added to a `.field-group` to trigger validation error styles.</li></ul>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Testing Recommendations</h2>
+            <div class="feature-list">
+                <div class="feature-category">
+                    <h4>Browser Testing</h4><p>Test in Chrome, Firefox, and Safari.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Device Testing</h4><p>Verify layout and usability on desktop, tablet, and mobile viewports.</p>
+                </div>
+                <div class="feature-category">
+                    <h4>Accessibility Testing</h4><ul><li>Verify keyboard focus is trapped within the modal.</li><li>Test that the `Esc` key closes the modal.</li><li>Use a screen reader to confirm the dialog role and title are announced correctly.</li><li>Check color contrast of all elements.</li></ul>
+                </div>
+                <div class="feature-category">
+                    <h4>Performance Testing</h4><p>Not performance-critical, but the entrance animation should be smooth (60fps).</p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</body>
+</html>

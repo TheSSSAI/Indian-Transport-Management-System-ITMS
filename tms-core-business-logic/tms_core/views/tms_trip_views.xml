@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- TMS Trip Kanban View -->
+        <record id="tms_trip_view_kanban" model="ir.ui.view">
+            <field name="name">tms.trip.view.kanban</field>
+            <field name="model">tms.trip</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="state">
+                    <field name="state"/>
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="driver_id"/>
+                    <field name="vehicle_id"/>
+                    <field name="destination_location"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <span><field name="name"/></span>
+                                        </strong>
+                                    </div>
+                                </div>
+                                <div><field name="customer_id"/></div>
+                                <div>To: <field name="destination_location"/></div>
+                                <div class="text-muted">
+                                    <field name="driver_id"/> | <field name="vehicle_id"/>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+
+        <!-- TMS Trip Tree View -->
+        <record id="tms_trip_view_tree" model="ir.ui.view">
+            <field name="name">tms.trip.view.tree</field>
+            <field name="model">tms.trip</field>
+            <field name="arch" type="xml">
+                <tree string="Trips" decoration-info="state=='planned' or state=='assigned'" decoration-muted="state=='completed' or state=='invoiced' or state=='paid'" decoration-success="state=='delivered'" decoration-warning="state=='on_hold'" decoration-danger="state=='canceled'">
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="source_location"/>
+                    <field name="destination_location"/>
+                    <field name="driver_id"/>
+                    <field name="vehicle_id"/>
+                    <field name="expected_delivery_date"/>
+                    <field name="total_revenue" widget="monetary" sum="Total Revenue" groups="tms_core.group_tms_dispatch_manager,tms_core.group_tms_finance_officer"/>
+                    <field name="state" widget="badge" decoration-success="state in ('delivered', 'completed', 'invoiced', 'paid')" decoration-info="state in ('planned', 'assigned', 'in_transit')" decoration-warning="state == 'on_hold'" decoration-danger="state == 'canceled'"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- TMS Trip Form View -->
+        <record id="tms_trip_view_form" model="ir.ui.view">
+            <field name="name">tms.trip.view.form</field>
+            <field name="model">tms.trip</field>
+            <field name="arch" type="xml">
+                <form string="Trip">
+                    <header>
+                        <button name="action_assign" string="Assign" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'planned')]}"/>
+                        <button name="action_start_trip" string="Start Trip" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'assigned')]}"/>
+                        <button name="action_put_on_hold" string="Put On Hold" type="object" attrs="{'invisible': [('state', '!=', 'in_transit')]}"/>
+                        <button name="%(tms_core.action_tms_reason_wizard)d" string="Resume Trip" type="action" context="{'default_target_model': 'tms.trip', 'default_target_method': 'action_resume_from_hold'}" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'on_hold')]}"/>
+                        <button name="action_deliver" string="Mark as Delivered" type="object" attrs="{'invisible': [('state', '!=', 'in_transit')]}"/>
+                        <button name="action_complete" string="Complete Trip" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'delivered')]}"/>
+                        <button name="action_generate_invoice" string="Create Invoice" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'completed')]}"/>
+                        <button name="%(tms_core.action_tms_reason_wizard)d" string="Cancel Trip" type="action" context="{'default_target_model': 'tms.trip', 'default_target_method': 'action_cancel'}" attrs="{'invisible': [('state', 'in', ['delivered', 'completed', 'invoiced', 'paid', 'canceled'])]}"/>
+
+                        <field name="state" widget="statusbar" statusbar_visible="planned,assigned,in_transit,delivered,completed,invoiced,paid"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="name" readonly="1"/></h1>
+                        </div>
+                        <group>
+                            <group string="Trip Details">
+                                <field name="customer_id" required="1" options="{'no_create': True}"/>
+                                <field name="route_id" options="{'no_create': True}"/>
+                                <field name="source_location" required="1"/>
+                                <field name="destination_location" required="1"/>
+                                <field name="expected_delivery_date"/>
+                            </group>
+                             <group string="Assignment">
+                                <field name="vehicle_id" options="{'no_create': True}"/>
+                                <field name="driver_id" options="{'no_create': True}"/>
+                            </group>
+                        </group>
+                        <group string="Material &amp; Rate">
+                           <group>
+                               <field name="material_id" options="{'no_create': True}"/>
+                               <field name="weight"/>
+                           </group>
+                           <group>
+                               <field name="rate_type"/>
+                               <field name="rate"/>
+                           </group>
+                        </group>
+                        <group string="Financials" groups="tms_core.group_tms_dispatch_manager,tms_core.group_tms_finance_officer,tms_core.group_tms_admin">
+                            <field name="total_revenue" widget="monetary"/>
+                            <field name="total_approved_expenses" widget="monetary"/>
+                            <field name="profitability" widget="monetary" decoration-danger="profitability &lt; 0" decoration-success="profitability &gt; 0"/>
+                        </group>
+                        <notebook>
+                            <page string="Expenses">
+                                <field name="expense_ids" readonly="1"/>
+                            </page>
+                            <page string="Proof of Delivery">
+                                <field name="pod_ids" readonly="1"/>
+                            </page>
+                            <page string="Event Log">
+                                <field name="event_ids" readonly="1"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                     <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- TMS Trip Search View -->
+        <record id="tms_trip_view_search" model="ir.ui.view">
+            <field name="name">tms.trip.view.search</field>
+            <field name="model">tms.trip</field>
+            <field name="arch" type="xml">
+                <search string="Search Trips">
+                    <field name="name" string="Trip ID"/>
+                    <field name="customer_id"/>
+                    <field name="driver_id"/>
+                    <field name="vehicle_id"/>
+                    <filter name="state_planned" string="Planned" domain="[('state', '=', 'planned')]"/>
+                    <filter name="state_assigned" string="Assigned" domain="[('state', '=', 'assigned')]"/>
+                    <filter name="state_in_transit" string="In-Transit" domain="[('state', '=', 'in_transit')]"/>
+                    <filter name="state_on_hold" string="On Hold" domain="[('state', '=', 'on_hold')]"/>
+                    <filter name="state_delivered" string="Delivered" domain="[('state', '=', 'delivered')]"/>
+                     <group expand="0" string="Group By">
+                        <filter name="group_by_state" string="Status" context="{'group_by': 'state'}"/>
+                        <filter name="group_by_customer" string="Customer" context="{'group_by': 'customer_id'}"/>
+                        <filter name="group_by_driver" string="Driver" context="{'group_by': 'driver_id'}"/>
+                        <filter name="group_by_vehicle" string="Vehicle" context="{'group_by': 'vehicle_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- TMS Trip Action -->
+        <record id="action_tms_trip" model="ir.actions.act_window">
+            <field name="name">Trips</field>
+            <field name="res_model">tms.trip</field>
+            <field name="view_mode">tree,kanban,form</field>
+            <field name="context">{'search_default_state_in_transit': 1, 'search_default_state_assigned': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new trip.
+                </p><p>
+                    Manage the full lifecycle of your transport jobs, from planning to payment.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>

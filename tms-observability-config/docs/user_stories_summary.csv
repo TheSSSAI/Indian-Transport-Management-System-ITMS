@@ -1,0 +1,2 @@
+"total_stories","total_story_points","must_have_stories","should_have_stories","could_have_stories","epics_identified","estimated_sprints","key_dependencies"
+"85","331","49","29","7","[""Core System & Foundation"",""Master Data Management"",""Trip Management Lifecycle"",""Driver Portal"",""Financial Management & Invoicing"",""Reporting & Analytics"",""Monitoring & Alerts"",""Transition & Go-Live""]","19","[""Core Odoo Framework Setup"",""Master Data models before Transactional models"",""Trip Lifecycle before Driver Portal actions"",""GSP API Sandbox Access""]"

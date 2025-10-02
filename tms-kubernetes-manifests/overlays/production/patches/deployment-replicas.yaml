@@ -1,0 +1,76 @@
+#
+# Kustomize patch to enforce High Availability (HA) settings for production Deployments.
+#
+# This patch ensures a minimum number of replicas are running and that they are
+# distributed across different availability zones to meet the 99.9% uptime requirement (REQ-1-502).
+#
+# This declarative approach is preferred over setting a simple value in `values.yaml` because
+# it allows for more complex configuration like `affinity` rules to be managed centrally.
+#
+---
+# Patch for the Odoo monolith Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tms-odoo
+spec:
+  # Set a static replica count of 3 for the Odoo application to ensure HA.
+  # Odoo is stateful and does not autoscale horizontally in this architecture.
+  replicas: 3
+  template:
+    spec:
+      affinity:
+        podAntiAffinity:
+          # This rule is critical for HA. It prevents scheduling multiple pods
+          # of this application on the same node or in the same availability zone.
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - tms-odoo
+              # Spreads pods across different physical hosts within a zone
+              topologyKey: "kubernetes.io/hostname"
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - tms-odoo
+              # Spreads pods across different AWS Availability Zones for maximum resilience
+              topologyKey: "topology.kubernetes.io/zone"
+---
+# Patch for the GPS ingestion microservice Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tms-gps-service
+spec:
+  # Sets the initial replica count for the GPS service.
+  # The HorizontalPodAutoscaler (HPA) will manage this value dynamically at runtime,
+  # but setting it to 3 ensures a highly available starting state.
+  replicas: 3
+  template:
+    spec:
+      affinity:
+        podAntiAffinity:
+          # Same HA rules as Odoo to ensure the stateless microservice is also
+          # resilient to node and availability zone failures.
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - tms-gps-service
+              # Spreads pods across different physical hosts within a zone
+              topologyKey: "kubernetes.io/hostname"
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - tms-gps-service
+              # Spreads pods across different AWS Availability Zones
+              topologyKey: "topology.kubernetes.io/zone"

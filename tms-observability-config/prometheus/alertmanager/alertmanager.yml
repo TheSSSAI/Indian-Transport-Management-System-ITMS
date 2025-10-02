@@ -1,0 +1,108 @@
+# -------------------------------------------------------------------
+# Alertmanager Configuration
+# -------------------------------------------------------------------
+# This file defines the routing, grouping, and notification logic for
+# alerts received from Prometheus. It is the core of the alerting pipeline.
+#
+# It is designed to:
+# - Group similar alerts to prevent notification spam.
+# - Route alerts based on severity and other labels to different destinations.
+# - Integrate with external notification services (e.g., Slack, PagerDuty).
+# - Comply with REQ-1-602 for sending notifications on critical events.
+# - Adhere to REQ-1-503 by not containing any hardcoded secrets.
+# -------------------------------------------------------------------
+
+global:
+  # The default address for Slack notifications.
+  # The API URL itself is a secret and will be provided via file-based secrets.
+  # This makes the config reusable across environments.
+  slack_api_url_file: /etc/alertmanager/secrets/slack_webhook_url
+
+  # Default Opsgenie API key and URL (for SRE On-Call Platform integration).
+  opsgenie_api_key_file: /etc/alertmanager/secrets/opsgenie_api_key
+  opsgenie_api_url: https://api.opsgenie.com/
+
+# Templates for customizing notification messages.
+templates:
+- '/etc/alertmanager/templates/*.tmpl'
+
+# Main routing tree. All alerts from Prometheus enter here.
+route:
+  # The labels by which incoming alerts are grouped together.
+  # Grouping by cluster, alertname, namespace, and job helps consolidate related alerts.
+  group_by: ['alertname', 'cluster', 'namespace', 'job']
+
+  # How long to wait to buffer alerts of the same group before sending a notification.
+  group_wait: 30s
+
+  # How long to wait before sending a notification about new alerts for a group
+  # that has already sent an initial notification.
+  group_interval: 5m
+
+  # How long to wait before re-sending a notification if an alert is still firing.
+  repeat_interval: 4h
+
+  # The default receiver for any alert that doesn't match a more specific route.
+  # This acts as a catch-all.
+  receiver: 'default-notifications'
+
+  # A list of sub-routes. Alerts are evaluated against these in order.
+  routes:
+  # -------------------- CRITICAL ALERTS --------------------
+  - receiver: 'critical-sre-oncall'
+    # Match alerts with the label 'severity' set to 'critical'.
+    # These are high-priority, service-impacting alerts that require immediate attention.
+    matchers:
+    - severity = "critical"
+    # Continue matching subsequent sibling routes. Set to true to allow an alert
+    # to be sent to multiple receivers if it matches multiple routes.
+    continue: false
+
+  # -------------------- WARNING ALERTS --------------------
+  - receiver: 'warning-notifications'
+    # Match alerts with the label 'severity' set to 'warning'.
+    # These are important but not immediately service-impacting.
+    matchers:
+    - severity = "warning"
+    continue: false
+
+# Inhibition rules to prevent cascading or redundant alerts.
+inhibit_rules:
+- source_matchers:
+  - alertname = "KubeletDown"
+  target_matchers:
+  - alertname =~ "Kube(?!let|API).*" # Silence most Kube alerts if the Kubelet is down.
+  equal:
+  - 'instance'
+
+# Defines the notification integrations.
+receivers:
+- name: 'default-notifications'
+  slack_configs:
+  - channel: '#tms-alerts-low-priority'
+    send_resolved: true
+    title: '{{ template "slack.default.title" . }}'
+    text: '{{ template "slack.default.text" . }}'
+
+- name: 'warning-notifications'
+  slack_configs:
+  - channel: '#tms-alerts-warnings'
+    send_resolved: true
+    title: '[WARNING] {{ template "slack.default.title" . }}'
+    text: '{{ template "slack.default.text" . }}'
+
+- name: 'critical-sre-oncall'
+  # Example integration with Opsgenie for on-call paging.
+  opsgenie_configs:
+  - send_resolved: true
+    # The API key is securely loaded from the file specified in 'global'.
+    message: '{{ .CommonAnnotations.summary }}'
+    description: '{{ .CommonAnnotations.description }}'
+    priority: 'P1'
+    source: 'Prometheus'
+  # Also send critical alerts to a high-priority Slack channel for visibility.
+  slack_configs:
+  - channel: '#tms-alerts-critical'
+    send_resolved: true
+    title: '[CRITICAL] {{ template "slack.default.title" . }}'
+    text: '{{ template "slack.default.text" . }}'

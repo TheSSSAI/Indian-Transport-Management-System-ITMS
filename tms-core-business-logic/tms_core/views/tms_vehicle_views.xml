@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- TMS Vehicle Tree View -->
+        <record id="tms_vehicle_view_tree" model="ir.ui.view">
+            <field name="name">tms.vehicle.view.tree</field>
+            <field name="model">tms.vehicle</field>
+            <field name="arch" type="xml">
+                <tree string="Vehicles">
+                    <field name="truck_number"/>
+                    <field name="model"/>
+                    <field name="capacity"/>
+                    <field name="ownership_type"/>
+                    <field name="driver_id"/>
+                    <field name="next_service_due_date"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- TMS Vehicle Form View -->
+        <record id="tms_vehicle_view_form" model="ir.ui.view">
+            <field name="name">tms.vehicle.view.form</field>
+            <field name="model">tms.vehicle</field>
+            <field name="arch" type="xml">
+                <form string="Vehicle">
+                    <sheet>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="truck_number" placeholder="e.g., MH12AB1234"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="model"/>
+                                <field name="capacity" string="Capacity (Tons)"/>
+                                <field name="fuel_type"/>
+                            </group>
+                            <group>
+                                <field name="ownership_type"/>
+                                <field name="owner_details" attrs="{'invisible': [('ownership_type', '!=', 'outsourced')]}"/>
+                                <field name="driver_id" string="Default Driver"/>
+                                <field name="active" widget="boolean_toggle"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Compliance Documents">
+                                <field name="document_ids">
+                                    <tree editable="bottom">
+                                        <field name="document_type" required="1"/>
+                                        <field name="document_attachment" required="1" widget="binary" filename="document_name"/>
+                                        <field name="document_name" invisible="1"/>
+                                        <field name="expiry_date" required="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                             <page string="Service &amp; Maintenance">
+                                <group>
+                                    <field name="last_service_date"/>
+                                    <field name="next_service_due_date"/>
+                                    <field name="last_odometer_reading"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- TMS Vehicle Search View -->
+        <record id="tms_vehicle_view_search" model="ir.ui.view">
+            <field name="name">tms.vehicle.view.search</field>
+            <field name="model">tms.vehicle</field>
+            <field name="arch" type="xml">
+                <search string="Search Vehicles">
+                    <field name="truck_number"/>
+                    <field name="model"/>
+                    <field name="driver_id"/>
+                    <filter name="company_owned" string="Company-Owned" domain="[('ownership_type', '=', 'company_owned')]"/>
+                    <filter name="outsourced" string="Outsourced" domain="[('ownership_type', '=', 'outsourced')]"/>
+                    <separator/>
+                    <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_ownership" string="Ownership Type" context="{'group_by': 'ownership_type'}"/>
+                        <filter name="group_by_fuel_type" string="Fuel Type" context="{'group_by': 'fuel_type'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- TMS Vehicle Action -->
+        <record id="action_tms_vehicle" model="ir.actions.act_window">
+            <field name="name">Vehicles</field>
+            <field name="res_model">tms.vehicle</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new vehicle record.
+                </p><p>
+                    Manage your fleet of vehicles here. Each vehicle can be assigned to trips
+                    and have its documents and service history tracked.
+                </p>
+            </field>
+        </record>
+    </data>
+</odoo>
